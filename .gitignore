@@ -1,0 +1,65 @@
+﻿## Ignore Visual Studio temporary files, build results, and user-specific files.
+.vs/
+bin/
+obj/
+
+## User-specific files
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]uild/
+[Ll]og/
+[Ll]ogs/
+
+## .NET / ASP.NET Core
+project.lock.json
+project.assets.json
+artifacts/
+TestResults/
+coverage/
+*.trx
+*.coverage
+*.coveragexml
+
+## Entity Framework local bundles
+*.db
+*.sqlite
+*.sqlite3
+
+## Rider / JetBrains
+.idea/
+*.sln.iml
+
+## VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+## OS files
+.DS_Store
+Thumbs.db
+
+## Local environment / secrets
+.env
+.env.*
+secrets.json
+
+## Local ASP.NET Core configuration files
+appsettings.Local.json
+appsettings.*.Local.json
+

@@ -1,0 +1,70 @@
+@StudyFlow.API_HostAddress = https://localhost:7123
+
+GET {{StudyFlow.API_HostAddress}}/api/subjects
+
+###
+
+GET {{StudyFlow.API_HostAddress}}/api/subjects/1
+
+###
+
+POST {{StudyFlow.API_HostAddress}}/api/subjects
+Content-Type: application/json
+
+{
+  "name": "Redes"
+}
+
+###
+
+
+GET {{StudyFlow.API_HostAddress}}/api/topics
+
+###
+
+POST {{StudyFlow.API_HostAddress}}/api/topics
+Content-Type: application/json
+
+{
+  "name": "Modelo OSI",
+  "subjectId": 1
+}
+
+###
+
+@subjectId=1
+GET {{StudyFlow.API_HostAddress}}/api/topics/by-subject/{{subjectId}}
+
+###
+
+@id=1
+GET {{StudyFlow.API_HostAddress}}/api/topics/{{id}}
+
+###
+
+
+
+
+
+
+
+GET {{StudyFlow.API_HostAddress}}/api/study-notes
+
+###
+
+GET {{StudyFlow.API_HostAddress}}/api/study-notes/1
+
+###
+
+GET {{StudyFlow.API_HostAddress}}/api/study-notes/by-topic/1
+
+###
+
+POST {{StudyFlow.API_HostAddress}}/api/study-notes
+Content-Type: application/json
+
+{
+  "name": "Modelo OSI - resumen",
+  "markdownText": "# Modelo OSI\n\nEl modelo OSI tiene 7 capas...",
+  "topicId": 1
+}

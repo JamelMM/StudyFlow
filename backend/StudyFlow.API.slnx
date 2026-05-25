@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="StudyFlow.API/StudyFlow.API.csproj" />
+  <Project Path="StudyFlow.Application/StudyFlow.Application.csproj" Id="39fd355c-7da9-48d8-9c7d-747fd971ce7a" />
+  <Project Path="StudyFlow.Domain/StudyFlow.Domain.csproj" Id="dbd25299-5d00-48f0-8104-3e3a7fdabf4b" />
+  <Project Path="StudyFlow.Infrastructure/StudyFlow.Infrastructure.csproj" Id="ae23e650-ec7a-491b-93c6-acfe93119662" />
+</Solution>
