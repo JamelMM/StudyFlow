@@ -1,4 +1,4 @@
-﻿# StudyFlow
+# StudyFlow
 
 StudyFlow is a personal learning project built as a full-stack application.
 
@@ -13,12 +13,21 @@ StudyFlow/
 │   ├── StudyFlow.Infrastructure/
 │   └── StudyFlow.API.slnx
 ├── frontend/
-│   └── .gitkeep
+│   ├── android/
+│   ├── ios/
+│   ├── lib/
+│   │   ├── data/
+│   │   ├── models/
+│   │   └── screens/
+│   ├── test/
+│   ├── web/
+│   ├── pubspec.yaml
+│   └── README.md
 ├── .gitignore
 └── README.md
 ```
 
-The backend is already in progress. The frontend folder is reserved for the future Flutter application.
+The backend is already in progress. The Flutter frontend has also been started and currently provides a visual, navigable version of StudyFlow using local example data.
 
 ---
 
@@ -26,9 +35,9 @@ The backend is already in progress. The frontend folder is reserved for the futu
 
 ### About
 
-StudyFlow is a learning API built with ASP.NET Core Web API. The goal is to organize study content into subjects, topics, and study notes, and later extend the system with quizzes and review sessions.
+StudyFlow is a full-stack learning project with an ASP.NET Core Web API backend and a Flutter frontend. The goal is to organize study content into subjects, topics, and study notes, and later extend the system with quizzes and review sessions.
 
-This project is also my personal learning project for backend development with C#, ASP.NET Core, Entity Framework Core, PostgreSQL, dependency injection, repositories, services, DTOs, and layered architecture.
+This project is also my personal learning project for backend and frontend development with C#, ASP.NET Core, Entity Framework Core, PostgreSQL, Dart, Flutter, dependency injection, repositories, services, DTOs, and layered architecture.
 
 ### Current Backend Features
 
@@ -67,13 +76,69 @@ HTTP Request
 -> PostgreSQL
 ```
 
+### Current Frontend Features
+
+The Flutter frontend has been started as the mobile client for StudyFlow.
+
+Current frontend features:
+
+- View a list of subjects
+- Open a subject and view its topics
+- Open a topic and view its study notes
+- Open a study note and read its content
+- Local dummy data for subjects, topics, and study notes
+- Basic navigation between screens
+- Basic app theming with a custom color scheme
+
+### Frontend Structure
+
+StudyFlow frontend is currently organized as a small Flutter application:
+
+```text
+StudyFlow/frontend/
+-> Flutter mobile application
+
+lib/models
+-> Frontend data models such as Subject, Topic, and StudyNote
+
+lib/data
+-> Local example data used before connecting the backend
+
+lib/screens
+-> App screens for subjects, topics, study notes, and note details
+```
+
+### Frontend Flow
+
+```text
+SubjectsScreen
+-> TopicsScreen
+-> StudyNotesScreen
+-> NoteScreen
+```
+
+### Frontend Tech Stack
+
+- Dart
+- Flutter
+- Material Design
+- Local dummy data
+- Flutter Navigator for screen navigation
+
+### Current Frontend Status
+
+The first frontend sprint is focused on building a visual and navigable version of StudyFlow without backend integration.
+
+The frontend currently uses local example data and will be extended step by step with more UI features, creation flows, and backend integration.
+
 ### Tech Stack
 
 - C#
 - ASP.NET Core Web API
 - Entity Framework Core
 - PostgreSQL
-- Flutter planned for the frontend
+- Dart
+- Flutter
 - Clean Architecture inspired layering
 
 ### Local Backend Setup
@@ -106,9 +171,9 @@ dotnet ef database update --project StudyFlow.Infrastructure --startup-project S
 
 ### Ueber das Projekt
 
-StudyFlow ist eine Lern-API mit ASP.NET Core Web API. Das Ziel ist, Lerninhalte in Subjects, Topics und Study Notes zu organisieren und das System spaeter mit Quizzes und Review Sessions zu erweitern.
+StudyFlow ist ein Full-Stack-Lernprojekt mit einem ASP.NET Core Web API Backend und einem Flutter-Frontend. Das Ziel ist, Lerninhalte in Subjects, Topics und Study Notes zu organisieren und das System spaeter mit Quizzes und Review Sessions zu erweitern.
 
-Dieses Projekt ist gleichzeitig mein persoenliches Lernprojekt fuer Backend-Entwicklung mit C#, ASP.NET Core, Entity Framework Core, PostgreSQL, Dependency Injection, Repositories, Services, DTOs und Schichtenarchitektur.
+Dieses Projekt ist gleichzeitig mein persoenliches Lernprojekt fuer Backend- und Frontend-Entwicklung mit C#, ASP.NET Core, Entity Framework Core, PostgreSQL, Dart, Flutter, Dependency Injection, Repositories, Services, DTOs und Schichtenarchitektur.
 
 ### Aktuelle Backend-Funktionen
 
@@ -147,19 +212,75 @@ HTTP Request
 -> PostgreSQL
 ```
 
+### Aktuelle Frontend-Funktionen
+
+Das Flutter-Frontend wurde als mobiler Client fuer StudyFlow gestartet.
+
+Aktuelle Frontend-Funktionen:
+
+- Liste von Subjects anzeigen
+- Ein Subject oeffnen und die dazugehoerigen Topics anzeigen
+- Ein Topic oeffnen und die dazugehoerigen Study Notes anzeigen
+- Eine Study Note oeffnen und ihren Inhalt lesen
+- Lokale Beispieldaten fuer Subjects, Topics und Study Notes
+- Einfache Navigation zwischen den Screens
+- Einfaches App-Theming mit eigenem Farbschema
+
+### Frontend-Struktur
+
+Das StudyFlow-Frontend ist aktuell als kleine Flutter-Anwendung organisiert:
+
+```text
+StudyFlow/frontend/
+-> Flutter Mobile Application
+
+lib/models
+-> Frontend-Datenmodelle wie Subject, Topic und StudyNote
+
+lib/data
+-> Lokale Beispieldaten, die vor der Backend-Anbindung verwendet werden
+
+lib/screens
+-> App-Screens fuer Subjects, Topics, Study Notes und Note Details
+```
+
+### Frontend Flow
+
+```text
+SubjectsScreen
+-> TopicsScreen
+-> StudyNotesScreen
+-> NoteScreen
+```
+
+### Frontend Tech Stack
+
+- Dart
+- Flutter
+- Material Design
+- Lokale Beispieldaten
+- Flutter Navigator fuer die Navigation zwischen Screens
+
+### Aktueller Frontend-Status
+
+Der erste Frontend-Sprint konzentriert sich darauf, eine visuelle und navigierbare Version von StudyFlow ohne Backend-Anbindung zu erstellen.
+
+Das Frontend verwendet aktuell lokale Beispieldaten und wird Schritt fuer Schritt mit weiteren UI-Funktionen, Creation Flows und Backend-Anbindung erweitert.
+
 ### Tech Stack
 
 - C#
 - ASP.NET Core Web API
 - Entity Framework Core
 - PostgreSQL
-- Flutter ist fuer das Frontend geplant
+- Dart
+- Flutter
 - Clean-Architecture-inspirierte Schichten
 
 ### Lokales Backend Setup
 
-Die echte Datenbank-Connection-String wird nicht nach GitHub committed.
-Fuer lokale Entwicklung wird sie mit ASP.NET Core User Secrets gespeichert:
+Der echte Datenbank-Connection-String wird nicht nach GitHub committed.
+Fuer lokale Entwicklung wird er mit ASP.NET Core User Secrets gespeichert:
 
 ```powershell
 cd backend
