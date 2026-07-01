@@ -6,25 +6,25 @@ The repository is organized as a monorepo:
 
 ```text
 StudyFlow/
-├── backend/
-│   ├── StudyFlow.API/
-│   ├── StudyFlow.Application/
-│   ├── StudyFlow.Domain/
-│   ├── StudyFlow.Infrastructure/
-│   └── StudyFlow.API.slnx
-├── frontend/
-│   ├── android/
-│   ├── ios/
-│   ├── lib/
-│   │   ├── data/
-│   │   ├── models/
-│   │   └── screens/
-│   ├── test/
-│   ├── web/
-│   ├── pubspec.yaml
-│   └── README.md
-├── .gitignore
-└── README.md
+|-- backend/
+|   |-- StudyFlow.API/
+|   |-- StudyFlow.Application/
+|   |-- StudyFlow.Domain/
+|   |-- StudyFlow.Infrastructure/
+|   `-- StudyFlow.API.slnx
+|-- frontend/
+|   |-- android/
+|   |-- ios/
+|   |-- lib/
+|   |   |-- data/
+|   |   |-- models/
+|   |   `-- screens/
+|   |-- test/
+|   |-- web/
+|   |-- pubspec.yaml
+|   `-- README.md
+|-- .gitignore
+`-- README.md
 ```
 
 The backend is already in progress. The Flutter frontend has also been started and currently provides a visual, navigable version of StudyFlow using local example data.
@@ -83,10 +83,11 @@ The Flutter frontend has been started as the mobile client for StudyFlow.
 Current frontend features:
 
 - View a list of subjects
+- Create subjects locally
 - Open a subject and view its topics
 - Open a topic and view its study notes
 - Open a study note and read its content
-- Local dummy data for subjects, topics, and study notes
+- Local example data for subjects, topics, and study notes
 - Basic navigation between screens
 - Basic app theming with a custom color scheme
 
@@ -105,7 +106,7 @@ lib/data
 -> Local example data used before connecting the backend
 
 lib/screens
--> App screens for subjects, topics, study notes, and note details
+-> App screens for subjects, topics, study notes, note details, and local creation flows
 ```
 
 ### Frontend Flow
@@ -122,14 +123,15 @@ SubjectsScreen
 - Dart
 - Flutter
 - Material Design
-- Local dummy data
+- Local example data
 - Flutter Navigator for screen navigation
+- Local state with StatefulWidget and setState
 
 ### Current Frontend Status
 
-The first frontend sprint is focused on building a visual and navigable version of StudyFlow without backend integration.
+The current frontend sprint focuses on building a visual and navigable version of StudyFlow without backend integration.
 
-The frontend currently uses local example data and will be extended step by step with more UI features, creation flows, and backend integration.
+The frontend currently uses local example data. Subject creation is already handled locally in memory. More creation flows and backend integration will be added step by step.
 
 ### Tech Stack
 
@@ -163,6 +165,27 @@ Run database migrations from the backend folder:
 ```powershell
 cd backend
 dotnet ef database update --project StudyFlow.Infrastructure --startup-project StudyFlow.API
+```
+
+### Local Frontend Setup
+
+Install Flutter dependencies:
+
+```powershell
+cd frontend
+flutter pub get
+```
+
+Analyze the Flutter project:
+
+```powershell
+flutter analyze
+```
+
+Run the Flutter frontend:
+
+```powershell
+flutter run
 ```
 
 ---
@@ -219,6 +242,7 @@ Das Flutter-Frontend wurde als mobiler Client fuer StudyFlow gestartet.
 Aktuelle Frontend-Funktionen:
 
 - Liste von Subjects anzeigen
+- Subjects lokal erstellen
 - Ein Subject oeffnen und die dazugehoerigen Topics anzeigen
 - Ein Topic oeffnen und die dazugehoerigen Study Notes anzeigen
 - Eine Study Note oeffnen und ihren Inhalt lesen
@@ -241,7 +265,7 @@ lib/data
 -> Lokale Beispieldaten, die vor der Backend-Anbindung verwendet werden
 
 lib/screens
--> App-Screens fuer Subjects, Topics, Study Notes und Note Details
+-> App-Screens fuer Subjects, Topics, Study Notes, Note Details und lokale Creation Flows
 ```
 
 ### Frontend Flow
@@ -260,12 +284,13 @@ SubjectsScreen
 - Material Design
 - Lokale Beispieldaten
 - Flutter Navigator fuer die Navigation zwischen Screens
+- Lokaler State mit StatefulWidget und setState
 
 ### Aktueller Frontend-Status
 
-Der erste Frontend-Sprint konzentriert sich darauf, eine visuelle und navigierbare Version von StudyFlow ohne Backend-Anbindung zu erstellen.
+Der aktuelle Frontend-Sprint konzentriert sich darauf, eine visuelle und navigierbare Version von StudyFlow ohne Backend-Anbindung zu erstellen.
 
-Das Frontend verwendet aktuell lokale Beispieldaten und wird Schritt fuer Schritt mit weiteren UI-Funktionen, Creation Flows und Backend-Anbindung erweitert.
+Das Frontend verwendet aktuell lokale Beispieldaten. Das lokale Erstellen von Subjects ist bereits umgesetzt. Weitere Creation Flows und die Backend-Anbindung werden Schritt fuer Schritt ergaenzt.
 
 ### Tech Stack
 
@@ -299,4 +324,25 @@ Datenbank-Migrationen ausfuehren:
 ```powershell
 cd backend
 dotnet ef database update --project StudyFlow.Infrastructure --startup-project StudyFlow.API
+```
+
+### Lokales Frontend Setup
+
+Flutter-Abhaengigkeiten installieren:
+
+```powershell
+cd frontend
+flutter pub get
+```
+
+Flutter-Projekt analysieren:
+
+```powershell
+flutter analyze
+```
+
+Flutter-Frontend starten:
+
+```powershell
+flutter run
 ```
