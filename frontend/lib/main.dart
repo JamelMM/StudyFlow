@@ -8,10 +8,14 @@ void main() {
     MaterialApp(
       theme: ThemeData().copyWith(
         colorScheme: colorScheme,
-
+        scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
         appBarTheme: const AppBarTheme().copyWith(
           backgroundColor: colorScheme.onPrimaryContainer,
           foregroundColor: colorScheme.primaryContainer,
+        ),
+        iconTheme: const IconThemeData().copyWith(
+          color: colorScheme.onPrimaryContainer,
+          size: 30.0,
         ),
         cardTheme: CardThemeData().copyWith(
           color: colorScheme.primaryContainer,
@@ -21,7 +25,12 @@ void main() {
           titleLarge: TextStyle(
             fontWeight: FontWeight.bold,
             color: colorScheme.onSecondaryContainer,
-            fontSize: 20,
+            fontSize: 24,
+          ),
+          titleMedium: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: colorScheme.onSecondaryContainer,
+            fontSize: 22,
           ),
         ),
       ),

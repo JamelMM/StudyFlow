@@ -16,34 +16,37 @@ class TopicsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(subject.name)),
-      body: ListView.builder(
-        itemCount: subjectTopics.length,
-        itemBuilder: (context, index) {
-          final topic = subjectTopics[index];
+      body: Padding(
+        padding: const EdgeInsets.only(top: 20),
+        child: ListView.builder(
+          itemCount: subjectTopics.length,
+          itemBuilder: (context, index) {
+            final topic = subjectTopics[index];
 
-          return Card(
-            child: InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => StudyNotesScreen(topic: topic),
+            return Card(
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => StudyNotesScreen(topic: topic),
+                    ),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.topic),
+                      const SizedBox(width: 12),
+                      Text(topic.name),
+                    ],
                   ),
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    const Icon(Icons.topic),
-                    const SizedBox(width: 12),
-                    Text(topic.name),
-                  ],
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

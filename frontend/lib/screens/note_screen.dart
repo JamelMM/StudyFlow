@@ -11,10 +11,13 @@ class NoteScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(note.title)),
 
-      body: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text(note.content),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 20),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(note.content),
+          ),
         ),
       ),
     );
