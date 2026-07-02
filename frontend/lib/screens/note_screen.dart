@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/study_note.dart';
+import 'package:frontend/widgets/studyflow_screen_body.dart';
 
 class NoteScreen extends StatelessWidget {
   const NoteScreen({super.key, required this.note});
@@ -11,12 +12,14 @@ class NoteScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(note.title)),
 
-      body: Padding(
-        padding: const EdgeInsets.only(top: 20),
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(note.content),
+      body: StudyFlowScreenBody(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 20),
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(note.content),
+            ),
           ),
         ),
       ),

@@ -1,19 +1,19 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/Material.dart';
 
-class NewSubject extends StatefulWidget {
-  const NewSubject({super.key, required this.onAddSubject});
+class NewTopic extends StatefulWidget {
+  const NewTopic({super.key, required this.onAddTopic});
 
-  final Function(String name) onAddSubject;
+  final Function(String name) onAddTopic;
 
   @override
-  State<NewSubject> createState() => _NewSubjectState();
+  State<NewTopic> createState() => _NewTopicState();
 }
 
-class _NewSubjectState extends State<NewSubject> {
-  final _nameController = TextEditingController();
+class _NewTopicState extends State<NewTopic> {
+  final _titleController = TextEditingController();
 
-  void _submitSubjectData() {
-    if (_nameController.text.trim() == "") {
+  void _submitTopicData() {
+    if (_titleController.text.trim() == "") {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -31,14 +31,13 @@ class _NewSubjectState extends State<NewSubject> {
       );
       return;
     }
-
-    widget.onAddSubject(_nameController.text.trim());
+    widget.onAddTopic(_titleController.text.trim());
     Navigator.pop(context);
   }
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _titleController.dispose();
     super.dispose();
   }
 
@@ -49,16 +48,16 @@ class _NewSubjectState extends State<NewSubject> {
       child: Column(
         children: [
           TextField(
-            controller: _nameController,
-            maxLength: 50,
+            controller: _titleController,
+            maxLength: 80,
             decoration: InputDecoration(label: Text('Title')),
           ),
           SizedBox(height: 16),
           Row(
             children: [
               FilledButton(
-                onPressed: _submitSubjectData,
-                child: Text('Save Subject'),
+                onPressed: _submitTopicData,
+                child: Text('Save Topic'),
               ),
               TextButton(
                 child: Text('Cancel'),

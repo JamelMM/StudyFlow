@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
 
-class NewSubject extends StatefulWidget {
-  const NewSubject({super.key, required this.onAddSubject});
+class NewStudyNote extends StatefulWidget {
+  const NewStudyNote({super.key, required this.onAddNote});
 
-  final Function(String name) onAddSubject;
+  final void Function(String name, String content) onAddNote;
 
   @override
-  State<NewSubject> createState() => _NewSubjectState();
+  State<NewStudyNote> createState() => _NewStudyNoteState();
 }
 
-class _NewSubjectState extends State<NewSubject> {
+class _NewStudyNoteState extends State<NewStudyNote> {
   final _nameController = TextEditingController();
+  final _contentController = TextEditingController();
 
-  void _submitSubjectData() {
-    if (_nameController.text.trim() == "") {
+  void _submitNewStudyNoteData() {
+    if (_nameController.text.trim() == "" ||
+        _contentController.text.trim() == "") {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Invalid input'),
-          content: const Text('Please make sure a valid name was entered.'),
+          content: const Text(
+            'Please make sure a valid name and content were entered.',
+          ),
           actions: [
             TextButton(
               onPressed: () {
@@ -31,14 +35,17 @@ class _NewSubjectState extends State<NewSubject> {
       );
       return;
     }
-
-    widget.onAddSubject(_nameController.text.trim());
+    widget.onAddNote(
+      _nameController.text.trim(),
+      _contentController.text.trim(),
+    );
     Navigator.pop(context);
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _contentController.dispose();
     super.dispose();
   }
 
@@ -48,17 +55,25 @@ class _NewSubjectState extends State<NewSubject> {
       padding: EdgeInsets.all(16),
       child: Column(
         children: [
+          SizedBox(height: 50),
           TextField(
             controller: _nameController,
-            maxLength: 50,
+            maxLength: 80,
             decoration: InputDecoration(label: Text('Title')),
           ),
+          TextField(
+            controller: _contentController,
+            maxLength: 2000,
+            maxLines: 8,
+            decoration: InputDecoration(label: Text('Content')),
+          ),
+
           SizedBox(height: 16),
           Row(
             children: [
               FilledButton(
-                onPressed: _submitSubjectData,
-                child: Text('Save Subject'),
+                onPressed: _submitNewStudyNoteData,
+                child: Text('Save Topic'),
               ),
               TextButton(
                 child: Text('Cancel'),
