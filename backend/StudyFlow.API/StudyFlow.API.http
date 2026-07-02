@@ -12,7 +12,7 @@ POST {{StudyFlow.API_HostAddress}}/api/subjects
 Content-Type: application/json
 
 {
-  "name": "Redes"
+  "name": "Bases de datos"
 }
 
 ###
@@ -26,8 +26,8 @@ POST {{StudyFlow.API_HostAddress}}/api/topics
 Content-Type: application/json
 
 {
-  "name": "Modelo OSI",
-  "subjectId": 1
+  "name": "Postgressql",
+  "subjectId": 3
 }
 
 ###
@@ -64,7 +64,7 @@ POST {{StudyFlow.API_HostAddress}}/api/study-notes
 Content-Type: application/json
 
 {
-  "name": "Modelo OSI - resumen",
-  "markdownText": "# Modelo OSI\n\nEl modelo OSI tiene 7 capas...",
-  "topicId": 1
+  "name": "SELECT",
+  "markdownText": "# SELECT\n\nSELECT sirve para consultar datos en SQL.",
+  "topicId": 3
 }
