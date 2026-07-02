@@ -18,7 +18,8 @@ StudyFlow/
 |   |-- lib/
 |   |   |-- data/
 |   |   |-- models/
-|   |   `-- screens/
+|   |   |-- screens/
+|   |   `-- widgets/
 |   |-- test/
 |   |-- web/
 |   |-- pubspec.yaml
@@ -27,7 +28,7 @@ StudyFlow/
 `-- README.md
 ```
 
-The backend is already in progress. The Flutter frontend has also been started and currently provides a visual, navigable version of StudyFlow using local example data.
+The backend is in progress and already exposes the first API endpoints. The Flutter frontend has also been started and currently provides a visual, navigable version of StudyFlow using local example data.
 
 ---
 
@@ -85,11 +86,16 @@ Current frontend features:
 - View a list of subjects
 - Create subjects locally
 - Open a subject and view its topics
+- Create topics locally
 - Open a topic and view its study notes
+- Create study notes locally
+- Delete study notes locally
 - Open a study note and read its content
 - Local example data for subjects, topics, and study notes
 - Basic navigation between screens
 - Basic app theming with a custom color scheme
+- SnackBar feedback for local actions
+- Reusable widgets for shared layout and list items
 
 ### Frontend Structure
 
@@ -107,6 +113,9 @@ lib/data
 
 lib/screens
 -> App screens for subjects, topics, study notes, note details, and local creation flows
+
+lib/widgets
+-> Reusable UI widgets such as shared screen layout, decorative corner lines, and study note list items
 ```
 
 ### Frontend Flow
@@ -131,7 +140,7 @@ SubjectsScreen
 
 The current frontend sprint focuses on building a visual and navigable version of StudyFlow without backend integration.
 
-The frontend currently uses local example data. Subject creation is already handled locally in memory. More creation flows and backend integration will be added step by step.
+The frontend currently uses local example data. Local creation flows for subjects, topics, and study notes are implemented in memory. Study notes can also be deleted locally. Backend integration will be added later step by step.
 
 ### Tech Stack
 
@@ -244,11 +253,16 @@ Aktuelle Frontend-Funktionen:
 - Liste von Subjects anzeigen
 - Subjects lokal erstellen
 - Ein Subject oeffnen und die dazugehoerigen Topics anzeigen
+- Topics lokal erstellen
 - Ein Topic oeffnen und die dazugehoerigen Study Notes anzeigen
+- Study Notes lokal erstellen
+- Study Notes lokal loeschen
 - Eine Study Note oeffnen und ihren Inhalt lesen
 - Lokale Beispieldaten fuer Subjects, Topics und Study Notes
 - Einfache Navigation zwischen den Screens
 - Einfaches App-Theming mit eigenem Farbschema
+- SnackBar-Feedback fuer lokale Aktionen
+- Wiederverwendbare Widgets fuer gemeinsames Layout und Listenelemente
 
 ### Frontend-Struktur
 
@@ -266,6 +280,9 @@ lib/data
 
 lib/screens
 -> App-Screens fuer Subjects, Topics, Study Notes, Note Details und lokale Creation Flows
+
+lib/widgets
+-> Wiederverwendbare UI-Widgets wie gemeinsames Screen-Layout, dekorative Corner Lines und Study Note List Items
 ```
 
 ### Frontend Flow
@@ -290,7 +307,7 @@ SubjectsScreen
 
 Der aktuelle Frontend-Sprint konzentriert sich darauf, eine visuelle und navigierbare Version von StudyFlow ohne Backend-Anbindung zu erstellen.
 
-Das Frontend verwendet aktuell lokale Beispieldaten. Das lokale Erstellen von Subjects ist bereits umgesetzt. Weitere Creation Flows und die Backend-Anbindung werden Schritt fuer Schritt ergaenzt.
+Das Frontend verwendet aktuell lokale Beispieldaten. Lokale Creation Flows fuer Subjects, Topics und Study Notes sind im Speicher umgesetzt. Study Notes koennen lokal geloescht werden. Die Backend-Anbindung wird spaeter Schritt fuer Schritt ergaenzt.
 
 ### Tech Stack
 
