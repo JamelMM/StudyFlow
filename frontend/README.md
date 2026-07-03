@@ -18,6 +18,17 @@ The current frontend is a local prototype. It uses local example data and is not
 - Custom color scheme
 - Reusable layout and list item widgets
 - SnackBar feedback for local actions
+  
+## Screenshots
+
+Current work-in-progress Flutter UI using local example data.
+
+<p>
+  <img src="docs/screenshots/subjects-screen.png" alt="Subjects screen" width="220">
+  <img src="docs/screenshots/topics-screen.png" alt="Topics screen" width="220">
+  <img src="docs/screenshots/study-notes-screen.png" alt="Study notes screen" width="220">
+  <img src="docs/screenshots/note-detail-screen.png" alt="Note detail screen" width="220">
+</p>
 
 ## App Flow
 
