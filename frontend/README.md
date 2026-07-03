@@ -16,7 +16,7 @@ The current frontend is a local prototype. It uses local example data and is not
 - Open a study note and read its content
 - Basic Material Design UI
 - Custom color scheme
-- Reusable layout and list item widgets
+- Reusable layout, list item, and empty state widgets
 - SnackBar feedback for local actions
   
 ## Screenshots
@@ -69,6 +69,7 @@ lib/
 |   `-- new_study_note.dart
 `-- widgets/
     |-- corner_lines.dart
+    |-- empty_state_message.dart
     |-- studyflow_screen_body.dart
     `-- study_notes/
         `-- study_note_list_item.dart
@@ -111,6 +112,6 @@ The frontend is intentionally local-first at this stage. The goal of this sprint
 
 - Improve local creation forms
 - Refine local state handling
-- Add better empty states and validation
+- Improve form validation
 - Prepare API service classes
 - Connect the Flutter frontend to the ASP.NET Core backend
