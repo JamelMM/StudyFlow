@@ -80,6 +80,7 @@ HTTP Request
 ### Current Frontend Features
 
 The Flutter frontend has been started as the mobile client for StudyFlow.
+See the frontend README for current Flutter UI screenshots.
 
 Current frontend features:
 
@@ -247,6 +248,7 @@ HTTP Request
 ### Aktuelle Frontend-Funktionen
 
 Das Flutter-Frontend wurde als mobiler Client fuer StudyFlow gestartet.
+Siehe Frontend-README fuer aktuelle Screenshots der Flutter-Oberflaeche.
 
 Aktuelle Frontend-Funktionen:
 
