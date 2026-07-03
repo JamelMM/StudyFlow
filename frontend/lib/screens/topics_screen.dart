@@ -6,6 +6,7 @@ import 'package:frontend/models/topic.dart';
 import 'package:frontend/screens/new_topic.dart';
 import 'package:frontend/widgets/studyflow_screen_body.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/widgets/empty_state_message.dart';
 
 class TopicsScreen extends StatefulWidget {
   const TopicsScreen({super.key, required this.subject});
@@ -62,8 +63,12 @@ class _TopicsScreenState extends State<TopicsScreen> {
       return topic.subjectId == widget.subject.id;
     }).toList();
 
-    Widget mainContent = const Center(
-      child: Text('No topics found. Start adding some.'),
+    Widget mainContent = EmptyStateMessage(
+      icon: Icons.create_new_folder_outlined,
+      title: 'No topics yet.',
+      message: 'Create your first topic for this subject.',
+      buttonText: 'Add topic',
+      onPressed: _openAddTopicOverlay,
     );
 
     if (subjectTopics.isNotEmpty) {

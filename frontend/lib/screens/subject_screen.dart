@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/data/example_data.dart';
+import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/screens/topics_screen.dart';
 import 'package:frontend/models/subject.dart';
 import 'package:frontend/screens/new_subject.dart';
@@ -52,8 +53,12 @@ class _SubjectScreenState extends State<SubjectScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget mainContent = const Center(
-      child: Text('No subjects found. Start adding some.'),
+    Widget mainContent = EmptyStateMessage(
+      icon: Icons.menu_book_outlined,
+      title: 'No subjects yet.',
+      message: 'Create your first subject.',
+      buttonText: 'Add subject',
+      onPressed: _openAddSubjectOverlay,
     );
 
     if (_subjects.isNotEmpty) {

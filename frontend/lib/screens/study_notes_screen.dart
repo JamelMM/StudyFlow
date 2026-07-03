@@ -7,6 +7,7 @@ import 'package:frontend/screens/note_screen.dart';
 import 'package:frontend/widgets/study_notes/study_note_list_item.dart';
 import 'package:frontend/widgets/studyflow_screen_body.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/widgets/empty_state_message.dart';
 
 class StudyNotesScreen extends StatefulWidget {
   const StudyNotesScreen({super.key, required this.topic});
@@ -75,8 +76,12 @@ class _StudyNotesScreenState extends State<StudyNotesScreen> {
       return studyNote.topicId == widget.topic.id;
     }).toList();
 
-    Widget mainContent = const Center(
-      child: Text('No notes found. Start adding some.'),
+    Widget mainContent = EmptyStateMessage(
+      icon: Icons.note_add_outlined,
+      title: 'No study notes yet.',
+      message: 'Create your first note for this topic.',
+      buttonText: 'Add note',
+      onPressed: _openAddStudyNoteOverlay,
     );
 
     if (notes.isNotEmpty) {

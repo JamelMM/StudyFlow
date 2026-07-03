@@ -30,6 +30,16 @@ Current work-in-progress Flutter UI using local example data.
   <img src="docs/screenshots/note-detail-screen.png" alt="Note detail screen" width="220">
 </p>
 
+## Empty States
+
+Screens shown when there is no local data yet.
+
+<p>
+  <img src="docs/screenshots/subjects-empty-screen.png" width="180" />
+  <img src="docs/screenshots/topics-empty-screen.png" width="180" />
+  <img src="docs/screenshots/study-notes-empty-screen.png" width="180" />
+</p>
+
 ## App Flow
 
 ```text
