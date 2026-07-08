@@ -1,4 +1,4 @@
-# StudyFlow
+﻿# StudyFlow
 
 StudyFlow is a personal learning project built as a full-stack application.
 
@@ -16,8 +16,11 @@ StudyFlow/
 |   |-- android/
 |   |-- ios/
 |   |-- lib/
+|   |   |-- core/
 |   |   |-- data/
+|   |   |-- local/
 |   |   |-- models/
+|   |   |-- repositories/
 |   |   |-- screens/
 |   |   `-- widgets/
 |   |-- test/
@@ -28,7 +31,7 @@ StudyFlow/
 `-- README.md
 ```
 
-The backend is in progress and already exposes the first API endpoints. The Flutter frontend has also been started and currently provides a visual, navigable version of StudyFlow using local example data.
+The backend is in progress and already exposes the first API endpoints. The Flutter frontend has also been started and currently provides a visual, navigable, local-first version of StudyFlow using local in-memory repositories backed by example data.
 
 ---
 
@@ -84,6 +87,7 @@ See the frontend README for current Flutter UI screenshots.
 
 Current frontend features:
 
+- Start screen before entering the main StudyFlow flow
 - View a list of subjects
 - Create subjects locally
 - Open a subject and view its topics
@@ -92,7 +96,10 @@ Current frontend features:
 - Create study notes locally
 - Delete study notes locally
 - Open a study note and read its content
-- Local example data for subjects, topics, and study notes
+- Local in-memory repositories for subjects, topics, and study notes
+- Repository contracts for local-first data access
+- Dependency registration with get_it
+- Local example data used behind the current repository implementations
 - Basic navigation between screens
 - Basic app theming with a custom color scheme
 - SnackBar feedback for local actions
@@ -106,14 +113,23 @@ StudyFlow frontend is currently organized as a small Flutter application:
 StudyFlow/frontend/
 -> Flutter mobile application
 
+lib/core
+-> Dependency registration and app-level setup
+
 lib/models
 -> Frontend data models such as Subject, Topic, and StudyNote
 
 lib/data
--> Local example data used before connecting the backend
+-> Local example data used before connecting persistence or the backend
+
+lib/repositories/contracts
+-> Repository contracts for frontend data access
+
+lib/local
+-> Local in-memory repository implementations used before persistence/API integration
 
 lib/screens
--> App screens for subjects, topics, study notes, note details, and local creation flows
+-> App screens for start, subjects, topics, study notes, note details, and local creation flows
 
 lib/widgets
 -> Reusable UI widgets such as shared screen layout, decorative corner lines, empty state messages, and study note list items
@@ -122,7 +138,8 @@ lib/widgets
 ### Frontend Flow
 
 ```text
-SubjectsScreen
+StartScreen
+-> SubjectsScreen
 -> TopicsScreen
 -> StudyNotesScreen
 -> NoteScreen
@@ -133,7 +150,9 @@ SubjectsScreen
 - Dart
 - Flutter
 - Material Design
-- Local example data
+- Local in-memory repositories
+- Repository pattern for local data access
+- get_it for lightweight dependency registration
 - Flutter Navigator for screen navigation
 - Local state with StatefulWidget and setState
 
@@ -141,7 +160,7 @@ SubjectsScreen
 
 The current frontend sprint focuses on building a visual and navigable version of StudyFlow without backend integration.
 
-The frontend currently uses local example data. Local creation flows for subjects, topics, and study notes are implemented in memory. Study notes can also be deleted locally. Reusable empty states are shown when no local data is available. Backend integration will be added later step by step.
+The frontend currently uses local in-memory repositories backed by example data. Local creation flows for subjects, topics, and study notes are implemented in memory. Study notes can also be deleted locally. Reusable empty states are shown when no local data is available. The repository layer prepares the app for later local persistence, likely with ToStore, and later ASP.NET Core API integration.
 
 ### Tech Stack
 
@@ -151,6 +170,7 @@ The frontend currently uses local example data. Local creation flows for subject
 - PostgreSQL
 - Dart
 - Flutter
+- get_it
 - Clean Architecture inspired layering
 
 ### Local Backend Setup
@@ -252,6 +272,7 @@ Siehe Frontend-README fuer aktuelle Screenshots der Flutter-Oberflaeche.
 
 Aktuelle Frontend-Funktionen:
 
+- Startscreen vor dem Einstieg in den Hauptbereich der App
 - Liste von Subjects anzeigen
 - Subjects lokal erstellen
 - Ein Subject oeffnen und die dazugehoerigen Topics anzeigen
@@ -260,7 +281,10 @@ Aktuelle Frontend-Funktionen:
 - Study Notes lokal erstellen
 - Study Notes lokal loeschen
 - Eine Study Note oeffnen und ihren Inhalt lesen
-- Lokale Beispieldaten fuer Subjects, Topics und Study Notes
+- Lokale In-Memory-Repositories fuer Subjects, Topics und Study Notes
+- Repository-Vertraege fuer lokalen Datenzugriff
+- Dependency-Registrierung mit get_it
+- Lokale Beispieldaten hinter den aktuellen Repository-Implementierungen
 - Einfache Navigation zwischen den Screens
 - Einfaches App-Theming mit eigenem Farbschema
 - SnackBar-Feedback fuer lokale Aktionen
@@ -274,14 +298,23 @@ Das StudyFlow-Frontend ist aktuell als kleine Flutter-Anwendung organisiert:
 StudyFlow/frontend/
 -> Flutter Mobile Application
 
+lib/core
+-> Dependency-Registrierung und app-weites Setup
+
 lib/models
 -> Frontend-Datenmodelle wie Subject, Topic und StudyNote
 
 lib/data
--> Lokale Beispieldaten, die vor der Backend-Anbindung verwendet werden
+-> Lokale Beispieldaten, die vor Persistenz oder Backend-Anbindung verwendet werden
+
+lib/repositories/contracts
+-> Repository-Vertraege fuer den Datenzugriff im Frontend
+
+lib/local
+-> Lokale In-Memory-Repository-Implementierungen vor Persistenz/API-Integration
 
 lib/screens
--> App-Screens fuer Subjects, Topics, Study Notes, Note Details und lokale Creation Flows
+-> App-Screens fuer Start, Subjects, Topics, Study Notes, Note Details und lokale Creation Flows
 
 lib/widgets
 -> Wiederverwendbare UI-Widgets wie gemeinsames Screen-Layout, dekorative Corner Lines, Empty-State-Meldungen und Study Note List Items
@@ -290,7 +323,8 @@ lib/widgets
 ### Frontend Flow
 
 ```text
-SubjectsScreen
+StartScreen
+-> SubjectsScreen
 -> TopicsScreen
 -> StudyNotesScreen
 -> NoteScreen
@@ -301,7 +335,9 @@ SubjectsScreen
 - Dart
 - Flutter
 - Material Design
-- Lokale Beispieldaten
+- Lokale In-Memory-Repositories
+- Repository Pattern fuer lokalen Datenzugriff
+- get_it fuer einfache Dependency-Registrierung
 - Flutter Navigator fuer die Navigation zwischen Screens
 - Lokaler State mit StatefulWidget und setState
 
@@ -309,7 +345,7 @@ SubjectsScreen
 
 Der aktuelle Frontend-Sprint konzentriert sich darauf, eine visuelle und navigierbare Version von StudyFlow ohne Backend-Anbindung zu erstellen.
 
-Das Frontend verwendet aktuell lokale Beispieldaten. Lokale Creation Flows fuer Subjects, Topics und Study Notes sind im Speicher umgesetzt. Study Notes koennen lokal geloescht werden. Wiederverwendbare Empty States werden angezeigt, wenn keine lokalen Daten vorhanden sind. Die Backend-Anbindung wird spaeter Schritt fuer Schritt ergaenzt.
+Das Frontend verwendet aktuell lokale In-Memory-Repositories, die auf Beispieldaten basieren. Lokale Creation Flows fuer Subjects, Topics und Study Notes sind im Speicher umgesetzt. Study Notes koennen lokal geloescht werden. Wiederverwendbare Empty States werden angezeigt, wenn keine lokalen Daten vorhanden sind. Die Repository-Schicht bereitet die App auf spaetere lokale Persistenz, wahrscheinlich mit ToStore, und spaetere ASP.NET Core API-Anbindung vor.
 
 ### Tech Stack
 
@@ -319,6 +355,7 @@ Das Frontend verwendet aktuell lokale Beispieldaten. Lokale Creation Flows fuer 
 - PostgreSQL
 - Dart
 - Flutter
+- get_it
 - Clean-Architecture-inspirierte Schichten
 
 ### Lokales Backend Setup
