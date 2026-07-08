@@ -11,7 +11,7 @@ class NoteScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(note.title)),
+      appBar: AppBar(title: Text(note.name)),
       body: StudyFlowScreenBody(
         child: Padding(
           padding: const EdgeInsets.only(top: 20),
@@ -31,7 +31,7 @@ class NoteScreen extends StatelessWidget {
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text(note.content),
+                  child: Text(note.markdownText),
                 ),
               ),
             ],

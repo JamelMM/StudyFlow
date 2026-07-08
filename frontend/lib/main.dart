@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/screens/subject_screen.dart';
+import 'package:frontend/screens/start_screen.dart';
+import 'package:frontend/core/service_locator.dart';
 
 final colorScheme = ColorScheme.fromSeed(seedColor: Color(0xFF14213D));
 
 void main() {
+  setupDependencies();
+
   runApp(
     MaterialApp(
       theme: ThemeData().copyWith(
@@ -34,7 +37,7 @@ void main() {
           ),
         ),
       ),
-      home: SubjectScreen(),
+      home: StartScreen(),
     ),
   );
 }

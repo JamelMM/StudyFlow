@@ -2,12 +2,16 @@ class StudyNote {
   const StudyNote({
     required this.id,
     required this.topicId,
-    required this.title,
-    required this.content,
+    required this.name,
+    required this.markdownText,
+    required this.createdAt,
+    this.updatedAt,
   });
 
   final int id;
   final int topicId;
-  final String title;
-  final String content;
+  final String name;
+  final String markdownText;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
 }

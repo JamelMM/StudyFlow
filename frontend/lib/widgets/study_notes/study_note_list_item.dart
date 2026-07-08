@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/models/study_note.dart';
 
 class StudyNoteListItem extends StatelessWidget {
-  const StudyNoteListItem({
-    super.key,
-    required this.note,
-    required this.onTap,
-  });
+  const StudyNoteListItem({super.key, required this.note, required this.onTap});
 
   final StudyNote note;
   final void Function() onTap;
@@ -22,7 +18,7 @@ class StudyNoteListItem extends StatelessWidget {
             children: [
               const Icon(Icons.notes),
               const SizedBox(width: 12),
-              Expanded(child: Text(note.title)),
+              Expanded(child: Text(note.name)),
             ],
           ),
         ),

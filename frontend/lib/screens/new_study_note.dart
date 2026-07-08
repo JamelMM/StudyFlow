@@ -11,11 +11,11 @@ class NewStudyNote extends StatefulWidget {
 
 class _NewStudyNoteState extends State<NewStudyNote> {
   final _nameController = TextEditingController();
-  final _contentController = TextEditingController();
+  final _markdownTextController = TextEditingController();
 
   void _submitNewStudyNoteData() {
     if (_nameController.text.trim() == "" ||
-        _contentController.text.trim() == "") {
+        _markdownTextController.text.trim() == "") {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -37,7 +37,7 @@ class _NewStudyNoteState extends State<NewStudyNote> {
     }
     widget.onAddNote(
       _nameController.text.trim(),
-      _contentController.text.trim(),
+      _markdownTextController.text.trim(),
     );
     Navigator.pop(context);
   }
@@ -45,7 +45,7 @@ class _NewStudyNoteState extends State<NewStudyNote> {
   @override
   void dispose() {
     _nameController.dispose();
-    _contentController.dispose();
+    _markdownTextController.dispose();
     super.dispose();
   }
 
@@ -62,7 +62,7 @@ class _NewStudyNoteState extends State<NewStudyNote> {
             decoration: InputDecoration(label: Text('Title')),
           ),
           TextField(
-            controller: _contentController,
+            controller: _markdownTextController,
             maxLength: 2000,
             maxLines: 8,
             decoration: InputDecoration(label: Text('Content')),

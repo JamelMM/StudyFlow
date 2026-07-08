@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/data/example_data.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/screens/topics_screen.dart';
 import 'package:frontend/models/subject.dart';
 import 'package:frontend/screens/new_subject.dart';
 import 'package:frontend/widgets/studyflow_screen_body.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/repositories/contracts/subjects_repository.dart';
+import 'package:frontend/core/service_locator.dart';
 
 class SubjectScreen extends StatefulWidget {
   const SubjectScreen({super.key});
@@ -17,7 +18,15 @@ class SubjectScreen extends StatefulWidget {
 }
 
 class _SubjectScreenState extends State<SubjectScreen> {
-  final List<Subject> _subjects = [...exampleSubjects];
+  final SubjectsRepository _subjectsRepository = getIt<SubjectsRepository>();
+
+  late List<Subject> _subjects;
+
+  @override
+  void initState() {
+    super.initState();
+    _subjects = _subjectsRepository.getSubjects();
+  }
 
   void _openAddSubjectOverlay() {
     showModalBottomSheet(
@@ -37,7 +46,8 @@ class _SubjectScreenState extends State<SubjectScreen> {
     final newSubject = Subject(id: _subjects.length + 1, name: name);
 
     setState(() {
-      _subjects.add(newSubject);
+      _subjectsRepository.addSubject(newSubject);
+      _subjects = _subjectsRepository.getSubjects();
     });
 
     ScaffoldMessenger.of(context).clearSnackBars();
