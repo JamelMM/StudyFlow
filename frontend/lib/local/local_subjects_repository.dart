@@ -6,12 +6,12 @@ class LocalSubjectsRepository implements SubjectsRepository {
   final List<Subject> _subjects = [...exampleSubjects];
 
   @override
-  List<Subject> getSubjects() {
+  Future<List<Subject>> getSubjects() async {
     return _subjects;
   }
 
   @override
-  void addSubject(Subject subject) {
+  Future<void> addSubject(Subject subject) async {
     _subjects.add(subject);
   }
 }

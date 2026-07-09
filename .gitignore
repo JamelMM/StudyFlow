@@ -1,4 +1,4 @@
-﻿## Ignore Visual Studio temporary files, build results, and user-specific files.
+## Ignore Visual Studio temporary files, build results, and user-specific files.
 .vs/
 bin/
 obj/
@@ -62,4 +62,7 @@ secrets.json
 ## Local ASP.NET Core configuration files
 appsettings.Local.json
 appsettings.*.Local.json
+
+## Flutter DevTools local settings
+frontend/devtools_options.yaml
 

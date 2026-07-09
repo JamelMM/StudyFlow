@@ -46,3 +46,7 @@ app.*.map.json
 
 
 flutter_01.png
+
+# Flutter DevTools local settings
+devtools_options.yaml
+

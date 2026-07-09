@@ -6,7 +6,7 @@ class LocalStudyNotesRepository implements StudyNotesRepository {
   final List<StudyNote> _studyNotes = [...exampleStudyNotes];
 
   @override
-  List<StudyNote> getStudyNotesByTopicId(int topicId) {
+  List<StudyNote> getStudyNotesByTopicId(String topicId) {
     return _studyNotes.where((studyNote) {
       return studyNote.topicId == topicId;
     }).toList();

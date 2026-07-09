@@ -1,7 +1,7 @@
 import 'package:frontend/models/subject.dart';
 
 abstract class SubjectsRepository {
-  List<Subject> getSubjects();
+  Future<List<Subject>> getSubjects();
 
-  void addSubject(Subject subject);
+  Future<void> addSubject(Subject subject);
 }

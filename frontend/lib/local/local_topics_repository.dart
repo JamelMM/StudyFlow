@@ -6,7 +6,7 @@ class LocalTopicRepository implements TopicsRepository {
   final List<Topic> _topics = [...exampleTopics];
 
   @override
-  List<Topic> getTopicsBySubjectId(int subjectId) {
+  List<Topic> getTopicsBySubjectId(String subjectId) {
     return _topics.where((topic) => topic.subjectId == subjectId).toList();
   }
 

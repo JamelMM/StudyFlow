@@ -1,4 +1,4 @@
-﻿# StudyFlow Frontend
+# StudyFlow Frontend
 
 This folder contains the Flutter frontend for StudyFlow.
 
@@ -19,6 +19,7 @@ The current frontend is a local-first prototype. It uses local in-memory reposit
 - Custom color scheme
 - Local repository layer for subjects, topics, and study notes
 - Repository contracts for local-first data access
+- String-based IDs prepared for ToStore and backend integration
 - Dependency registration with get_it
 - Reusable layout, list item, and empty state widgets
 - SnackBar feedback for local actions
@@ -101,6 +102,7 @@ lib/
 - Local in-memory repositories
 - Repository pattern with local implementations
 - get_it for dependency registration
+- ToStore dependency added for upcoming local persistence
 - StatefulWidget and setState for local state
 - Flutter Navigator for screen navigation
 
@@ -126,15 +128,16 @@ flutter run
 
 ## Current Status
 
-The frontend is intentionally local-first at this stage. Screens access data through repository contracts. The current repository implementations are in-memory and backed by local example data.
+The frontend is intentionally local-first at this stage. Screens access data through repository contracts. The current repository implementations are in-memory and backed by local example data. Models now use string-based IDs to prepare the app for ToStore persistence and later backend synchronization.
 
 The goal of this sprint is to understand Flutter fundamentals, screen navigation, local state, forms, list rendering, dependency registration, repository-based data access, and basic UI structure before connecting the app to persistence or the backend.
 
 ## Next Steps
 
 - Refine repository structure
-- Add local persistence, likely with ToStore
+- Add local persistence with ToStore, starting with subjects
 - Improve form validation
 - Add quizzes and questions
 - Prepare API service classes
 - Connect the Flutter frontend to the ASP.NET Core backend
+

@@ -9,8 +9,8 @@ class Topic {
     this.currentScore,
   });
 
-  final int id;
-  final int subjectId;
+  final String id;
+  final String subjectId;
   final String name;
   final DateTime createdAt;
   final DateTime? nextReviewDate;

@@ -8,8 +8,8 @@ class StudyNote {
     this.updatedAt,
   });
 
-  final int id;
-  final int topicId;
+  final String id;
+  final String topicId;
   final String name;
   final String markdownText;
   final DateTime createdAt;

@@ -1,4 +1,4 @@
-﻿# StudyFlow
+# StudyFlow
 
 StudyFlow is a personal learning project built as a full-stack application.
 
@@ -99,6 +99,7 @@ Current frontend features:
 - Local in-memory repositories for subjects, topics, and study notes
 - Repository contracts for local-first data access
 - Dependency registration with get_it
+- String-based frontend IDs prepared for local persistence and backend/API integration
 - Local example data used behind the current repository implementations
 - Basic navigation between screens
 - Basic app theming with a custom color scheme
@@ -160,7 +161,7 @@ StartScreen
 
 The current frontend sprint focuses on building a visual and navigable version of StudyFlow without backend integration.
 
-The frontend currently uses local in-memory repositories backed by example data. Local creation flows for subjects, topics, and study notes are implemented in memory. Study notes can also be deleted locally. Reusable empty states are shown when no local data is available. The repository layer prepares the app for later local persistence, likely with ToStore, and later ASP.NET Core API integration.
+The frontend currently uses local in-memory repositories backed by example data. Local creation flows for subjects, topics, and study notes are implemented in memory. Study notes can also be deleted locally. Reusable empty states are shown when no local data is available. The frontend models now use string-based IDs, which prepares the app for ToStore local persistence and later ASP.NET Core API integration.
 
 ### Tech Stack
 
@@ -284,6 +285,7 @@ Aktuelle Frontend-Funktionen:
 - Lokale In-Memory-Repositories fuer Subjects, Topics und Study Notes
 - Repository-Vertraege fuer lokalen Datenzugriff
 - Dependency-Registrierung mit get_it
+- String-basierte Frontend-IDs als Vorbereitung auf lokale Persistenz und Backend/API-Anbindung
 - Lokale Beispieldaten hinter den aktuellen Repository-Implementierungen
 - Einfache Navigation zwischen den Screens
 - Einfaches App-Theming mit eigenem Farbschema
@@ -345,7 +347,7 @@ StartScreen
 
 Der aktuelle Frontend-Sprint konzentriert sich darauf, eine visuelle und navigierbare Version von StudyFlow ohne Backend-Anbindung zu erstellen.
 
-Das Frontend verwendet aktuell lokale In-Memory-Repositories, die auf Beispieldaten basieren. Lokale Creation Flows fuer Subjects, Topics und Study Notes sind im Speicher umgesetzt. Study Notes koennen lokal geloescht werden. Wiederverwendbare Empty States werden angezeigt, wenn keine lokalen Daten vorhanden sind. Die Repository-Schicht bereitet die App auf spaetere lokale Persistenz, wahrscheinlich mit ToStore, und spaetere ASP.NET Core API-Anbindung vor.
+Das Frontend verwendet aktuell lokale In-Memory-Repositories, die auf Beispieldaten basieren. Lokale Creation Flows fuer Subjects, Topics und Study Notes sind im Speicher umgesetzt. Study Notes koennen lokal geloescht werden. Wiederverwendbare Empty States werden angezeigt, wenn keine lokalen Daten vorhanden sind. Die Frontend-Modelle verwenden jetzt String-basierte IDs. Dadurch wird die App auf lokale Persistenz mit ToStore und eine spaetere ASP.NET Core API-Anbindung vorbereitet.
 
 ### Tech Stack
 
@@ -402,3 +404,4 @@ Flutter-Frontend starten:
 ```powershell
 flutter run
 ```
+
