@@ -6,12 +6,24 @@ class LocalTopicRepository implements TopicsRepository {
   final List<Topic> _topics = [...exampleTopics];
 
   @override
-  List<Topic> getTopicsBySubjectId(String subjectId) {
+  Future<List<Topic>> getTopicsBySubjectId(String subjectId) async {
     return _topics.where((topic) => topic.subjectId == subjectId).toList();
   }
 
   @override
-  void addTopic(Topic topic) {
-    _topics.add(topic);
+  Future<Topic> addTopic({
+    required String subjectId,
+    required String name,
+  }) async {
+    final newTopic = Topic(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      subjectId: subjectId,
+      name: name,
+      createdAt: DateTime.now(),
+    );
+
+    _topics.add(newTopic);
+
+    return newTopic;
   }
 }

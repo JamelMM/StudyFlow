@@ -1,7 +1,7 @@
 import 'package:frontend/models/topic.dart';
 
 abstract class TopicsRepository {
-  List<Topic> getTopicsBySubjectId(String subjectId);
+  Future<List<Topic>> getTopicsBySubjectId(String subjectId);
 
-  void addTopic(Topic topic);
+  Future<Topic> addTopic({required String subjectId, required String name});
 }
