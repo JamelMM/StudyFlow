@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:frontend/screens/start_screen.dart';
 import 'package:frontend/core/service_locator.dart';
 
+import 'local/tostore/studyflow_database.dart';
+
 final colorScheme = ColorScheme.fromSeed(seedColor: Color(0xFF14213D));
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await StudyFlowDatabase.initialize();
   setupDependencies();
 
   runApp(

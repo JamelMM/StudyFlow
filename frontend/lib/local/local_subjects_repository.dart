@@ -11,7 +11,14 @@ class LocalSubjectsRepository implements SubjectsRepository {
   }
 
   @override
-  Future<void> addSubject(Subject subject) async {
-    _subjects.add(subject);
+  Future<Subject> addSubject(String name) async {
+    final newSubject = Subject(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      name: name,
+    );
+
+    _subjects.add(newSubject);
+
+    return newSubject;
   }
 }
