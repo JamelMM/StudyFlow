@@ -1,7 +1,13 @@
 import 'package:frontend/models/study_note.dart';
 
 abstract class StudyNotesRepository {
-  List<StudyNote> getStudyNotesByTopicId(String topicId);
-  void addStudyNote(StudyNote studynote);
-  void removeStudyNote(StudyNote studynote);
+  Future<List<StudyNote>> getStudyNotesByTopicId(String topicId);
+
+  Future<StudyNote> addStudyNote({
+    required String topicId,
+    required String name,
+    required String markdownText,
+  });
+
+  Future<void> removeStudyNote(String id);
 }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class NewStudyNote extends StatefulWidget {
   const NewStudyNote({super.key, required this.onAddNote});
 
-  final void Function(String name, String content) onAddNote;
+  final Future<void> Function(String name, String content) onAddNote;
 
   @override
   State<NewStudyNote> createState() => _NewStudyNoteState();
@@ -13,7 +13,7 @@ class _NewStudyNoteState extends State<NewStudyNote> {
   final _nameController = TextEditingController();
   final _markdownTextController = TextEditingController();
 
-  void _submitNewStudyNoteData() {
+  Future<void> _submitNewStudyNoteData() async {
     if (_nameController.text.trim() == "" ||
         _markdownTextController.text.trim() == "") {
       showDialog(
@@ -35,10 +35,14 @@ class _NewStudyNoteState extends State<NewStudyNote> {
       );
       return;
     }
-    widget.onAddNote(
+    await widget.onAddNote(
       _nameController.text.trim(),
       _markdownTextController.text.trim(),
     );
+
+    if (!mounted) {
+      return;
+    }
     Navigator.pop(context);
   }
 

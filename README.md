@@ -31,7 +31,7 @@ StudyFlow/
 `-- README.md
 ```
 
-The backend is in progress and already exposes the first API endpoints. The Flutter frontend has also been started and currently provides a visual, navigable, local-first version of StudyFlow using local in-memory repositories backed by example data.
+The backend is in progress and already exposes the first API endpoints. The Flutter frontend has also been started and currently provides a visual, navigable, local-first version of StudyFlow using repository contracts and ToStore-backed local persistence.
 
 ---
 
@@ -41,7 +41,7 @@ The backend is in progress and already exposes the first API endpoints. The Flut
 
 StudyFlow is a full-stack learning project with an ASP.NET Core Web API backend and a Flutter frontend. The goal is to organize study content into subjects, topics, and study notes, and later extend the system with quizzes and review sessions.
 
-This project is also my personal learning project for backend and frontend development with C#, ASP.NET Core, Entity Framework Core, PostgreSQL, Dart, Flutter, dependency injection, repositories, services, DTOs, and layered architecture.
+This project is also my personal learning project for backend and frontend development with C#, ASP.NET Core, Entity Framework Core, PostgreSQL, Dart, Flutter, dependency injection, repositories, services, DTOs, local persistence, and layered architecture.
 
 ### Current Backend Features
 
@@ -82,8 +82,7 @@ HTTP Request
 
 ### Current Frontend Features
 
-The Flutter frontend has been started as the mobile client for StudyFlow.
-See the frontend README for current Flutter UI screenshots.
+The Flutter frontend has been started as the mobile client for StudyFlow. See the frontend README for current Flutter UI screenshots.
 
 Current frontend features:
 
@@ -96,11 +95,11 @@ Current frontend features:
 - Create study notes locally
 - Delete study notes locally
 - Open a study note and read its content
-- Local in-memory repositories for subjects, topics, and study notes
-- Repository contracts for local-first data access
+- Local persistence with ToStore for subjects, topics, and study notes
+- Repository contracts with ToStore-backed local implementations
 - Dependency registration with get_it
 - String-based frontend IDs prepared for local persistence and backend/API integration
-- Local example data used behind the current repository implementations
+- Local example data used as initial development data
 - Basic navigation between screens
 - Basic app theming with a custom color scheme
 - SnackBar feedback for local actions
@@ -121,13 +120,16 @@ lib/models
 -> Frontend data models such as Subject, Topic, and StudyNote
 
 lib/data
--> Local example data used before connecting persistence or the backend
+-> Local example data used as initial development data
 
 lib/repositories/contracts
 -> Repository contracts for frontend data access
 
 lib/local
--> Local in-memory repository implementations used before persistence/API integration
+-> Local repository implementations, including ToStore-based persistence
+
+lib/local/tostore
+-> ToStore database setup, schemas, and ToStore repository implementations
 
 lib/screens
 -> App screens for start, subjects, topics, study notes, note details, and local creation flows
@@ -151,17 +153,19 @@ StartScreen
 - Dart
 - Flutter
 - Material Design
-- Local in-memory repositories
-- Repository pattern for local data access
+- ToStore for local persistence
+- Repository pattern with local ToStore implementations
 - get_it for lightweight dependency registration
 - Flutter Navigator for screen navigation
 - Local state with StatefulWidget and setState
 
 ### Current Frontend Status
 
-The current frontend sprint focuses on building a visual and navigable version of StudyFlow without backend integration.
+The current frontend sprint focuses on building a visual, navigable, local-first version of StudyFlow before backend integration.
 
-The frontend currently uses local in-memory repositories backed by example data. Local creation flows for subjects, topics, and study notes are implemented in memory. Study notes can also be deleted locally. Reusable empty states are shown when no local data is available. The frontend models now use string-based IDs, which prepares the app for ToStore local persistence and later ASP.NET Core API integration.
+The frontend currently uses repository contracts with ToStore-backed local persistence for subjects, topics, and study notes. Local creation flows for subjects, topics, and study notes are implemented, and study notes can also be deleted locally.
+
+Reusable empty states are shown when no local data is available. The frontend models use string-based IDs, which prepares the app for local persistence and later ASP.NET Core API integration.
 
 ### Tech Stack
 
@@ -171,13 +175,13 @@ The frontend currently uses local in-memory repositories backed by example data.
 - PostgreSQL
 - Dart
 - Flutter
+- ToStore
 - get_it
 - Clean Architecture inspired layering
 
 ### Local Backend Setup
 
-The real database connection string is not committed to GitHub.
-For local development, store it with ASP.NET Core User Secrets:
+The real database connection string is not committed to GitHub. For local development, store it with ASP.NET Core User Secrets:
 
 ```powershell
 cd backend
@@ -227,7 +231,7 @@ flutter run
 
 StudyFlow ist ein Full-Stack-Lernprojekt mit einem ASP.NET Core Web API Backend und einem Flutter-Frontend. Das Ziel ist, Lerninhalte in Subjects, Topics und Study Notes zu organisieren und das System spaeter mit Quizzes und Review Sessions zu erweitern.
 
-Dieses Projekt ist gleichzeitig mein persoenliches Lernprojekt fuer Backend- und Frontend-Entwicklung mit C#, ASP.NET Core, Entity Framework Core, PostgreSQL, Dart, Flutter, Dependency Injection, Repositories, Services, DTOs und Schichtenarchitektur.
+Dieses Projekt ist gleichzeitig mein persoenliches Lernprojekt fuer Backend- und Frontend-Entwicklung mit C#, ASP.NET Core, Entity Framework Core, PostgreSQL, Dart, Flutter, Dependency Injection, Repositories, Services, DTOs, lokaler Persistenz und Schichtenarchitektur.
 
 ### Aktuelle Backend-Funktionen
 
@@ -268,8 +272,7 @@ HTTP Request
 
 ### Aktuelle Frontend-Funktionen
 
-Das Flutter-Frontend wurde als mobiler Client fuer StudyFlow gestartet.
-Siehe Frontend-README fuer aktuelle Screenshots der Flutter-Oberflaeche.
+Das Flutter-Frontend wurde als mobiler Client fuer StudyFlow gestartet. Siehe Frontend-README fuer aktuelle Screenshots der Flutter-Oberflaeche.
 
 Aktuelle Frontend-Funktionen:
 
@@ -282,11 +285,11 @@ Aktuelle Frontend-Funktionen:
 - Study Notes lokal erstellen
 - Study Notes lokal loeschen
 - Eine Study Note oeffnen und ihren Inhalt lesen
-- Lokale In-Memory-Repositories fuer Subjects, Topics und Study Notes
-- Repository-Vertraege fuer lokalen Datenzugriff
+- Lokale Persistenz mit ToStore fuer Subjects, Topics und Study Notes
+- Repository-Vertraege mit ToStore-basierten lokalen Implementierungen
 - Dependency-Registrierung mit get_it
 - String-basierte Frontend-IDs als Vorbereitung auf lokale Persistenz und Backend/API-Anbindung
-- Lokale Beispieldaten hinter den aktuellen Repository-Implementierungen
+- Lokale Beispieldaten als initiale Entwicklungsdaten
 - Einfache Navigation zwischen den Screens
 - Einfaches App-Theming mit eigenem Farbschema
 - SnackBar-Feedback fuer lokale Aktionen
@@ -307,13 +310,16 @@ lib/models
 -> Frontend-Datenmodelle wie Subject, Topic und StudyNote
 
 lib/data
--> Lokale Beispieldaten, die vor Persistenz oder Backend-Anbindung verwendet werden
+-> Lokale Beispieldaten als initiale Entwicklungsdaten
 
 lib/repositories/contracts
 -> Repository-Vertraege fuer den Datenzugriff im Frontend
 
 lib/local
--> Lokale In-Memory-Repository-Implementierungen vor Persistenz/API-Integration
+-> Lokale Repository-Implementierungen, inklusive ToStore-basierter Persistenz
+
+lib/local/tostore
+-> ToStore-Datenbank-Setup, Schemas und ToStore-Repository-Implementierungen
 
 lib/screens
 -> App-Screens fuer Start, Subjects, Topics, Study Notes, Note Details und lokale Creation Flows
@@ -337,17 +343,19 @@ StartScreen
 - Dart
 - Flutter
 - Material Design
-- Lokale In-Memory-Repositories
-- Repository Pattern fuer lokalen Datenzugriff
+- ToStore fuer lokale Persistenz
+- Repository Pattern mit lokalen ToStore-Implementierungen
 - get_it fuer einfache Dependency-Registrierung
 - Flutter Navigator fuer die Navigation zwischen Screens
 - Lokaler State mit StatefulWidget und setState
 
 ### Aktueller Frontend-Status
 
-Der aktuelle Frontend-Sprint konzentriert sich darauf, eine visuelle und navigierbare Version von StudyFlow ohne Backend-Anbindung zu erstellen.
+Der aktuelle Frontend-Sprint konzentriert sich darauf, eine visuelle, navigierbare und local-first Version von StudyFlow vor der Backend-Anbindung zu erstellen.
 
-Das Frontend verwendet aktuell lokale In-Memory-Repositories, die auf Beispieldaten basieren. Lokale Creation Flows fuer Subjects, Topics und Study Notes sind im Speicher umgesetzt. Study Notes koennen lokal geloescht werden. Wiederverwendbare Empty States werden angezeigt, wenn keine lokalen Daten vorhanden sind. Die Frontend-Modelle verwenden jetzt String-basierte IDs. Dadurch wird die App auf lokale Persistenz mit ToStore und eine spaetere ASP.NET Core API-Anbindung vorbereitet.
+Das Frontend verwendet aktuell Repository-Vertraege mit ToStore-basierter lokaler Persistenz fuer Subjects, Topics und Study Notes. Lokale Creation Flows fuer Subjects, Topics und Study Notes sind umgesetzt. Study Notes koennen lokal geloescht werden.
+
+Wiederverwendbare Empty States werden angezeigt, wenn keine lokalen Daten vorhanden sind. Die Frontend-Modelle verwenden String-basierte IDs. Dadurch wird die App auf lokale Persistenz und eine spaetere ASP.NET Core API-Anbindung vorbereitet.
 
 ### Tech Stack
 
@@ -357,13 +365,13 @@ Das Frontend verwendet aktuell lokale In-Memory-Repositories, die auf Beispielda
 - PostgreSQL
 - Dart
 - Flutter
+- ToStore
 - get_it
 - Clean-Architecture-inspirierte Schichten
 
 ### Lokales Backend Setup
 
-Der echte Datenbank-Connection-String wird nicht nach GitHub committed.
-Fuer lokale Entwicklung wird er mit ASP.NET Core User Secrets gespeichert:
+Der echte Datenbank-Connection-String wird nicht nach GitHub committed. Fuer lokale Entwicklung wird er mit ASP.NET Core User Secrets gespeichert:
 
 ```powershell
 cd backend
@@ -404,4 +412,3 @@ Flutter-Frontend starten:
 ```powershell
 flutter run
 ```
-

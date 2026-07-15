@@ -2,7 +2,7 @@
 
 This folder contains the Flutter frontend for StudyFlow.
 
-The current frontend is a local-first prototype. It uses local in-memory repositories backed by example data and is not connected to the ASP.NET Core backend yet.
+The current frontend is a local-first prototype. It uses repository contracts with ToStore-backed local persistence and is not connected to the ASP.NET Core backend yet.
 
 ## Current Features
 
@@ -18,6 +18,7 @@ The current frontend is a local-first prototype. It uses local in-memory reposit
 - Basic Material Design UI
 - Custom color scheme
 - Local repository layer for subjects, topics, and study notes
+- ToStore-backed local persistence for subjects, topics, and study notes
 - Repository contracts for local-first data access
 - String-based IDs prepared for ToStore and backend integration
 - Dependency registration with get_it
@@ -26,7 +27,7 @@ The current frontend is a local-first prototype. It uses local in-memory reposit
   
 ## Screenshots
 
-Current work-in-progress Flutter UI using local in-memory repositories backed by example data.
+Current work-in-progress Flutter UI using local-first ToStore persistence.
 
 <p>
   <img src="docs/screenshots/start-screen.png" alt="Start screen" width="220">
@@ -65,6 +66,12 @@ lib/
 |-- data/
 |   `-- example_data.dart
 |-- local/
+|   |-- tostore/
+|   |   |-- studyflow_database.dart
+|   |   |-- studyflow_schemas.dart
+|   |   |-- tostore_subjects_repository.dart
+|   |   |-- tostore_topics_repository.dart
+|   |   `-- tostore_study_notes_repository.dart
 |   |-- local_subjects_repository.dart
 |   |-- local_topics_repository.dart
 |   `-- local_study_notes_repository.dart
@@ -92,6 +99,7 @@ lib/
     |-- studyflow_screen_body.dart
     `-- study_notes/
         `-- study_note_list_item.dart
+ 
 ```
 
 ## Tech Stack
@@ -99,11 +107,10 @@ lib/
 - Dart
 - Flutter
 - Material Design
-- Local in-memory repositories
-- Repository pattern with local implementations
+- ToStore for local persistence
+- Repository pattern with local ToStore implementations
 - get_it for dependency registration
-- ToStore dependency added for upcoming local persistence
-- StatefulWidget and setState for local state
+- StatefulWidget and setState for local UI state
 - Flutter Navigator for screen navigation
 
 ## Run Locally
@@ -128,16 +135,19 @@ flutter run
 
 ## Current Status
 
-The frontend is intentionally local-first at this stage. Screens access data through repository contracts. The current repository implementations are in-memory and backed by local example data. Models now use string-based IDs to prepare the app for ToStore persistence and later backend synchronization.
+The frontend is intentionally local-first at this stage.
 
-The goal of this sprint is to understand Flutter fundamentals, screen navigation, local state, forms, list rendering, dependency registration, repository-based data access, and basic UI structure before connecting the app to persistence or the backend.
+Screens access data through repository contracts, and the active implementations use ToStore for local persistence. Subjects, topics, and study notes can be created locally. Study notes can also be deleted locally.
+
+The frontend models use string-based IDs to prepare the app for later backend synchronization.
 
 ## Next Steps
 
-- Refine repository structure
-- Add local persistence with ToStore, starting with subjects
+- Continue refining ToStore persistence and repository structure
+- Add edit flows for existing study notes
 - Improve form validation
 - Add quizzes and questions
 - Prepare API service classes
 - Connect the Flutter frontend to the ASP.NET Core backend
+- Add synchronization between local data and backend data
 

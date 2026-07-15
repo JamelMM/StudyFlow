@@ -6,19 +6,35 @@ class LocalStudyNotesRepository implements StudyNotesRepository {
   final List<StudyNote> _studyNotes = [...exampleStudyNotes];
 
   @override
-  List<StudyNote> getStudyNotesByTopicId(String topicId) {
+  Future<List<StudyNote>> getStudyNotesByTopicId(String topicId) async {
     return _studyNotes.where((studyNote) {
       return studyNote.topicId == topicId;
     }).toList();
   }
 
   @override
-  void addStudyNote(StudyNote studynote) {
-    _studyNotes.add(studynote);
+  Future<StudyNote> addStudyNote({
+    required String topicId,
+    required String name,
+    required String markdownText,
+  }) async {
+    final newStudyNote = StudyNote(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      topicId: topicId,
+      name: name,
+      markdownText: markdownText,
+      createdAt: DateTime.now(),
+    );
+
+    _studyNotes.add(newStudyNote);
+
+    return newStudyNote;
   }
 
   @override
-  void removeStudyNote(StudyNote studyNote) {
-    _studyNotes.remove(studyNote);
+  Future<void> removeStudyNote(String id) async {
+    _studyNotes.removeWhere((studyNote) {
+      return studyNote.id == id;
+    });
   }
 }
