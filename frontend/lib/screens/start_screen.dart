@@ -17,7 +17,6 @@ class _StartScreenState extends State<StartScreen> {
   void initState() {
     super.initState();
 
-    // Configura el tiempo de espera (por ejemplo, 3 segundos)
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
@@ -43,18 +42,19 @@ class _StartScreenState extends State<StartScreen> {
               ),
             ),
             const SizedBox(height: 80),
-            IconButton.filledTonal(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SubjectScreen(),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.auto_stories, size: 128),
+            Container(
+              width: 140,
+              height: 140,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.auto_stories,
+                size: 126,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
             ),
-            // Un indicador de carga
             SizedBox(height: 100),
             Text(
               "Learn. Organize. Remember.",

@@ -3,7 +3,6 @@ import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/screens/topics_screen.dart';
 import 'package:frontend/models/subject.dart';
 import 'package:frontend/screens/new_subject.dart';
-import 'package:frontend/widgets/studyflow_screen_body.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/repositories/contracts/subjects_repository.dart';
 import 'package:frontend/core/service_locator.dart';
@@ -120,26 +119,24 @@ class _SubjectScreenState extends State<SubjectScreen> {
           IconButton(onPressed: _openAddSubjectOverlay, icon: Icon(Icons.add)),
         ],
       ),
-      body: StudyFlowScreenBody(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Text(
-                  'Subjects',
-                  style: GoogleFonts.inter(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Text(
+                'Subjects',
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
               ),
-              SizedBox(height: 30),
-              Expanded(child: mainContent),
-            ],
-          ),
+            ),
+            SizedBox(height: 30),
+            Expanded(child: mainContent),
+          ],
         ),
       ),
     );
