@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/subject.dart';
-import 'package:frontend/screens/study_notes_screen.dart';
 import 'package:frontend/models/topic.dart';
 import 'package:frontend/screens/new_topic.dart';
-import 'package:frontend/widgets/studyflow_screen_body.dart';
+import 'package:frontend/screens/topic_detail_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/repositories/contracts/topics_repository.dart';
@@ -97,7 +96,7 @@ class _TopicsScreenState extends State<TopicsScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => StudyNotesScreen(topic: topic),
+                    builder: (context) => TopicDetailScreen(topic: topic),
                   ),
                 );
               },
@@ -124,26 +123,24 @@ class _TopicsScreenState extends State<TopicsScreen> {
           IconButton(onPressed: _openAddTopicOverlay, icon: Icon(Icons.add)),
         ],
       ),
-      body: StudyFlowScreenBody(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Text(
-                  'Topics',
-                  style: GoogleFonts.inter(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Text(
+                'Topics',
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
               ),
-              SizedBox(height: 30),
-              Expanded(child: mainContent),
-            ],
-          ),
+            ),
+            SizedBox(height: 30),
+            Expanded(child: mainContent),
+          ],
         ),
       ),
     );

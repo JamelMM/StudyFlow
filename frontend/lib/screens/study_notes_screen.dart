@@ -6,7 +6,6 @@ import 'package:frontend/repositories/contracts/study_notes_repository.dart';
 import 'package:frontend/screens/new_study_note.dart';
 import 'package:frontend/screens/note_screen.dart';
 import 'package:frontend/widgets/study_notes/study_note_list_item.dart';
-import 'package:frontend/widgets/studyflow_screen_body.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/core/service_locator.dart';
@@ -28,6 +27,8 @@ class _StudyNotesScreenState extends State<StudyNotesScreen> {
 
   List<StudyNote> _studyNotes = [];
 
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -45,6 +46,7 @@ class _StudyNotesScreenState extends State<StudyNotesScreen> {
 
     setState(() {
       _studyNotes = loadedStudyNotes;
+      _isLoading = false;
     });
   }
 
@@ -89,7 +91,6 @@ class _StudyNotesScreenState extends State<StudyNotesScreen> {
     }
 
     ScaffoldMessenger.of(context).clearSnackBars();
-
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Note deleted', textAlign: TextAlign.center),
@@ -99,23 +100,23 @@ class _StudyNotesScreenState extends State<StudyNotesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final notes = _studyNotes.where((studyNote) {
-      return studyNote.topicId == widget.topic.id;
-    }).toList();
+    Widget mainContent;
 
-    Widget mainContent = EmptyStateMessage(
-      icon: Icons.note_add_outlined,
-      title: 'No study notes yet.',
-      message: 'Create your first note for this topic.',
-      buttonText: 'Add note',
-      onPressed: _openAddStudyNoteOverlay,
-    );
-
-    if (notes.isNotEmpty) {
+    if (_isLoading) {
+      mainContent = const Center(child: CircularProgressIndicator());
+    } else if (_studyNotes.isEmpty) {
+      mainContent = EmptyStateMessage(
+        icon: Icons.note_add_outlined,
+        title: 'No study notes yet.',
+        message: 'Create your first note for this topic.',
+        buttonText: 'Add note',
+        onPressed: _openAddStudyNoteOverlay,
+      );
+    } else {
       mainContent = ListView.builder(
-        itemCount: notes.length,
+        itemCount: _studyNotes.length,
         itemBuilder: (context, index) {
-          final note = notes[index];
+          final note = _studyNotes[index];
 
           return Dismissible(
             key: ValueKey(note.id),
@@ -144,37 +145,24 @@ class _StudyNotesScreenState extends State<StudyNotesScreen> {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.topic.name),
-        actions: [
-          IconButton(
-            onPressed: _openAddStudyNoteOverlay,
-            icon: const Icon(Icons.add),
-          ),
-        ],
-      ),
-      body: StudyFlowScreenBody(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Text(
-                  'Notes',
-                  style: GoogleFonts.inter(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
-                ),
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Text(
+              'Notes',
+              style: GoogleFonts.inter(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
               ),
-              const SizedBox(height: 30),
-              Expanded(child: mainContent),
-            ],
+            ),
           ),
-        ),
+          const SizedBox(height: 30),
+          Expanded(child: mainContent),
+        ],
       ),
     );
   }

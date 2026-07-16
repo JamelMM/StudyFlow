@@ -103,7 +103,9 @@ Current frontend features:
 - Basic navigation between screens
 - Basic app theming with a custom color scheme
 - SnackBar feedback for local actions
-- Reusable widgets for shared layout, list items, and empty states
+- Open a topic in a dedicated topic detail screen
+- Switch between study notes and quiz area with a bottom navigation bar
+- Initial quiz model and quiz tab placeholder
 
 ### Frontend Structure
 
@@ -135,7 +137,7 @@ lib/screens
 -> App screens for start, subjects, topics, study notes, note details, and local creation flows
 
 lib/widgets
--> Reusable UI widgets such as shared screen layout, decorative corner lines, empty state messages, and study note list items
+-> Reusable UI widgets such as shared screen layout, empty state messages, and study note list items
 ```
 
 ### Frontend Flow
@@ -144,7 +146,9 @@ lib/widgets
 StartScreen
 -> SubjectsScreen
 -> TopicsScreen
--> StudyNotesScreen
+-> TopicDetailScreen
+   -> StudyNotesScreen
+   -> QuizzesScreen
 -> NoteScreen
 ```
 

@@ -24,6 +24,9 @@ The current frontend is a local-first prototype. It uses repository contracts wi
 - Dependency registration with get_it
 - Reusable layout, list item, and empty state widgets
 - SnackBar feedback for local actions
+- Open topics in a dedicated topic detail screen
+- Switch between notes and quiz area with a bottom navigation bar
+- Initial quiz model and quiz placeholder screen
   
 ## Screenshots
 
@@ -53,7 +56,9 @@ Screens shown when there is no local data yet.
 StartScreen
 -> SubjectsScreen
 -> TopicsScreen
--> StudyNotesScreen
+-> TopicDetailScreen
+   -> StudyNotesScreen
+   -> QuizzesScreen
 -> NoteScreen
 ```
 
@@ -78,6 +83,7 @@ lib/
 |-- models/
 |   |-- subject.dart
 |   |-- topic.dart
+|   |-- quiz.dart
 |   `-- study_note.dart
 |-- repositories/
 |   `-- contracts/
@@ -92,11 +98,12 @@ lib/
 |   |-- note_screen.dart
 |   |-- new_subject.dart
 |   |-- new_topic.dart
+|   |-- topic_detail_screen.dart
+|   |-- quizzes_screen.dart
 |   `-- new_study_note.dart
 `-- widgets/
     |-- corner_lines.dart
     |-- empty_state_message.dart
-    |-- studyflow_screen_body.dart
     `-- study_notes/
         `-- study_note_list_item.dart
  
@@ -150,4 +157,7 @@ The frontend models use string-based IDs to prepare the app for later backend sy
 - Prepare API service classes
 - Connect the Flutter frontend to the ASP.NET Core backend
 - Add synchronization between local data and backend data
+- Refactor StudyNotesScreen into an internal StudyNotesView
+- Replace the quiz placeholder with a local quiz creation flow
+- Add quiz questions and answer options
 
