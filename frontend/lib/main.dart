@@ -28,6 +28,7 @@ void main() async {
         cardTheme: CardThemeData().copyWith(
           color: colorScheme.primaryContainer,
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          elevation: 4,
         ),
         textTheme: ThemeData().textTheme.copyWith(
           titleLarge: TextStyle(

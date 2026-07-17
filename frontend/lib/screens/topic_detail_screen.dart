@@ -23,15 +23,13 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget activePage = StudyNotesScreen(topic: widget.topic);
-
-    if (_selectedPageIndex == 1) {
-      activePage = QuizzesScreen(topic: widget.topic);
-    }
+    final pages = <Widget>[
+      StudyNotesScreen(topic: widget.topic),
+      QuizzesScreen(topic: widget.topic),
+    ];
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.topic.name)),
-      body: activePage,
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
         selectedItemColor: Theme.of(context).colorScheme.primaryContainer,
@@ -45,6 +43,7 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.quiz), label: 'Quiz'),
         ],
       ),
+      body: IndexedStack(index: _selectedPageIndex, children: pages),
     );
   }
 }

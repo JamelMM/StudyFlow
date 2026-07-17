@@ -19,7 +19,7 @@ class ToStoreStudyNotesRepository implements StudyNotesRepository {
       'name': name,
       'markdownText': markdownText,
       'createdAt': createdAt.toIso8601String(),
-      'updateAt': null,
+      'updatedAt': null,
     });
 
     if (!result.isSuccess) {
