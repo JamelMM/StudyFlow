@@ -298,6 +298,9 @@ Aktuelle Frontend-Funktionen:
 - Einfaches App-Theming mit eigenem Farbschema
 - SnackBar-Feedback fuer lokale Aktionen
 - Wiederverwendbare Widgets fuer gemeinsames Layout, Listenelemente und Empty States
+- Ein Topic in einem eigenen Topic-Detail-Screen oeffnen
+- Zwischen Study Notes und Quiz-Bereich ueber eine Bottom Navigation wechseln
+- Erstes Quiz-Modell und ein vorlaeufiger Quiz-Tab als Platzhalter
 
 ### Frontend-Struktur
 
@@ -311,7 +314,7 @@ lib/core
 -> Dependency-Registrierung und app-weites Setup
 
 lib/models
--> Frontend-Datenmodelle wie Subject, Topic und StudyNote
+-> Frontend-Datenmodelle wie Subject, Topic, StudyNote und Quiz
 
 lib/data
 -> Lokale Beispieldaten als initiale Entwicklungsdaten
@@ -326,10 +329,10 @@ lib/local/tostore
 -> ToStore-Datenbank-Setup, Schemas und ToStore-Repository-Implementierungen
 
 lib/screens
--> App-Screens fuer Start, Subjects, Topics, Study Notes, Note Details und lokale Creation Flows
+-> App-Screens fuer Start, Subjects, Topics, Topic Details, Study Notes, Quiz-Platzhalter, Note Details und lokale Creation Flows
 
 lib/widgets
--> Wiederverwendbare UI-Widgets wie gemeinsames Screen-Layout, dekorative Corner Lines, Empty-State-Meldungen und Study Note List Items
+-> Wiederverwendbare UI-Widgets wie gemeinsames Screen-Layout, Empty-State-Meldungen und Study Note List Items
 ```
 
 ### Frontend Flow
@@ -338,7 +341,9 @@ lib/widgets
 StartScreen
 -> SubjectsScreen
 -> TopicsScreen
--> StudyNotesScreen
+-> TopicDetailScreen
+   -> StudyNotesScreen
+   -> QuizzesScreen
 -> NoteScreen
 ```
 
@@ -360,6 +365,8 @@ Der aktuelle Frontend-Sprint konzentriert sich darauf, eine visuelle, navigierba
 Das Frontend verwendet aktuell Repository-Vertraege mit ToStore-basierter lokaler Persistenz fuer Subjects, Topics und Study Notes. Lokale Creation Flows fuer Subjects, Topics und Study Notes sind umgesetzt. Study Notes koennen lokal geloescht werden.
 
 Wiederverwendbare Empty States werden angezeigt, wenn keine lokalen Daten vorhanden sind. Die Frontend-Modelle verwenden String-basierte IDs. Dadurch wird die App auf lokale Persistenz und eine spaetere ASP.NET Core API-Anbindung vorbereitet.
+
+Zusätzlich wurde ein Topic-Detail-Screen eingeführt. Dort kann der Benutzer innerhalb eines Topics zwischen Study Notes und einem vorläufigen Quiz-Bereich wechseln. Der Quiz-Bereich ist aktuell noch ein Platzhalter und dient als Vorbereitung fuer die naechsten Schritte mit Quizzes, Questions und Answer Options.
 
 ### Tech Stack
 
