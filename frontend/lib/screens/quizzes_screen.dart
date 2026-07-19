@@ -5,6 +5,7 @@ import 'package:frontend/core/service_locator.dart';
 import 'package:frontend/models/quiz.dart';
 import 'package:frontend/models/topic.dart';
 import 'package:frontend/repositories/contracts/quizzes_repository.dart';
+import 'package:frontend/screens/quiz_questions_screen.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -48,7 +49,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
 
   Future<void> _createQuiz() async {
     await _quizzesRepository.addQuiz(
-      name: '${widget.topic.name} Quiz',
+      name: widget.topic.name,
       topicId: widget.topic.id,
     );
 
@@ -85,46 +86,55 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
         onPressed: _createQuiz,
       );
     } else {
-      title = quiz.name;
-
       mainContent = Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SizedBox(
               width: double.infinity,
-              height: 160,
+              height: 360,
               child: Card(
-                elevation: 12,
-                child: InkWell(
-                  onTap: () {},
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.quiz, size: 64),
-                        const SizedBox(height: 12),
-                        Text(
-                          quiz.name,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onPrimaryContainer,
-                          ),
+                color: const Color(0xFFFFF3B0),
+                elevation: 6,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.quiz, size: 80),
+                      const SizedBox(height: 64),
+                      Text(
+                        quiz.name,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onPrimaryContainer,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 36),
-            FilledButton(onPressed: () {}, child: const Text('Start quiz')),
+            FilledButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => QuizQuestionsScreen(quiz: quiz),
+                  ),
+                );
+              },
+              child: const Text('Start quiz'),
+            ),
           ],
         ),
       );

@@ -1,5 +1,8 @@
+import 'package:frontend/local/tostore/tostore_answer_options_repository.dart';
+import 'package:frontend/local/tostore/tostore_questions_repository.dart';
 import 'package:frontend/local/tostore/tostore_study_notes_repository.dart';
 import 'package:frontend/local/tostore/tostore_topics_repository.dart';
+import 'package:frontend/repositories/contracts/answeroptionsrepository.dart';
 import 'package:frontend/repositories/contracts/quizzes_repository.dart';
 import 'package:get_it/get_it.dart';
 import 'package:frontend/local/tostore/tostore_subjects_repository.dart';
@@ -7,6 +10,7 @@ import 'package:frontend/local/tostore/tostore_quizzes_repository.dart';
 import 'package:frontend/repositories/contracts/study_notes_repository.dart';
 import 'package:frontend/repositories/contracts/topics_repository.dart';
 import 'package:frontend/repositories/contracts/subjects_repository.dart';
+import 'package:frontend/repositories/contracts/questions_repository.dart';
 
 final getIt = GetIt.instance;
 
@@ -18,4 +22,10 @@ void setupDependencies() {
   getIt.registerSingleton<StudyNotesRepository>(ToStoreStudyNotesRepository());
 
   getIt.registerSingleton<QuizzesRepository>(ToStoreQuizzesRepository());
+
+  getIt.registerSingleton<QuestionsRepository>(ToStoreQuestionsRepository());
+
+  getIt.registerSingleton<AnswerOptionsRepository>(
+    ToStoreAnswerOptionsRepository(),
+  );
 }
