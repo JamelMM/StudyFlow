@@ -91,21 +91,22 @@ Current frontend features:
 - Create subjects locally
 - Open a subject and view its topics
 - Create topics locally
+- Open a topic in a dedicated topic detail screen
+- Switch between study notes and quiz area with a bottom navigation bar
 - Open a topic and view its study notes
 - Create study notes locally
 - Delete study notes locally
 - Open a study note and read its content
-- Local persistence with ToStore for subjects, topics, and study notes
+- Local persistence with ToStore for subjects, topics, study notes, quizzes, questions, and answer options
 - Repository contracts with ToStore-backed local implementations
 - Dependency registration with get_it
 - String-based frontend IDs prepared for local persistence and backend/API integration
-- Local example data used as initial development data
+- Quiz foundation with Quiz, Question, and AnswerOption models
+- Initial quiz questions screen
 - Basic navigation between screens
 - Basic app theming with a custom color scheme
 - SnackBar feedback for local actions
-- Open a topic in a dedicated topic detail screen
-- Switch between study notes and quiz area with a bottom navigation bar
-- Initial quiz model and quiz tab placeholder
+- Dummy data and in-memory repositories have been removed
 
 ### Frontend Structure
 

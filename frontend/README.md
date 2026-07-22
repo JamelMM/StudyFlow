@@ -68,44 +68,27 @@ StartScreen
 lib/
 |-- core/
 |   `-- service_locator.dart
-|-- data/
-|   `-- example_data.dart
 |-- local/
-|   |-- tostore/
-|   |   |-- studyflow_database.dart
-|   |   |-- studyflow_schemas.dart
-|   |   |-- tostore_subjects_repository.dart
-|   |   |-- tostore_topics_repository.dart
-|   |   `-- tostore_study_notes_repository.dart
-|   |-- local_subjects_repository.dart
-|   |-- local_topics_repository.dart
-|   `-- local_study_notes_repository.dart
+|   `-- tostore/
+|       |-- studyflow_database.dart
+|       |-- studyflow_schemas.dart
+|       |-- tostore_subjects_repository.dart
+|       |-- tostore_topics_repository.dart
+|       |-- tostore_study_notes_repository.dart
+|       |-- tostore_quizzes_repository.dart
+|       |-- tostore_questions_repository.dart
+|       `-- tostore_answer_options_repository.dart
 |-- models/
 |   |-- subject.dart
 |   |-- topic.dart
+|   |-- study_note.dart
 |   |-- quiz.dart
-|   `-- study_note.dart
+|   |-- question.dart
+|   `-- answer_option.dart
 |-- repositories/
 |   `-- contracts/
-|       |-- subjects_repository.dart
-|       |-- topics_repository.dart
-|       `-- study_notes_repository.dart
 |-- screens/
-|   |-- start_screen.dart
-|   |-- subject_screen.dart
-|   |-- topics_screen.dart
-|   |-- study_notes_screen.dart
-|   |-- note_screen.dart
-|   |-- new_subject.dart
-|   |-- new_topic.dart
-|   |-- topic_detail_screen.dart
-|   |-- quizzes_screen.dart
-|   `-- new_study_note.dart
-`-- widgets/
-    |-- corner_lines.dart
-    |-- empty_state_message.dart
-    `-- study_notes/
-        `-- study_note_list_item.dart
+|-- widgets/
  
 ```
 
