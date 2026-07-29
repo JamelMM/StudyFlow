@@ -5,9 +5,10 @@ import 'package:frontend/core/service_locator.dart';
 import 'package:frontend/models/quiz.dart';
 import 'package:frontend/models/topic.dart';
 import 'package:frontend/repositories/contracts/quizzes_repository.dart';
-import 'package:frontend/screens/quiz_questions_screen.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/screens/quiz_play_screen.dart';
+import 'package:frontend/screens/quiz_questions_screen.dart';
 
 class QuizzesScreen extends StatefulWidget {
   const QuizzesScreen({super.key, required this.topic});
@@ -129,11 +130,23 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => QuizQuestionsScreen(quiz: quiz),
+                    builder: (context) => QuizPlayScreen(quiz: quiz),
                   ),
                 );
               },
               child: const Text('Start quiz'),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => QuizQuestionsScreen(quiz: quiz),
+                  ),
+                );
+              },
+              child: const Text('Manage questions'),
             ),
           ],
         ),

@@ -39,7 +39,7 @@ The backend is in progress and already exposes the first API endpoints. The Flut
 
 ### About
 
-StudyFlow is a full-stack learning project with an ASP.NET Core Web API backend and a Flutter frontend. The goal is to organize study content into subjects, topics, and study notes, and later extend the system with quizzes and review sessions.
+StudyFlow is a full-stack learning project with an ASP.NET Core Web API backend and a Flutter frontend. The goal is to organize study content into subjects, topics, study notes, quizzes, questions, and answer options.
 
 This project is also my personal learning project for backend and frontend development with C#, ASP.NET Core, Entity Framework Core, PostgreSQL, Dart, Flutter, dependency injection, repositories, services, DTOs, local persistence, and layered architecture.
 
@@ -101,8 +101,13 @@ Current frontend features:
 - Repository contracts with ToStore-backed local implementations
 - Dependency registration with get_it
 - String-based frontend IDs prepared for local persistence and backend/API integration
-- Quiz foundation with Quiz, Question, and AnswerOption models
-- Initial quiz questions screen
+- Local quiz flow with question management, answer options, and answer feedback
+- Create quiz questions locally
+- Create answer options for quiz questions
+- Mark answer options as correct
+- Manage quiz questions and answer options
+- Start a quiz and answer questions
+- Visual feedback for correct and incorrect quiz answers
 - Basic navigation between screens
 - Basic app theming with a custom color scheme
 - SnackBar feedback for local actions
@@ -120,10 +125,7 @@ lib/core
 -> Dependency registration and app-level setup
 
 lib/models
--> Frontend data models such as Subject, Topic, and StudyNote
-
-lib/data
--> Local example data used as initial development data
+-> Frontend data models such as Subject, Topic, StudyNote, Quiz, Question, and AnswerOption
 
 lib/repositories/contracts
 -> Repository contracts for frontend data access
@@ -135,7 +137,7 @@ lib/local/tostore
 -> ToStore database setup, schemas, and ToStore repository implementations
 
 lib/screens
--> App screens for start, subjects, topics, study notes, note details, and local creation flows
+-> App screens for start, subjects, topics, topic details, study notes, quizzes, questions, answer options, note details, and local creation flows
 
 lib/widgets
 -> Reusable UI widgets such as shared screen layout, empty state messages, and study note list items
@@ -149,8 +151,11 @@ StartScreen
 -> TopicsScreen
 -> TopicDetailScreen
    -> StudyNotesScreen
+      -> NoteScreen
    -> QuizzesScreen
--> NoteScreen
+      -> QuizQuestionsScreen
+         -> QuestionDetailScreen
+      -> QuizPlayScreen
 ```
 
 ### Frontend Tech Stack
@@ -168,7 +173,9 @@ StartScreen
 
 The current frontend sprint focuses on building a visual, navigable, local-first version of StudyFlow before backend integration.
 
-The frontend currently uses repository contracts with ToStore-backed local persistence for subjects, topics, and study notes. Local creation flows for subjects, topics, and study notes are implemented, and study notes can also be deleted locally.
+The frontend currently uses repository contracts with ToStore-backed local persistence for subjects, topics, study notes, quizzes, questions, and answer options. Local creation flows for subjects, topics, study notes, quiz questions, and answer options are implemented. Study notes can also be deleted locally.
+
+The quiz area now supports a first local quiz flow. Users can create questions, add answer options, mark the correct answer, start a quiz, select answers, and receive visual feedback for correct and incorrect answers.
 
 Reusable empty states are shown when no local data is available. The frontend models use string-based IDs, which prepares the app for local persistence and later ASP.NET Core API integration.
 
@@ -234,7 +241,7 @@ flutter run
 
 ### Ueber das Projekt
 
-StudyFlow ist ein Full-Stack-Lernprojekt mit einem ASP.NET Core Web API Backend und einem Flutter-Frontend. Das Ziel ist, Lerninhalte in Subjects, Topics und Study Notes zu organisieren und das System spaeter mit Quizzes und Review Sessions zu erweitern.
+StudyFlow ist ein Full-Stack-Lernprojekt mit einem ASP.NET Core Web API Backend und einem Flutter-Frontend. Das Ziel ist, Lerninhalte in Subjects, Topics, Study Notes, Quizzes, Questions und Answer Options zu organisieren.
 
 Dieses Projekt ist gleichzeitig mein persoenliches Lernprojekt fuer Backend- und Frontend-Entwicklung mit C#, ASP.NET Core, Entity Framework Core, PostgreSQL, Dart, Flutter, Dependency Injection, Repositories, Services, DTOs, lokaler Persistenz und Schichtenarchitektur.
 
@@ -286,39 +293,41 @@ Aktuelle Frontend-Funktionen:
 - Subjects lokal erstellen
 - Ein Subject oeffnen und die dazugehoerigen Topics anzeigen
 - Topics lokal erstellen
+- Ein Topic in einem eigenen Topic-Detail-Screen oeffnen
+- Zwischen Study Notes und Quiz-Bereich ueber eine Bottom Navigation wechseln
 - Ein Topic oeffnen und die dazugehoerigen Study Notes anzeigen
 - Study Notes lokal erstellen
 - Study Notes lokal loeschen
 - Eine Study Note oeffnen und ihren Inhalt lesen
-- Lokale Persistenz mit ToStore fuer Subjects, Topics und Study Notes
+- Lokale Persistenz mit ToStore fuer Subjects, Topics, Study Notes, Quizzes, Questions und Answer Options
 - Repository-Vertraege mit ToStore-basierten lokalen Implementierungen
 - Dependency-Registrierung mit get_it
 - String-basierte Frontend-IDs als Vorbereitung auf lokale Persistenz und Backend/API-Anbindung
-- Lokale Beispieldaten als initiale Entwicklungsdaten
+- Lokaler Quiz-Flow mit Fragenverwaltung, Antwortoptionen und Antwort-Feedback
+- Quiz-Fragen lokal erstellen
+- Antwortoptionen fuer Quiz-Fragen lokal erstellen
+- Richtige Antwortoptionen markieren
+- Quiz-Fragen und Antwortoptionen verwalten
+- Ein Quiz starten und Fragen beantworten
+- Visuelles Feedback fuer richtige und falsche Antworten
 - Einfache Navigation zwischen den Screens
 - Einfaches App-Theming mit eigenem Farbschema
 - SnackBar-Feedback fuer lokale Aktionen
-- Wiederverwendbare Widgets fuer gemeinsames Layout, Listenelemente und Empty States
-- Ein Topic in einem eigenen Topic-Detail-Screen oeffnen
-- Zwischen Study Notes und Quiz-Bereich ueber eine Bottom Navigation wechseln
-- Erstes Quiz-Modell und ein vorlaeufiger Quiz-Tab als Platzhalter
+- Dummy Data und In-Memory-Repositories wurden entfernt
 
 ### Frontend-Struktur
 
 Das StudyFlow-Frontend ist aktuell als kleine Flutter-Anwendung organisiert:
 
 ```text
-StudyFlow/frontend/
+SStudyFlow/frontend/
 -> Flutter Mobile Application
 
 lib/core
 -> Dependency-Registrierung und app-weites Setup
 
 lib/models
--> Frontend-Datenmodelle wie Subject, Topic, StudyNote und Quiz
-
-lib/data
--> Lokale Beispieldaten als initiale Entwicklungsdaten
+-> Frontend-Datenmodelle wie Subject, Topic, StudyNote, Quiz, Question und AnswerOption
 
 lib/repositories/contracts
 -> Repository-Vertraege fuer den Datenzugriff im Frontend
@@ -330,10 +339,10 @@ lib/local/tostore
 -> ToStore-Datenbank-Setup, Schemas und ToStore-Repository-Implementierungen
 
 lib/screens
--> App-Screens fuer Start, Subjects, Topics, Topic Details, Study Notes, Quiz-Platzhalter, Note Details und lokale Creation Flows
+-> App-Screens fuer Start, Subjects, Topics, Topic Details, Study Notes, Quizzes, Questions, Answer Options, Note Details und lokale Creation Flows
 
 lib/widgets
--> Wiederverwendbare UI-Widgets wie gemeinsames Screen-Layout, Empty-State-Meldungen und Study Note List Items
+-> Wiederverwendbare UI-Widgets wie Empty-State-Meldungen und Study Note List Items
 ```
 
 ### Frontend Flow
@@ -344,8 +353,11 @@ StartScreen
 -> TopicsScreen
 -> TopicDetailScreen
    -> StudyNotesScreen
+      -> NoteScreen
    -> QuizzesScreen
--> NoteScreen
+      -> QuizQuestionsScreen
+         -> QuestionDetailScreen
+      -> QuizPlayScreen
 ```
 
 ### Frontend Tech Stack
@@ -363,11 +375,11 @@ StartScreen
 
 Der aktuelle Frontend-Sprint konzentriert sich darauf, eine visuelle, navigierbare und local-first Version von StudyFlow vor der Backend-Anbindung zu erstellen.
 
-Das Frontend verwendet aktuell Repository-Vertraege mit ToStore-basierter lokaler Persistenz fuer Subjects, Topics und Study Notes. Lokale Creation Flows fuer Subjects, Topics und Study Notes sind umgesetzt. Study Notes koennen lokal geloescht werden.
+Das Frontend verwendet aktuell Repository-Vertraege mit ToStore-basierter lokaler Persistenz fuer Subjects, Topics, Study Notes, Quizzes, Questions und Answer Options. Lokale Creation Flows fuer Subjects, Topics, Study Notes, Quiz-Fragen und Antwortoptionen sind umgesetzt. Study Notes koennen lokal geloescht werden.
+
+Der Quiz-Bereich unterstuetzt jetzt einen ersten lokalen Quiz-Flow. Benutzer koennen Fragen erstellen, Antwortoptionen hinzufuegen, die richtige Antwort markieren, ein Quiz starten, Antworten auswaehlen und visuelles Feedback fuer richtige und falsche Antworten erhalten.
 
 Wiederverwendbare Empty States werden angezeigt, wenn keine lokalen Daten vorhanden sind. Die Frontend-Modelle verwenden String-basierte IDs. Dadurch wird die App auf lokale Persistenz und eine spaetere ASP.NET Core API-Anbindung vorbereitet.
-
-Zusätzlich wurde ein Topic-Detail-Screen eingeführt. Dort kann der Benutzer innerhalb eines Topics zwischen Study Notes und einem vorläufigen Quiz-Bereich wechseln. Der Quiz-Bereich ist aktuell noch ein Platzhalter und dient als Vorbereitung fuer die naechsten Schritte mit Quizzes, Questions und Answer Options.
 
 ### Tech Stack
 

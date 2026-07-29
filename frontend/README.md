@@ -11,23 +11,28 @@ The current frontend is a local-first prototype. It uses repository contracts wi
 - Create subjects locally
 - View topics for a selected subject
 - Create topics locally
+- Open topics in a dedicated topic detail screen
+- Switch between notes and quiz area with a bottom navigation bar
 - View study notes for a selected topic
 - Create study notes locally
 - Delete study notes locally
 - Open a study note and read its content
 - Basic Material Design UI
 - Custom color scheme
-- Local repository layer for subjects, topics, and study notes
-- ToStore-backed local persistence for subjects, topics, and study notes
+- ToStore-backed local persistence for subjects, topics, study notes, quizzes, questions, and answer options
 - Repository contracts for local-first data access
 - String-based IDs prepared for ToStore and backend integration
 - Dependency registration with get_it
-- Reusable layout, list item, and empty state widgets
+- Reusable list item and empty state widgets
 - SnackBar feedback for local actions
-- Open topics in a dedicated topic detail screen
-- Switch between notes and quiz area with a bottom navigation bar
-- Initial quiz model and quiz placeholder screen
-  
+- Local quiz model with questions and answer options
+- Create quiz questions locally
+- Create answer options for quiz questions
+- Mark answer options as correct
+- Manage quiz questions and answer options
+- Start a quiz and answer questions
+- Visual feedback for correct and incorrect quiz answers
+
 ## Screenshots
 
 Current work-in-progress Flutter UI using local-first ToStore persistence.
@@ -58,9 +63,11 @@ StartScreen
 -> TopicsScreen
 -> TopicDetailScreen
    -> StudyNotesScreen
+      -> NoteScreen
    -> QuizzesScreen
--> NoteScreen
-```
+      -> QuizQuestionsScreen
+         -> QuestionDetailScreen
+      -> QuizPlayScreen
 
 ## Project Structure
 
@@ -127,20 +134,21 @@ flutter run
 
 The frontend is intentionally local-first at this stage.
 
-Screens access data through repository contracts, and the active implementations use ToStore for local persistence. Subjects, topics, and study notes can be created locally. Study notes can also be deleted locally.
+Screens access data through repository contracts, and the active implementations use ToStore for local persistence. Subjects, topics, study notes, quizzes, questions, and answer options can be created locally. Study notes can also be deleted locally.
+
+The quiz area now has a first usable local flow. Users can create quiz questions, add answer options, mark correct answers, start the quiz, select answers, and receive visual feedback for correct and incorrect answers.
 
 The frontend models use string-based IDs to prepare the app for later backend synchronization.
 
 ## Next Steps
 
-- Continue refining ToStore persistence and repository structure
-- Add edit flows for existing study notes
+- Improve quiz play results and add a summary screen
+- Add edit/delete flows for quiz questions and answer options
+- Add validation to ensure each question has one correct answer
 - Improve form validation
-- Add quizzes and questions
+- Add edit flows for existing study notes
 - Prepare API service classes
 - Connect the Flutter frontend to the ASP.NET Core backend
 - Add synchronization between local data and backend data
 - Refactor StudyNotesScreen into an internal StudyNotesView
-- Replace the quiz placeholder with a local quiz creation flow
-- Add quiz questions and answer options
 

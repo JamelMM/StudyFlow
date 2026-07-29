@@ -4,6 +4,7 @@ import 'package:frontend/models/question.dart';
 import 'package:frontend/models/quiz.dart';
 import 'package:frontend/repositories/contracts/questions_repository.dart';
 import 'package:frontend/screens/new_question.dart';
+import 'package:frontend/screens/question_detail_screen.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 
 class QuizQuestionsScreen extends StatefulWidget {
@@ -102,9 +103,20 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
           final question = _questions[index];
 
           return Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(question.markdownText),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        QuestionDetailScreen(question: question),
+                  ),
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(question.markdownText),
+              ),
             ),
           );
         },
@@ -112,7 +124,15 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.quiz.name)),
+      appBar: AppBar(
+        title: Text(widget.quiz.name),
+        actions: [
+          IconButton(
+            onPressed: _openAddQuestionOverlay,
+            icon: const Icon(Icons.add),
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.only(top: 20),
         child: Column(
