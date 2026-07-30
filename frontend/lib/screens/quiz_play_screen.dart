@@ -5,6 +5,7 @@ import 'package:frontend/models/answer_option.dart';
 import 'package:frontend/models/question.dart';
 import 'package:frontend/repositories/contracts/answeroptionsrepository.dart';
 import 'package:frontend/repositories/contracts/questions_repository.dart';
+import 'package:frontend/screens/quiz_result_screen.dart';
 
 class QuizPlayScreen extends StatefulWidget {
   const QuizPlayScreen({super.key, required this.quiz});
@@ -29,6 +30,7 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
   String? _selectedAnswerOptionId;
   bool _hasAnswered = false;
   bool _isLoading = true;
+  int _correctAnswersCount = 0;
 
   @override
   void initState() {
@@ -78,7 +80,16 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
     final nextQuestionIndex = _currentQuestionIndex + 1;
 
     if (nextQuestionIndex >= _questions.length) {
-      Navigator.pop(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => QuizResultScreen(
+            quiz: widget.quiz,
+            correctAnswersCount: _correctAnswersCount,
+            totalQuestions: _questions.length,
+          ),
+        ),
+      );
       return;
     }
 
@@ -107,6 +118,10 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
     setState(() {
       _selectedAnswerOptionId = answerOption.id;
       _hasAnswered = true;
+
+      if (answerOption.isCorrect) {
+        _correctAnswersCount++;
+      }
     });
   }
 

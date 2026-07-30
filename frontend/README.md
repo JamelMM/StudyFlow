@@ -32,6 +32,8 @@ The current frontend is a local-first prototype. It uses repository contracts wi
 - Manage quiz questions and answer options
 - Start a quiz and answer questions
 - Visual feedback for correct and incorrect quiz answers
+- Play quizzes with visual answer feedback
+- View final quiz results with score, percentage, and retry option
 
 ## Screenshots
 

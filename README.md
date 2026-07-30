@@ -108,6 +108,9 @@ Current frontend features:
 - Manage quiz questions and answer options
 - Start a quiz and answer questions
 - Visual feedback for correct and incorrect quiz answers
+- Play quizzes by answering multiple-choice questions
+- Show visual feedback for correct and incorrect quiz answers
+- Show a final quiz result screen with score, percentage, and retry option
 - Basic navigation between screens
 - Basic app theming with a custom color scheme
 - SnackBar feedback for local actions
@@ -156,6 +159,7 @@ StartScreen
       -> QuizQuestionsScreen
          -> QuestionDetailScreen
       -> QuizPlayScreen
+         -> QuizResultScreen
 ```
 
 ### Frontend Tech Stack
@@ -310,6 +314,9 @@ Aktuelle Frontend-Funktionen:
 - Quiz-Fragen und Antwortoptionen verwalten
 - Ein Quiz starten und Fragen beantworten
 - Visuelles Feedback fuer richtige und falsche Antworten
+- Quizfragen und Antwortoptionen lokal erstellen
+- Quizze mit richtig/falsch-Feedback spielen
+- Ergebnisbildschirm mit Punktzahl, Prozentanzeige und Wiederholen-Option anzeigen
 - Einfache Navigation zwischen den Screens
 - Einfaches App-Theming mit eigenem Farbschema
 - SnackBar-Feedback fuer lokale Aktionen
