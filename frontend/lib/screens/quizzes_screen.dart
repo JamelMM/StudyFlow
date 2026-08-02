@@ -9,6 +9,8 @@ import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/screens/quiz_play_screen.dart';
 import 'package:frontend/screens/quiz_questions_screen.dart';
+import 'package:frontend/repositories/contracts/questions_repository.dart';
+import 'package:frontend/repositories/contracts/answeroptionsrepository.dart';
 
 class QuizzesScreen extends StatefulWidget {
   const QuizzesScreen({super.key, required this.topic});
@@ -23,6 +25,9 @@ class QuizzesScreen extends StatefulWidget {
 
 class _QuizzesScreenState extends State<QuizzesScreen> {
   final QuizzesRepository _quizzesRepository = getIt<QuizzesRepository>();
+  final AnswerOptionsRepository _answerOptionsRepository =
+      getIt<AnswerOptionsRepository>();
+  final QuestionsRepository _questionsRepository = getIt<QuestionsRepository>();
 
   Quiz? _quiz;
   bool _isLoading = true;
@@ -66,6 +71,79 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
         content: Text('Quiz successfully created', textAlign: TextAlign.center),
         backgroundColor: Color(0xFF2F855A),
       ),
+    );
+  }
+
+  Future<void> _startQuiz(Quiz quiz) async {
+    final questions = await _questionsRepository.getQuestionsByQuizId(quiz.id);
+
+    if (questions.isEmpty) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Add at least one question before starting the quiz.',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+
+      return;
+    }
+
+    for (final question in questions) {
+      final answers = await _answerOptionsRepository
+          .getAnswerOptionsByQuestionId(question.id);
+
+      if (answers.isEmpty) {
+        if (!mounted) {
+          return;
+        }
+
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Every question needs at least one answer.',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+
+        return;
+      }
+
+      final hasCorrectAnswer = answers.any((answer) => answer.isCorrect);
+
+      if (!hasCorrectAnswer) {
+        if (!mounted) {
+          return;
+        }
+
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Every question needs one correct answer.',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+        return;
+      }
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => QuizPlayScreen(quiz: quiz)),
     );
   }
 
@@ -127,12 +205,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
             const SizedBox(height: 36),
             FilledButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => QuizPlayScreen(quiz: quiz),
-                  ),
-                );
+                _startQuiz(quiz);
               },
               child: const Text('Start quiz'),
             ),
@@ -152,6 +225,7 @@ class _QuizzesScreenState extends State<QuizzesScreen> {
         ),
       );
     }
+
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: Column(
