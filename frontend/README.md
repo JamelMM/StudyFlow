@@ -9,31 +9,35 @@ The current frontend is a local-first prototype. It uses repository contracts wi
 - Start screen before entering the main StudyFlow flow
 - View subjects
 - Create subjects locally
+- Delete subjects locally with confirmation
 - View topics for a selected subject
 - Create topics locally
+- Delete topics locally with confirmation
 - Open topics in a dedicated topic detail screen
 - Switch between notes and quiz area with a bottom navigation bar
 - View study notes for a selected topic
 - Create study notes locally
 - Delete study notes locally
 - Open a study note and read its content
-- Basic Material Design UI
-- Custom color scheme
+- Create quizzes locally
+- Create quiz questions locally
+- Delete quiz questions locally
+- Create answer options for quiz questions
+- Delete answer options locally
+- Mark answer options as correct
+- Validate quiz readiness before starting
+- Start a quiz and answer questions
+- Show visual feedback for correct and incorrect quiz answers
+- View final quiz results with score, percentage, and retry option
 - ToStore-backed local persistence for subjects, topics, study notes, quizzes, questions, and answer options
+- Cascade deletion support through ToStore relationships
 - Repository contracts for local-first data access
 - String-based IDs prepared for ToStore and backend integration
 - Dependency registration with get_it
+- Basic Material Design UI
+- Custom color scheme
 - Reusable list item and empty state widgets
 - SnackBar feedback for local actions
-- Local quiz model with questions and answer options
-- Create quiz questions locally
-- Create answer options for quiz questions
-- Mark answer options as correct
-- Manage quiz questions and answer options
-- Start a quiz and answer questions
-- Visual feedback for correct and incorrect quiz answers
-- Play quizzes with visual answer feedback
-- View final quiz results with score, percentage, and retry option
 
 ## Screenshots
 
@@ -136,11 +140,15 @@ flutter run
 
 The frontend is intentionally local-first at this stage.
 
-Screens access data through repository contracts, and the active implementations use ToStore for local persistence. Subjects, topics, study notes, quizzes, questions, and answer options can be created locally. Study notes can also be deleted locally.
+Screens access data through repository contracts, and the active implementations use ToStore for local persistence. Subjects, topics, study notes, quizzes, questions, and answer options can be created locally.
 
-The quiz area now has a first usable local flow. Users can create quiz questions, add answer options, mark correct answers, start the quiz, select answers, and receive visual feedback for correct and incorrect answers.
+The app now supports local deletion flows for subjects, topics, study notes, quiz questions, and answer options. Larger deletion flows, such as subjects and topics, use confirmation dialogs because related data can be removed through ToStore cascade relationships.
 
-The frontend models use string-based IDs to prepare the app for later backend synchronization.
+The quiz area has a first usable local flow. Users can create quiz questions, add answer options, mark correct answers, validate quiz readiness before starting, play quizzes, receive visual feedback for correct and incorrect answers, and view a final result screen with score and percentage.
+
+The frontend models use string-based IDs to prepare the app for local persistence and later backend synchronization.
+
+The next major step is adding an initial seed with public demo learning content so the app can be useful immediately after installation.
 
 ## Next Steps
 

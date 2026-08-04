@@ -48,4 +48,15 @@ class TostoreTopicsRepository implements TopicsRepository {
         })
         .toList();
   }
+
+  @override
+  Future<void> removeTopic(String id) async {
+    final result = await StudyFlowDatabase.db
+        .delete(_tableName)
+        .where('id', '=', id);
+
+    if (!result.isSuccess) {
+      throw Exception('Could not delete topic.');
+    }
+  }
 }

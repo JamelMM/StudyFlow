@@ -75,6 +75,53 @@ class _TopicsScreenState extends State<TopicsScreen> {
     );
   }
 
+  Future<void> _removeTopic(Topic topic) async {
+    await _topicsRepository.removeTopic(topic.id);
+
+    await _loadTopics();
+
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Topic deleted', textAlign: TextAlign.center),
+      ),
+    );
+  }
+
+  Future<bool> _confirmRemoveTopic(Topic topic) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Delete topic?'),
+          content: const Text(
+            'This will also delete its notes, quiz, questions, and answers.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, false);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, true);
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return shouldDelete == true;
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget mainContent = EmptyStateMessage(
@@ -90,24 +137,40 @@ class _TopicsScreenState extends State<TopicsScreen> {
         itemCount: _subjectTopics.length,
         itemBuilder: (context, index) {
           final topic = _subjectTopics[index];
-          return Card(
-            child: InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TopicDetailScreen(topic: topic),
+
+          return Dismissible(
+            key: ValueKey(topic.id),
+            background: Container(
+              color: const Color(0xFFC53030),
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(right: 20),
+              child: const Icon(Icons.delete, color: Colors.white),
+            ),
+            confirmDismiss: (direction) {
+              return _confirmRemoveTopic(topic);
+            },
+            onDismissed: (direction) {
+              _removeTopic(topic);
+            },
+            child: Card(
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TopicDetailScreen(topic: topic),
+                    ),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.topic),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(topic.name)),
+                    ],
                   ),
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    const Icon(Icons.topic),
-                    const SizedBox(width: 12),
-                    Text(topic.name),
-                  ],
                 ),
               ),
             ),

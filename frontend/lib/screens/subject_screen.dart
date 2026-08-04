@@ -69,6 +69,53 @@ class _SubjectScreenState extends State<SubjectScreen> {
     );
   }
 
+  Future<void> _removeSubject(Subject subject) async {
+    await _subjectsRepository.removeSubject(subject.id);
+
+    await _loadSubjects();
+
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Subject deleted', textAlign: TextAlign.center),
+      ),
+    );
+  }
+
+  Future<bool> _confirmRemoveSubject(Subject subject) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Delete subject?'),
+          content: const Text(
+            'This will also delete its topics, notes, quizzes, questions, and answers.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, false);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, true);
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return shouldDelete == true;
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget mainContent = EmptyStateMessage(
@@ -85,24 +132,39 @@ class _SubjectScreenState extends State<SubjectScreen> {
         itemBuilder: (context, index) {
           final subject = _subjects[index];
 
-          return Card(
-            child: InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TopicsScreen(subject: subject),
+          return Dismissible(
+            key: ValueKey(subject.id),
+            background: Container(
+              color: const Color(0xFFC53030),
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(right: 20),
+              child: const Icon(Icons.delete, color: Colors.white),
+            ),
+            confirmDismiss: (direction) {
+              return _confirmRemoveSubject(subject);
+            },
+            onDismissed: (direction) {
+              _removeSubject(subject);
+            },
+            child: Card(
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TopicsScreen(subject: subject),
+                    ),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.school),
+                      const SizedBox(width: 12),
+                      Text(subject.name),
+                    ],
                   ),
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    const Icon(Icons.school),
-                    const SizedBox(width: 12),
-                    Text(subject.name),
-                  ],
                 ),
               ),
             ),

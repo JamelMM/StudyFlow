@@ -81,6 +81,23 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
     );
   }
 
+  Future<void> _removeAnswerOption(AnswerOption answerOption) async {
+    await _answerOptionsRepository.removeAnswerOption(answerOption.id);
+
+    await _loadAnswerOptions();
+
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Answer deleted', textAlign: TextAlign.center),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget mainContent;
@@ -101,22 +118,34 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
         itemBuilder: (context, index) {
           final answerOption = _answerOptions[index];
 
-          return Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Icon(
-                    answerOption.isCorrect
-                        ? Icons.check_circle
-                        : Icons.radio_button_unchecked,
-                    color: answerOption.isCorrect
-                        ? const Color(0xFF2F855A)
-                        : Theme.of(context).colorScheme.onPrimaryContainer,
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(child: Text(answerOption.markdownText)),
-                ],
+          return Dismissible(
+            key: ValueKey(answerOption.id),
+            background: Container(
+              color: Colors.red,
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(right: 20),
+              child: const Icon(Icons.delete, color: Colors.white),
+            ),
+            onDismissed: (direction) {
+              _removeAnswerOption(answerOption);
+            },
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Icon(
+                      answerOption.isCorrect
+                          ? Icons.check_circle
+                          : Icons.radio_button_unchecked,
+                      color: answerOption.isCorrect
+                          ? const Color(0xFF2F855A)
+                          : Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(child: Text(answerOption.markdownText)),
+                  ],
+                ),
               ),
             ),
           );

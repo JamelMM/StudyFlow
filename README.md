@@ -89,32 +89,33 @@ Current frontend features:
 - Start screen before entering the main StudyFlow flow
 - View a list of subjects
 - Create subjects locally
+- Delete subjects locally with confirmation
 - Open a subject and view its topics
 - Create topics locally
+- Delete topics locally with confirmation
 - Open a topic in a dedicated topic detail screen
 - Switch between study notes and quiz area with a bottom navigation bar
-- Open a topic and view its study notes
 - Create study notes locally
 - Delete study notes locally
 - Open a study note and read its content
+- Create quizzes locally
+- Create quiz questions locally
+- Delete quiz questions locally
+- Create answer options locally
+- Delete answer options locally
+- Mark answer options as correct
+- Validate quiz readiness before starting
+- Play quizzes with visual answer feedback
+- Show final quiz results with score, percentage, and retry option
 - Local persistence with ToStore for subjects, topics, study notes, quizzes, questions, and answer options
-- Repository contracts with ToStore-backed local implementations
+- Cascade deletion support through ToStore relationships
+- Repository contracts with ToStore-backed implementations
 - Dependency registration with get_it
 - String-based frontend IDs prepared for local persistence and backend/API integration
-- Local quiz flow with question management, answer options, and answer feedback
-- Create quiz questions locally
-- Create answer options for quiz questions
-- Mark answer options as correct
-- Manage quiz questions and answer options
-- Start a quiz and answer questions
-- Visual feedback for correct and incorrect quiz answers
-- Play quizzes by answering multiple-choice questions
-- Show visual feedback for correct and incorrect quiz answers
-- Show a final quiz result screen with score, percentage, and retry option
 - Basic navigation between screens
 - Basic app theming with a custom color scheme
 - SnackBar feedback for local actions
-- Dummy data and in-memory repositories have been removed
+- Reusable widgets for shared layout, list items, and empty states
 
 ### Frontend Structure
 
@@ -288,39 +289,40 @@ HTTP Request
 
 ### Aktuelle Frontend-Funktionen
 
-Das Flutter-Frontend wurde als mobiler Client fuer StudyFlow gestartet. Siehe Frontend-README fuer aktuelle Screenshots der Flutter-Oberflaeche.
+Das Flutter-Frontend wurde als mobiler Client fuer StudyFlow gestartet. Aktuelle Screenshots befinden sich im Frontend-README.
 
 Aktuelle Frontend-Funktionen:
 
-- Startscreen vor dem Einstieg in den Hauptbereich der App
-- Liste von Subjects anzeigen
+- Startbildschirm vor dem eigentlichen StudyFlow-Bereich
+- Subjects anzeigen
 - Subjects lokal erstellen
-- Ein Subject oeffnen und die dazugehoerigen Topics anzeigen
+- Subjects lokal mit Bestaetigung loeschen
+- Topics zu einem Subject anzeigen
 - Topics lokal erstellen
+- Topics lokal mit Bestaetigung loeschen
 - Ein Topic in einem eigenen Topic-Detail-Screen oeffnen
 - Zwischen Study Notes und Quiz-Bereich ueber eine Bottom Navigation wechseln
-- Ein Topic oeffnen und die dazugehoerigen Study Notes anzeigen
 - Study Notes lokal erstellen
 - Study Notes lokal loeschen
-- Eine Study Note oeffnen und ihren Inhalt lesen
-- Lokale Persistenz mit ToStore fuer Subjects, Topics, Study Notes, Quizzes, Questions und Answer Options
-- Repository-Vertraege mit ToStore-basierten lokalen Implementierungen
-- Dependency-Registrierung mit get_it
-- String-basierte Frontend-IDs als Vorbereitung auf lokale Persistenz und Backend/API-Anbindung
-- Lokaler Quiz-Flow mit Fragenverwaltung, Antwortoptionen und Antwort-Feedback
-- Quiz-Fragen lokal erstellen
-- Antwortoptionen fuer Quiz-Fragen lokal erstellen
-- Richtige Antwortoptionen markieren
-- Quiz-Fragen und Antwortoptionen verwalten
-- Ein Quiz starten und Fragen beantworten
-- Visuelles Feedback fuer richtige und falsche Antworten
-- Quizfragen und Antwortoptionen lokal erstellen
+- Eine Study Note oeffnen und den Inhalt lesen
+- Quizze lokal erstellen
+- Quizfragen lokal erstellen
+- Quizfragen lokal loeschen
+- Antwortoptionen lokal erstellen
+- Antwortoptionen lokal loeschen
+- Antwortoptionen als richtig markieren
+- Quiz vor dem Start validieren
 - Quizze mit richtig/falsch-Feedback spielen
 - Ergebnisbildschirm mit Punktzahl, Prozentanzeige und Wiederholen-Option anzeigen
-- Einfache Navigation zwischen den Screens
+- Lokale Persistenz mit ToStore fuer Subjects, Topics, Study Notes, Quizze, Fragen und Antwortoptionen
+- Cascade Delete ueber ToStore-Beziehungen
+- Repository-Contracts mit ToStore-basierten Implementierungen
+- Dependency-Registrierung mit get_it
+- String-basierte IDs fuer lokale Persistenz und spaetere Backend/API-Integration
+- Einfache Navigation zwischen Screens
 - Einfaches App-Theming mit eigenem Farbschema
 - SnackBar-Feedback fuer lokale Aktionen
-- Dummy Data und In-Memory-Repositories wurden entfernt
+- Wiederverwendbare Widgets fuer gemeinsames Layout, Listenelemente und Empty States
 
 ### Frontend-Struktur
 

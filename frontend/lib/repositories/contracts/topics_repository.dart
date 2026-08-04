@@ -4,4 +4,6 @@ abstract class TopicsRepository {
   Future<List<Topic>> getTopicsBySubjectId(String subjectId);
 
   Future<Topic> addTopic({required String subjectId, required String name});
+
+  Future<void> removeTopic(String id);
 }

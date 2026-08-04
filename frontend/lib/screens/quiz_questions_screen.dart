@@ -82,6 +82,23 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
     );
   }
 
+  Future<void> _removeQuestion(Question question) async {
+    await _questionsRepository.removeQuestion(question.id);
+
+    await _loadQuestions();
+
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Question deleted', textAlign: TextAlign.center),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget mainContent;
@@ -101,21 +118,32 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
         itemCount: _questions.length,
         itemBuilder: (context, index) {
           final question = _questions[index];
-
-          return Card(
-            child: InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        QuestionDetailScreen(question: question),
-                  ),
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(question.markdownText),
+          return Dismissible(
+            key: ValueKey(question.id),
+            background: Container(
+              color: const Color(0xFFC53030),
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(right: 20),
+              child: const Icon(Icons.delete, color: Colors.white),
+            ),
+            onDismissed: (direction) {
+              _removeQuestion(question);
+            },
+            child: Card(
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          QuestionDetailScreen(question: question),
+                    ),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(question.markdownText),
+                ),
               ),
             ),
           );

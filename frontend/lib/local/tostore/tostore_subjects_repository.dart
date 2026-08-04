@@ -28,4 +28,15 @@ class ToStoreSubjectsRepository implements SubjectsRepository {
 
     return Subject(id: generatedId, name: name);
   }
+
+  @override
+  Future<void> removeSubject(String id) async {
+    final result = await StudyFlowDatabase.db
+        .delete(_tableName)
+        .where('id', '=', id);
+
+    if (!result.isSuccess) {
+      throw Exception('Could not delete subject.');
+    }
+  }
 }
