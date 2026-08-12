@@ -1,16 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/study_note.dart';
+import 'package:frontend/screens/edit_study_note.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/repositories/contracts/study_notes_repository.dart';
+import 'package:frontend/core/service_locator.dart';
 
-class NoteScreen extends StatelessWidget {
+class NoteScreen extends StatefulWidget {
   const NoteScreen({super.key, required this.note});
 
   final StudyNote note;
 
   @override
+  State<NoteScreen> createState() => _NoteScreenState();
+}
+
+class _NoteScreenState extends State<NoteScreen> {
+  final StudyNotesRepository _studyNotesRepository =
+      getIt<StudyNotesRepository>();
+
+  late StudyNote _note;
+
+  @override
+  void initState() {
+    super.initState();
+    _note = widget.note;
+  }
+
+  void _openEditStudyNoteOverlay() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+      builder: (ctx) =>
+          EditStudyNote(note: _note, onUpdateNote: _updateStudyNote),
+    );
+  }
+
+  Future<void> _updateStudyNote(String name, String markdownText) async {
+    await _studyNotesRepository.updateStudyNote(
+      id: _note.id,
+      name: name,
+      markdownText: markdownText,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _note = StudyNote(
+        id: _note.id,
+        topicId: _note.topicId,
+        name: name,
+        markdownText: markdownText,
+        createdAt: _note.createdAt,
+        updatedAt: DateTime.now(),
+      );
+    });
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Note successfully updated', textAlign: TextAlign.center),
+        backgroundColor: Color(0xFF2F855A),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(note.name)),
+      appBar: AppBar(
+        title: Text(_note.name),
+        actions: [
+          IconButton(
+            onPressed: _openEditStudyNoteOverlay,
+            icon: const Icon(Icons.edit),
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.only(top: 20),
         child: Column(
@@ -29,7 +98,7 @@ class NoteScreen extends StatelessWidget {
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Text(note.markdownText),
+                child: Text(_note.markdownText),
               ),
             ),
           ],

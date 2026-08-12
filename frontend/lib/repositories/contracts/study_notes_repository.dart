@@ -10,4 +10,10 @@ abstract class StudyNotesRepository {
   });
 
   Future<void> removeStudyNote(String id);
+
+  Future<void> updateStudyNote({
+    required String id,
+    required String name,
+    required String markdownText,
+  });
 }

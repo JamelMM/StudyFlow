@@ -69,4 +69,25 @@ class ToStoreStudyNotesRepository implements StudyNotesRepository {
       throw Exception('Could not delete study note.');
     }
   }
+
+  @override
+  Future<void> updateStudyNote({
+    required String id,
+    required String name,
+    required String markdownText,
+  }) async {
+    final updatedAt = DateTime.now();
+
+    final result = await StudyFlowDatabase.db
+        .update(_tableName, {
+          'name': name,
+          'markdownText': markdownText,
+          'updatedAt': updatedAt.toIso8601String(),
+        })
+        .where('id', '=', id);
+
+    if (!result.isSuccess) {
+      throw Exception('Could not update study note.');
+    }
+  }
 }
