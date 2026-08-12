@@ -59,4 +59,20 @@ class TostoreTopicsRepository implements TopicsRepository {
       throw Exception('Could not delete topic.');
     }
   }
+
+  @override
+  Future<void> updateTopic({required String id, required String name}) async {
+    final updatedAt = DateTime.now();
+
+    final result = await StudyFlowDatabase.db
+        .update(_tableName, {
+          'name': name,
+          'updatedAt': updatedAt.toIso8601String(),
+        })
+        .where('id', '=', id);
+
+    if (!result.isSuccess) {
+      throw Exception('Could not update topic.');
+    }
+  }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/subject.dart';
 import 'package:frontend/models/topic.dart';
+import 'package:frontend/screens/edit_topic.dart';
 import 'package:frontend/screens/new_topic.dart';
 import 'package:frontend/screens/topic_detail_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -122,6 +123,47 @@ class _TopicsScreenState extends State<TopicsScreen> {
     return shouldDelete == true;
   }
 
+  void _openEditTopicOverlay(Topic topic) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+      builder: (ctx) {
+        return EditTopic(
+          topic: topic,
+          onUpdateTopic: (name) {
+            _updateTopic(topic: topic, name: name);
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _updateTopic({
+    required Topic topic,
+    required String name,
+  }) async {
+    await _topicsRepository.updateTopic(id: topic.id, name: name);
+
+    await _loadTopics();
+
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Topic successfully updated',
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Color(0xFF2F855A),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget mainContent = EmptyStateMessage(
@@ -169,6 +211,27 @@ class _TopicsScreenState extends State<TopicsScreen> {
                       const Icon(Icons.topic),
                       const SizedBox(width: 12),
                       Expanded(child: Text(topic.name)),
+                      PopupMenuButton<String>(
+                        onSelected: (value) async {
+                          if (value == 'edit') {
+                            _openEditTopicOverlay(topic);
+                          }
+
+                          if (value == 'delete') {
+                            final shouldRemove = await _confirmRemoveTopic(
+                              topic,
+                            );
+
+                            if (shouldRemove == true) {
+                              _removeTopic(topic);
+                            }
+                          }
+                        },
+                        itemBuilder: (context) => const [
+                          PopupMenuItem(value: 'edit', child: Text('Edit')),
+                          PopupMenuItem(value: 'delete', child: Text('Delete')),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -183,7 +246,10 @@ class _TopicsScreenState extends State<TopicsScreen> {
       appBar: AppBar(
         title: Text(widget.subject.name),
         actions: [
-          IconButton(onPressed: _openAddTopicOverlay, icon: Icon(Icons.add)),
+          IconButton(
+            onPressed: _openAddTopicOverlay,
+            icon: const Icon(Icons.add),
+          ),
         ],
       ),
       body: Padding(
@@ -201,7 +267,7 @@ class _TopicsScreenState extends State<TopicsScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             Expanded(child: mainContent),
           ],
         ),

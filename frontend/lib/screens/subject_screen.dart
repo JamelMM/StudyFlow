@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/edit_subject.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/screens/topics_screen.dart';
 import 'package:frontend/models/subject.dart';
@@ -116,6 +117,47 @@ class _SubjectScreenState extends State<SubjectScreen> {
     return shouldDelete == true;
   }
 
+  void _openEditSubjectOverlay(Subject subject) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+      builder: (ctx) {
+        return EditSubject(
+          subject: subject,
+          onUpdateSubject: (name) {
+            _updateSubject(subject: subject, name: name);
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _updateSubject({
+    required Subject subject,
+    required String name,
+  }) async {
+    await _subjectsRepository.updateSubject(id: subject.id, name: name);
+
+    await _loadSubjects();
+
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Subject successfully updated',
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Color(0xFF2F855A),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget mainContent = EmptyStateMessage(
@@ -162,7 +204,28 @@ class _SubjectScreenState extends State<SubjectScreen> {
                     children: [
                       const Icon(Icons.school),
                       const SizedBox(width: 12),
-                      Text(subject.name),
+                      Expanded(child: Text(subject.name)),
+                      PopupMenuButton<String>(
+                        onSelected: (value) async {
+                          if (value == 'edit') {
+                            _openEditSubjectOverlay(subject);
+                          }
+
+                          if (value == 'delete') {
+                            final shouldRemove = await _confirmRemoveSubject(
+                              subject,
+                            );
+
+                            if (shouldRemove == true) {
+                              _removeSubject(subject);
+                            }
+                          }
+                        },
+                        itemBuilder: (context) => const [
+                          PopupMenuItem(value: 'edit', child: Text('Edit')),
+                          PopupMenuItem(value: 'delete', child: Text('Delete')),
+                        ],
+                      ),
                     ],
                   ),
                 ),
