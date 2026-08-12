@@ -6,6 +6,7 @@ import 'package:frontend/repositories/contracts/questions_repository.dart';
 import 'package:frontend/screens/new_question.dart';
 import 'package:frontend/screens/question_detail_screen.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
+import 'package:frontend/screens/edit_question.dart';
 
 class QuizQuestionsScreen extends StatefulWidget {
   const QuizQuestionsScreen({super.key, required this.quiz});
@@ -99,6 +100,78 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
     );
   }
 
+  Future<bool> _confirmRemoveQuestion(Question question) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Delete question?'),
+          content: const Text('This will also delete its answer options.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, false);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, true);
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return shouldDelete == true;
+  }
+
+  void _openEditQuestionOverlay(Question question) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+      builder: (ctx) {
+        return EditQuestion(
+          question: question,
+          onUpdateQuestion: (markdownText) {
+            _updateQuestion(question: question, markdownText: markdownText);
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _updateQuestion({
+    required Question question,
+    required String markdownText,
+  }) async {
+    await _questionsRepository.updateQuestion(
+      id: question.id,
+      markdownText: markdownText,
+    );
+
+    await _loadQuestions();
+
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Question successfully updated',
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Color(0xFF2F855A),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget mainContent;
@@ -126,6 +199,9 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
               padding: const EdgeInsets.only(right: 20),
               child: const Icon(Icons.delete, color: Colors.white),
             ),
+            confirmDismiss: (direction) {
+              return _confirmRemoveQuestion(question);
+            },
             onDismissed: (direction) {
               _removeQuestion(question);
             },
@@ -142,7 +218,38 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text(question.markdownText),
+                  child: Row(
+                    children: [
+                      Expanded(child: Text(question.markdownText)),
+                      PopupMenuButton<String>(
+                        onSelected: (value) async {
+                          if (value == 'edit') {
+                            _openEditQuestionOverlay(question);
+                          }
+
+                          if (value == 'delete') {
+                            final shouldRemove = await _confirmRemoveQuestion(
+                              question,
+                            );
+
+                            if (shouldRemove == true) {
+                              final shouldRemove = await _confirmRemoveQuestion(
+                                question,
+                              );
+
+                              if (shouldRemove == true) {
+                                _removeQuestion(question);
+                              }
+                            }
+                          }
+                        },
+                        itemBuilder: (context) => const [
+                          PopupMenuItem(value: 'edit', child: Text('Edit')),
+                          PopupMenuItem(value: 'delete', child: Text('Delete')),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

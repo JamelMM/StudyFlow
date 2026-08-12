@@ -8,4 +8,10 @@ abstract class AnswerOptionsRepository {
     required bool isCorrect,
   });
   Future<void> removeAnswerOption(String id);
+
+  Future<void> updateAnswerOption({
+    required String id,
+    required String markdownText,
+    required bool isCorrect,
+  });
 }

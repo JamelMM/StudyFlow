@@ -7,4 +7,9 @@ abstract class QuestionsRepository {
     required String markdownText,
   });
   Future<void> removeQuestion(String id);
+
+  Future<void> updateQuestion({
+    required String id,
+    required String markdownText,
+  });
 }

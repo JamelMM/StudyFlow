@@ -64,4 +64,23 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
       throw Exception('Could not delete question.');
     }
   }
+
+  @override
+  Future<void> updateQuestion({
+    required String id,
+    required String markdownText,
+  }) async {
+    final updatedAt = DateTime.now();
+
+    final result = await StudyFlowDatabase.db
+        .update(_tableName, {
+          'markdownText': markdownText,
+          'updatedAt': updatedAt.toIso8601String(),
+        })
+        .where('id', '=', id);
+
+    if (!result.isSuccess) {
+      throw Exception('Could not update question.');
+    }
+  }
 }

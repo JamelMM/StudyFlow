@@ -7,23 +7,15 @@ The current frontend is a local-first prototype. It uses repository contracts wi
 ## Current Features
 
 - Start screen before entering the main StudyFlow flow
-- View subjects
-- Create subjects locally
-- Delete subjects locally with confirmation
-- View topics for a selected subject
-- Create topics locally
-- Delete topics locally with confirmation
+- View, create, edit, and delete subjects locally
+- View, create, edit, and delete topics locally
 - Open topics in a dedicated topic detail screen
 - Switch between notes and quiz area with a bottom navigation bar
-- View study notes for a selected topic
-- Create study notes locally
-- Delete study notes locally
+- View, create, edit, and delete study notes locally
 - Open a study note and read its content
 - Create quizzes locally
-- Create quiz questions locally
-- Delete quiz questions locally
-- Create answer options for quiz questions
-- Delete answer options locally
+- View, create, edit, and delete quiz questions locally
+- View, create, edit, and delete answer options locally
 - Mark answer options as correct
 - Validate quiz readiness before starting
 - Start a quiz and answer questions
@@ -74,6 +66,8 @@ StartScreen
       -> QuizQuestionsScreen
          -> QuestionDetailScreen
       -> QuizPlayScreen
+         -> QuizResultScreen
+```
 
 ## Project Structure
 
@@ -136,27 +130,27 @@ Run the app:
 flutter run
 ```
 
-## Current Status
+# Current Status
 
 The frontend is intentionally local-first at this stage.
 
-Screens access data through repository contracts, and the active implementations use ToStore for local persistence. Subjects, topics, study notes, quizzes, questions, and answer options can be created locally.
+Screens access data through repository contracts, and the active implementations use ToStore for local persistence. Subjects, topics, study notes, quizzes, questions, and answer options are stored locally.
 
-The app now supports local deletion flows for subjects, topics, study notes, quiz questions, and answer options. Larger deletion flows, such as subjects and topics, use confirmation dialogs because related data can be removed through ToStore cascade relationships.
+The app now supports local create, edit, and delete flows for the main study entities: subjects, topics, study notes, quiz questions, and answer options. Larger deletion flows, such as subjects and topics, use confirmation dialogs because related data can be removed through ToStore cascade relationships.
 
-The quiz area has a first usable local flow. Users can create quiz questions, add answer options, mark correct answers, validate quiz readiness before starting, play quizzes, receive visual feedback for correct and incorrect answers, and view a final result screen with score and percentage.
+The quiz area has a first usable local flow. Users can create quiz questions, add answer options, mark correct answers, edit quiz content, validate quiz readiness before starting, play quizzes, receive visual feedback for correct and incorrect answers, and view a final result screen with score and percentage.
 
 The frontend models use string-based IDs to prepare the app for local persistence and later backend synchronization.
 
-The next major step is adding an initial seed with public demo learning content so the app can be useful immediately after installation.
+The next major step is refactoring screen logic into Riverpod-based controllers and adding stream/listener-based list updates with ToStore.
 
 ## Next Steps
 
-- Improve quiz play results and add a summary screen
-- Add edit/delete flows for quiz questions and answer options
-- Add validation to ensure each question has one correct answer
+- Refactor screen logic into Riverpod-based controllers
+- Add stream/listener-based list updates with ToStore
+- Preserve list position when items are edited
 - Improve form validation
-- Add edit flows for existing study notes
+- Add an initial seed with public demo learning content
 - Prepare API service classes
 - Connect the Flutter frontend to the ASP.NET Core backend
 - Add synchronization between local data and backend data

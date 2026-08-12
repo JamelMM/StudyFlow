@@ -87,22 +87,15 @@ The Flutter frontend has been started as the mobile client for StudyFlow. See th
 Current frontend features:
 
 - Start screen before entering the main StudyFlow flow
-- View a list of subjects
-- Create subjects locally
-- Delete subjects locally with confirmation
-- Open a subject and view its topics
-- Create topics locally
-- Delete topics locally with confirmation
+- View, create, edit, and delete subjects locally
+- View, create, edit, and delete topics locally
 - Open a topic in a dedicated topic detail screen
 - Switch between study notes and quiz area with a bottom navigation bar
-- Create study notes locally
-- Delete study notes locally
+- View, create, edit, and delete study notes locally
 - Open a study note and read its content
 - Create quizzes locally
-- Create quiz questions locally
-- Delete quiz questions locally
-- Create answer options locally
-- Delete answer options locally
+- View, create, edit, and delete quiz questions locally
+- View, create, edit, and delete answer options locally
 - Mark answer options as correct
 - Validate quiz readiness before starting
 - Play quizzes with visual answer feedback
@@ -178,9 +171,9 @@ StartScreen
 
 The current frontend sprint focuses on building a visual, navigable, local-first version of StudyFlow before backend integration.
 
-The frontend currently uses repository contracts with ToStore-backed local persistence for subjects, topics, study notes, quizzes, questions, and answer options. Local creation flows for subjects, topics, study notes, quiz questions, and answer options are implemented. Study notes can also be deleted locally.
+The frontend currently uses repository contracts with ToStore-backed local persistence for subjects, topics, study notes, quizzes, questions, and answer options. The main study entities now support local create, edit, and delete flows.
 
-The quiz area now supports a first local quiz flow. Users can create questions, add answer options, mark the correct answer, start a quiz, select answers, and receive visual feedback for correct and incorrect answers.
+The quiz area supports a first usable local quiz flow. Users can create questions, add answer options, mark the correct answer, edit quiz content, start a quiz, select answers, receive visual feedback for correct and incorrect answers, and view a final result screen.
 
 Reusable empty states are shown when no local data is available. The frontend models use string-based IDs, which prepares the app for local persistence and later ASP.NET Core API integration.
 
@@ -294,22 +287,15 @@ Das Flutter-Frontend wurde als mobiler Client fuer StudyFlow gestartet. Aktuelle
 Aktuelle Frontend-Funktionen:
 
 - Startbildschirm vor dem eigentlichen StudyFlow-Bereich
-- Subjects anzeigen
-- Subjects lokal erstellen
-- Subjects lokal mit Bestaetigung loeschen
-- Topics zu einem Subject anzeigen
-- Topics lokal erstellen
-- Topics lokal mit Bestaetigung loeschen
+- Subjects lokal anzeigen, erstellen, bearbeiten und loeschen
+- Topics lokal anzeigen, erstellen, bearbeiten und loeschen
 - Ein Topic in einem eigenen Topic-Detail-Screen oeffnen
 - Zwischen Study Notes und Quiz-Bereich ueber eine Bottom Navigation wechseln
-- Study Notes lokal erstellen
-- Study Notes lokal loeschen
+- Study Notes lokal anzeigen, erstellen, bearbeiten und loeschen
 - Eine Study Note oeffnen und den Inhalt lesen
 - Quizze lokal erstellen
-- Quizfragen lokal erstellen
-- Quizfragen lokal loeschen
-- Antwortoptionen lokal erstellen
-- Antwortoptionen lokal loeschen
+- Quizfragen lokal anzeigen, erstellen, bearbeiten und loeschen
+- Antwortoptionen lokal anzeigen, erstellen, bearbeiten und loeschen
 - Antwortoptionen als richtig markieren
 - Quiz vor dem Start validieren
 - Quizze mit richtig/falsch-Feedback spielen
@@ -329,7 +315,7 @@ Aktuelle Frontend-Funktionen:
 Das StudyFlow-Frontend ist aktuell als kleine Flutter-Anwendung organisiert:
 
 ```text
-SStudyFlow/frontend/
+StudyFlow/frontend/
 -> Flutter Mobile Application
 
 lib/core
@@ -384,9 +370,9 @@ StartScreen
 
 Der aktuelle Frontend-Sprint konzentriert sich darauf, eine visuelle, navigierbare und local-first Version von StudyFlow vor der Backend-Anbindung zu erstellen.
 
-Das Frontend verwendet aktuell Repository-Vertraege mit ToStore-basierter lokaler Persistenz fuer Subjects, Topics, Study Notes, Quizzes, Questions und Answer Options. Lokale Creation Flows fuer Subjects, Topics, Study Notes, Quiz-Fragen und Antwortoptionen sind umgesetzt. Study Notes koennen lokal geloescht werden.
+Das Frontend verwendet aktuell Repository-Vertraege mit ToStore-basierter lokaler Persistenz fuer Subjects, Topics, Study Notes, Quizzes, Questions und Answer Options. Die wichtigsten Lern-Entitaeten unterstuetzen jetzt lokale Create-, Edit- und Delete-Flows.
 
-Der Quiz-Bereich unterstuetzt jetzt einen ersten lokalen Quiz-Flow. Benutzer koennen Fragen erstellen, Antwortoptionen hinzufuegen, die richtige Antwort markieren, ein Quiz starten, Antworten auswaehlen und visuelles Feedback fuer richtige und falsche Antworten erhalten.
+Der Quiz-Bereich unterstuetzt jetzt einen ersten nutzbaren lokalen Quiz-Flow. Benutzer koennen Fragen erstellen, Antwortoptionen hinzufuegen, die richtige Antwort markieren, Quiz-Inhalte bearbeiten, ein Quiz starten, Antworten auswaehlen, visuelles Feedback fuer richtige und falsche Antworten erhalten und einen Ergebnisbildschirm anzeigen.
 
 Wiederverwendbare Empty States werden angezeigt, wenn keine lokalen Daten vorhanden sind. Die Frontend-Modelle verwenden String-basierte IDs. Dadurch wird die App auf lokale Persistenz und eine spaetere ASP.NET Core API-Anbindung vorbereitet.
 

@@ -3,6 +3,7 @@ import 'package:frontend/core/service_locator.dart';
 import 'package:frontend/models/answer_option.dart';
 import 'package:frontend/models/question.dart';
 import 'package:frontend/repositories/contracts/answeroptionsrepository.dart';
+import 'package:frontend/screens/edit_answer_option.dart';
 import 'package:frontend/screens/new_answer_option.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 
@@ -98,6 +99,84 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
     );
   }
 
+  Future<bool> _confirmRemoveAnswerOption(AnswerOption answerOption) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Delete answer?'),
+          content: const Text('This answer option will be deleted.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, false);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, true);
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return shouldDelete == true;
+  }
+
+  void _openEditAnswerOptionOverlay(AnswerOption answerOption) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+      builder: (ctx) {
+        return EditAnswerOption(
+          answerOption: answerOption,
+          onUpdateAnswerOption: (markdownText, isCorrect) {
+            _updateAnswerOption(
+              answerOption: answerOption,
+              markdownText: markdownText,
+              isCorrect: isCorrect,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _updateAnswerOption({
+    required AnswerOption answerOption,
+    required String markdownText,
+    required bool isCorrect,
+  }) async {
+    await _answerOptionsRepository.updateAnswerOption(
+      id: answerOption.id,
+      markdownText: markdownText,
+      isCorrect: isCorrect,
+    );
+
+    await _loadAnswerOptions();
+
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Answer successfully updated',
+          textAlign: TextAlign.center,
+        ),
+        backgroundColor: Color(0xFF2F855A),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget mainContent;
@@ -126,6 +205,9 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
               padding: const EdgeInsets.only(right: 20),
               child: const Icon(Icons.delete, color: Colors.white),
             ),
+            confirmDismiss: (direction) {
+              return _confirmRemoveAnswerOption(answerOption);
+            },
             onDismissed: (direction) {
               _removeAnswerOption(answerOption);
             },
@@ -144,6 +226,27 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
                     ),
                     const SizedBox(width: 12),
                     Expanded(child: Text(answerOption.markdownText)),
+                    PopupMenuButton<String>(
+                      onSelected: (value) async {
+                        if (value == 'edit') {
+                          _openEditAnswerOptionOverlay(answerOption);
+                        }
+
+                        if (value == 'delete') {
+                          final shouldRemove = await _confirmRemoveAnswerOption(
+                            answerOption,
+                          );
+
+                          if (shouldRemove == true) {
+                            _removeAnswerOption(answerOption);
+                          }
+                        }
+                      },
+                      itemBuilder: (context) => const [
+                        PopupMenuItem(value: 'edit', child: Text('Edit')),
+                        PopupMenuItem(value: 'delete', child: Text('Delete')),
+                      ],
+                    ),
                   ],
                 ),
               ),

@@ -73,4 +73,25 @@ class ToStoreAnswerOptionsRepository implements AnswerOptionsRepository {
       throw Exception('Could not delete answer.');
     }
   }
+
+  @override
+  Future<void> updateAnswerOption({
+    required String id,
+    required String markdownText,
+    required bool isCorrect,
+  }) async {
+    final updatedAt = DateTime.now();
+
+    final result = await StudyFlowDatabase.db
+        .update(_tableName, {
+          'markdownText': markdownText,
+          'isCorrect': isCorrect,
+          'updatedAt': updatedAt.toIso8601String(),
+        })
+        .where('id', '=', id);
+
+    if (!result.isSuccess) {
+      throw Exception('Could not update answer.');
+    }
+  }
 }
