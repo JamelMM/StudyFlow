@@ -5,41 +5,19 @@ import 'package:frontend/screens/topics_screen.dart';
 import 'package:frontend/models/subject.dart';
 import 'package:frontend/screens/new_subject.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:frontend/repositories/contracts/subjects_repository.dart';
-import 'package:frontend/core/service_locator.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/controllers/subjects_controller.dart';
 
-class SubjectScreen extends StatefulWidget {
+class SubjectScreen extends ConsumerStatefulWidget {
   const SubjectScreen({super.key});
 
   @override
-  State<SubjectScreen> createState() {
+  ConsumerState<SubjectScreen> createState() {
     return _SubjectScreenState();
   }
 }
 
-class _SubjectScreenState extends State<SubjectScreen> {
-  final SubjectsRepository _subjectsRepository = getIt<SubjectsRepository>();
-
-  List<Subject> _subjects = [];
-
-  Future<void> _loadSubjects() async {
-    final loadedSubjects = await _subjectsRepository.getSubjects();
-
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      _subjects = loadedSubjects;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSubjects();
-  }
-
+class _SubjectScreenState extends ConsumerState<SubjectScreen> {
   void _openAddSubjectOverlay() {
     showModalBottomSheet(
       context: context,
@@ -51,8 +29,7 @@ class _SubjectScreenState extends State<SubjectScreen> {
   }
 
   Future<void> _addSubject(String name) async {
-    await _subjectsRepository.addSubject(name);
-    await _loadSubjects();
+    await ref.read(subjectsControllerProvider.notifier).addSubject(name);
 
     if (!mounted) {
       return;
@@ -71,9 +48,9 @@ class _SubjectScreenState extends State<SubjectScreen> {
   }
 
   Future<void> _removeSubject(Subject subject) async {
-    await _subjectsRepository.removeSubject(subject.id);
-
-    await _loadSubjects();
+    await ref
+        .read(subjectsControllerProvider.notifier)
+        .removeSubject(subject.id);
 
     if (!mounted) {
       return;
@@ -138,9 +115,9 @@ class _SubjectScreenState extends State<SubjectScreen> {
     required Subject subject,
     required String name,
   }) async {
-    await _subjectsRepository.updateSubject(id: subject.id, name: name);
-
-    await _loadSubjects();
+    await ref
+        .read(subjectsControllerProvider.notifier)
+        .updateSubject(id: subject.id, name: name);
 
     if (!mounted) {
       return;
@@ -160,35 +137,32 @@ class _SubjectScreenState extends State<SubjectScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget mainContent = EmptyStateMessage(
-      icon: Icons.menu_book_outlined,
-      title: 'No subjects yet.',
-      message: 'Create your first subject.',
-      buttonText: 'Add subject',
-      onPressed: _openAddSubjectOverlay,
-    );
+    final subjectsAsync = ref.watch(subjectsControllerProvider);
 
-    if (_subjects.isNotEmpty) {
-      mainContent = ListView.builder(
-        itemCount: _subjects.length,
-        itemBuilder: (context, index) {
-          final subject = _subjects[index];
+    final mainContent = subjectsAsync.when(
+      loading: () {
+        return const Center(child: CircularProgressIndicator());
+      },
+      error: (error, stackTrace) {
+        return const Center(child: Text('Could not load subjects.'));
+      },
+      data: (subjects) {
+        if (subjects.isEmpty) {
+          return EmptyStateMessage(
+            icon: Icons.menu_book_outlined,
+            title: 'No subjects yet.',
+            message: 'Create your first subject.',
+            buttonText: 'Add subject',
+            onPressed: _openAddSubjectOverlay,
+          );
+        }
 
-          return Dismissible(
-            key: ValueKey(subject.id),
-            background: Container(
-              color: const Color(0xFFC53030),
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.only(right: 20),
-              child: const Icon(Icons.delete, color: Colors.white),
-            ),
-            confirmDismiss: (direction) {
-              return _confirmRemoveSubject(subject);
-            },
-            onDismissed: (direction) {
-              _removeSubject(subject);
-            },
-            child: Card(
+        return ListView.builder(
+          itemCount: subjects.length,
+          itemBuilder: (context, index) {
+            final subject = subjects[index];
+
+            return Card(
               child: InkWell(
                 onTap: () {
                   Navigator.push(
@@ -230,11 +204,11 @@ class _SubjectScreenState extends State<SubjectScreen> {
                   ),
                 ),
               ),
-            ),
-          );
-        },
-      );
-    }
+            );
+          },
+        );
+      },
+    );
 
     return Scaffold(
       appBar: AppBar(
