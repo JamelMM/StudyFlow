@@ -17,7 +17,7 @@ final getIt = GetIt.instance;
 void setupDependencies() {
   getIt.registerSingleton<SubjectsRepository>(ToStoreSubjectsRepository());
 
-  getIt.registerSingleton<TopicsRepository>(TostoreTopicsRepository());
+  getIt.registerSingleton<TopicsRepository>(ToStoreTopicsRepository());
 
   getIt.registerSingleton<StudyNotesRepository>(ToStoreStudyNotesRepository());
 

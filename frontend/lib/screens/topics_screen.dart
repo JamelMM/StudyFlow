@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/subject.dart';
 import 'package:frontend/models/topic.dart';
 import 'package:frontend/screens/edit_topic.dart';
@@ -6,45 +7,20 @@ import 'package:frontend/screens/new_topic.dart';
 import 'package:frontend/screens/topic_detail_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
-import 'package:frontend/repositories/contracts/topics_repository.dart';
-import 'package:frontend/core/service_locator.dart';
+import 'package:frontend/controllers/topics_controller.dart';
 
-class TopicsScreen extends StatefulWidget {
+class TopicsScreen extends ConsumerStatefulWidget {
   const TopicsScreen({super.key, required this.subject});
 
   final Subject subject;
 
   @override
-  State<TopicsScreen> createState() {
+  ConsumerState<TopicsScreen> createState() {
     return _TopicsScreenState();
   }
 }
 
-class _TopicsScreenState extends State<TopicsScreen> {
-  final TopicsRepository _topicsRepository = getIt<TopicsRepository>();
-
-  List<Topic> _subjectTopics = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _loadTopics();
-  }
-
-  Future<void> _loadTopics() async {
-    final loadedTopics = await _topicsRepository.getTopicsBySubjectId(
-      widget.subject.id,
-    );
-
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      _subjectTopics = loadedTopics;
-    });
-  }
-
+class _TopicsScreenState extends ConsumerState<TopicsScreen> {
   void _openAddTopicOverlay() {
     showModalBottomSheet(
       context: context,
@@ -56,9 +32,9 @@ class _TopicsScreenState extends State<TopicsScreen> {
   }
 
   Future<void> _addTopic(String name) async {
-    await _topicsRepository.addTopic(subjectId: widget.subject.id, name: name);
-
-    await _loadTopics();
+    await ref
+        .read(topicsControllerProvider(widget.subject.id).notifier)
+        .addTopic(name: name);
 
     if (!mounted) {
       return;
@@ -77,9 +53,9 @@ class _TopicsScreenState extends State<TopicsScreen> {
   }
 
   Future<void> _removeTopic(Topic topic) async {
-    await _topicsRepository.removeTopic(topic.id);
-
-    await _loadTopics();
+    await ref
+        .read(topicsControllerProvider(widget.subject.id).notifier)
+        .removeTopic(topic.id);
 
     if (!mounted) {
       return;
@@ -144,9 +120,9 @@ class _TopicsScreenState extends State<TopicsScreen> {
     required Topic topic,
     required String name,
   }) async {
-    await _topicsRepository.updateTopic(id: topic.id, name: name);
-
-    await _loadTopics();
+    await ref
+        .read(topicsControllerProvider(widget.subject.id).notifier)
+        .updateTopic(id: topic.id, name: name);
 
     if (!mounted) {
       return;
@@ -166,35 +142,28 @@ class _TopicsScreenState extends State<TopicsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget mainContent = EmptyStateMessage(
-      icon: Icons.create_new_folder_outlined,
-      title: 'No topics yet.',
-      message: 'Create your first topic for this subject.',
-      buttonText: 'Add topic',
-      onPressed: _openAddTopicOverlay,
-    );
+    final topicsAsync = ref.watch(topicsControllerProvider(widget.subject.id));
 
-    if (_subjectTopics.isNotEmpty) {
-      mainContent = ListView.builder(
-        itemCount: _subjectTopics.length,
-        itemBuilder: (context, index) {
-          final topic = _subjectTopics[index];
+    Widget mainContent = topicsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stackTrace) =>
+          const Center(child: Text('Could not load topics.')),
+      data: (topics) {
+        if (topics.isEmpty) {
+          return EmptyStateMessage(
+            icon: Icons.create_new_folder_outlined,
+            title: 'No topics yet.',
+            message: 'Create your first topic for this subject.',
+            buttonText: 'Add topic',
+            onPressed: _openAddTopicOverlay,
+          );
+        }
 
-          return Dismissible(
-            key: ValueKey(topic.id),
-            background: Container(
-              color: const Color(0xFFC53030),
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.only(right: 20),
-              child: const Icon(Icons.delete, color: Colors.white),
-            ),
-            confirmDismiss: (direction) {
-              return _confirmRemoveTopic(topic);
-            },
-            onDismissed: (direction) {
-              _removeTopic(topic);
-            },
-            child: Card(
+        return ListView.builder(
+          itemCount: topics.length,
+          itemBuilder: (context, index) {
+            final topic = topics[index];
+            return Card(
               child: InkWell(
                 onTap: () {
                   Navigator.push(
@@ -236,11 +205,11 @@ class _TopicsScreenState extends State<TopicsScreen> {
                   ),
                 ),
               ),
-            ),
-          );
-        },
-      );
-    }
+            );
+          },
+        );
+      },
+    );
 
     return Scaffold(
       appBar: AppBar(

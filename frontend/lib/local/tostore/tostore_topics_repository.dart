@@ -2,7 +2,7 @@ import 'package:frontend/local/tostore/studyflow_database.dart';
 import 'package:frontend/models/topic.dart';
 import 'package:frontend/repositories/contracts/topics_repository.dart';
 
-class TostoreTopicsRepository implements TopicsRepository {
+class ToStoreTopicsRepository implements TopicsRepository {
   static const _tableName = 'topics';
 
   @override
