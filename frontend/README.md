@@ -4,6 +4,8 @@ This folder contains the Flutter frontend for StudyFlow.
 
 The current frontend is a local-first prototype. It uses repository contracts with ToStore-backed local persistence and is not connected to the ASP.NET Core backend yet.
 
+The app is currently being migrated gradually to Riverpod. Subjects, topics, and study notes already use Riverpod providers/controllers for loading state and create/edit/delete actions. Other flows still use the previous repository access pattern until they are migrated.
+
 ## Current Features
 
 - Start screen before entering the main StudyFlow flow
@@ -24,6 +26,8 @@ The current frontend is a local-first prototype. It uses repository contracts wi
 - ToStore-backed local persistence for subjects, topics, study notes, quizzes, questions, and answer options
 - Cascade deletion support through ToStore relationships
 - Repository contracts for local-first data access
+- Initial Riverpod migration for subjects, topics, and study notes
+- Riverpod controllers for migrated list state and create/edit/delete actions
 - String-based IDs prepared for ToStore and backend integration
 - Dependency registration with get_it
 - Basic Material Design UI
@@ -75,6 +79,10 @@ StartScreen
 lib/
 |-- core/
 |   `-- service_locator.dart
+|-- controllers/
+|   |-- subjects_controller.dart
+|   |-- topics_controller.dart
+|   `-- study_notes_controller.dart
 |-- local/
 |   `-- tostore/
 |       |-- studyflow_database.dart
@@ -92,10 +100,16 @@ lib/
 |   |-- quiz.dart
 |   |-- question.dart
 |   `-- answer_option.dart
+|-- providers/
+|   |-- subjects_repository_provider.dart
+|   |-- topics_repository_provider.dart
+|   `-- study_notes_repository_provider.dart
 |-- repositories/
 |   `-- contracts/
 |-- screens/
 |-- widgets/
+|-- docs/
+|   `-- architecture/
  
 ```
 
@@ -106,8 +120,9 @@ lib/
 - Material Design
 - ToStore for local persistence
 - Repository pattern with local ToStore implementations
+- Riverpod for migrated state management and controller-based screen logic
 - get_it for dependency registration
-- StatefulWidget and setState for local UI state
+- StatefulWidget and setState for purely local visual UI state
 - Flutter Navigator for screen navigation
 
 ## Run Locally
@@ -136,17 +151,19 @@ The frontend is intentionally local-first at this stage.
 
 Screens access data through repository contracts, and the active implementations use ToStore for local persistence. Subjects, topics, study notes, quizzes, questions, and answer options are stored locally.
 
+Subjects, topics, and study notes have been migrated to Riverpod-based controllers. These controllers own the async list state and delegate persistence operations to the ToStore-backed repositories. The screens now observe provider state and forward user actions to controllers instead of loading and storing these lists manually.
+
 The app now supports local create, edit, and delete flows for the main study entities: subjects, topics, study notes, quiz questions, and answer options. Larger deletion flows, such as subjects and topics, use confirmation dialogs because related data can be removed through ToStore cascade relationships.
 
 The quiz area has a first usable local flow. Users can create quiz questions, add answer options, mark correct answers, edit quiz content, validate quiz readiness before starting, play quizzes, receive visual feedback for correct and incorrect answers, and view a final result screen with score and percentage.
 
 The frontend models use string-based IDs to prepare the app for local persistence and later backend synchronization.
 
-The next major step is refactoring screen logic into Riverpod-based controllers and adding stream/listener-based list updates with ToStore.
+The next major step is continuing the Riverpod migration for the quiz-related flows and then adding stream/listener-based list updates with ToStore.
 
 ## Next Steps
 
-- Refactor screen logic into Riverpod-based controllers
+- Continue migrating quiz-related screen logic into Riverpod-based controllers
 - Add stream/listener-based list updates with ToStore
 - Preserve list position when items are edited
 - Improve form validation
@@ -155,4 +172,3 @@ The next major step is refactoring screen logic into Riverpod-based controllers 
 - Connect the Flutter frontend to the ASP.NET Core backend
 - Add synchronization between local data and backend data
 - Refactor StudyNotesScreen into an internal StudyNotesView
-

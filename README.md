@@ -14,12 +14,15 @@ StudyFlow/
 |   `-- StudyFlow.API.slnx
 |-- frontend/
 |   |-- android/
+|   |-- docs/
 |   |-- ios/
 |   |-- lib/
 |   |   |-- core/
+|   |   |-- controllers/
 |   |   |-- data/
 |   |   |-- local/
 |   |   |-- models/
+|   |   |-- providers/
 |   |   |-- repositories/
 |   |   |-- screens/
 |   |   `-- widgets/
@@ -103,6 +106,8 @@ Current frontend features:
 - Local persistence with ToStore for subjects, topics, study notes, quizzes, questions, and answer options
 - Cascade deletion support through ToStore relationships
 - Repository contracts with ToStore-backed implementations
+- Initial Riverpod migration for subjects, topics, and study notes
+- Riverpod controllers for migrated list state and create/edit/delete actions
 - Dependency registration with get_it
 - String-based frontend IDs prepared for local persistence and backend/API integration
 - Basic navigation between screens
@@ -121,8 +126,14 @@ StudyFlow/frontend/
 lib/core
 -> Dependency registration and app-level setup
 
+lib/controllers
+-> Riverpod controllers for migrated state and user actions
+
 lib/models
 -> Frontend data models such as Subject, Topic, StudyNote, Quiz, Question, and AnswerOption
+
+lib/providers
+-> Riverpod providers for repositories and async state
 
 lib/repositories/contracts
 -> Repository contracts for frontend data access
@@ -163,15 +174,18 @@ StartScreen
 - Material Design
 - ToStore for local persistence
 - Repository pattern with local ToStore implementations
+- Riverpod for migrated state management and controller-based screen logic
 - get_it for lightweight dependency registration
 - Flutter Navigator for screen navigation
-- Local state with StatefulWidget and setState
+- Local widget state with StatefulWidget and setState where the state is purely visual
 
 ### Current Frontend Status
 
 The current frontend sprint focuses on building a visual, navigable, local-first version of StudyFlow before backend integration.
 
 The frontend currently uses repository contracts with ToStore-backed local persistence for subjects, topics, study notes, quizzes, questions, and answer options. The main study entities now support local create, edit, and delete flows.
+
+The frontend is being migrated gradually from screen-owned state and get_it-based access to Riverpod providers and controllers. Subjects, topics, and study notes already use Riverpod for loading state and create/edit/delete actions. Remaining flows still use the previous pattern until they are migrated.
 
 The quiz area supports a first usable local quiz flow. Users can create questions, add answer options, mark the correct answer, edit quiz content, start a quiz, select answers, receive visual feedback for correct and incorrect answers, and view a final result screen.
 
@@ -303,6 +317,8 @@ Aktuelle Frontend-Funktionen:
 - Lokale Persistenz mit ToStore fuer Subjects, Topics, Study Notes, Quizze, Fragen und Antwortoptionen
 - Cascade Delete ueber ToStore-Beziehungen
 - Repository-Contracts mit ToStore-basierten Implementierungen
+- Erste Riverpod-Migration fuer Subjects, Topics und Study Notes
+- Riverpod-Controller fuer migrierten Listen-State und Create/Edit/Delete-Aktionen
 - Dependency-Registrierung mit get_it
 - String-basierte IDs fuer lokale Persistenz und spaetere Backend/API-Integration
 - Einfache Navigation zwischen Screens
@@ -321,8 +337,14 @@ StudyFlow/frontend/
 lib/core
 -> Dependency-Registrierung und app-weites Setup
 
+lib/controllers
+-> Riverpod-Controller fuer migrierten State und Benutzeraktionen
+
 lib/models
 -> Frontend-Datenmodelle wie Subject, Topic, StudyNote, Quiz, Question und AnswerOption
+
+lib/providers
+-> Riverpod-Provider fuer Repositories und asynchronen State
 
 lib/repositories/contracts
 -> Repository-Vertraege fuer den Datenzugriff im Frontend
@@ -362,15 +384,18 @@ StartScreen
 - Material Design
 - ToStore fuer lokale Persistenz
 - Repository Pattern mit lokalen ToStore-Implementierungen
+- Riverpod fuer migriertes State Management und Controller-basierte Screen-Logik
 - get_it fuer einfache Dependency-Registrierung
 - Flutter Navigator fuer die Navigation zwischen Screens
-- Lokaler State mit StatefulWidget und setState
+- Lokaler Widget-State mit StatefulWidget und setState, wenn der State rein visuell ist
 
 ### Aktueller Frontend-Status
 
 Der aktuelle Frontend-Sprint konzentriert sich darauf, eine visuelle, navigierbare und local-first Version von StudyFlow vor der Backend-Anbindung zu erstellen.
 
 Das Frontend verwendet aktuell Repository-Vertraege mit ToStore-basierter lokaler Persistenz fuer Subjects, Topics, Study Notes, Quizzes, Questions und Answer Options. Die wichtigsten Lern-Entitaeten unterstuetzen jetzt lokale Create-, Edit- und Delete-Flows.
+
+Das Frontend wird schrittweise von Screen-eigenem State und get_it-basiertem Zugriff auf Riverpod-Provider und Controller migriert. Subjects, Topics und Study Notes verwenden bereits Riverpod fuer Ladezustand und Create/Edit/Delete-Aktionen. Die uebrigen Flows verwenden noch das bisherige Muster, bis sie migriert werden.
 
 Der Quiz-Bereich unterstuetzt jetzt einen ersten nutzbaren lokalen Quiz-Flow. Benutzer koennen Fragen erstellen, Antwortoptionen hinzufuegen, die richtige Antwort markieren, Quiz-Inhalte bearbeiten, ein Quiz starten, Antworten auswaehlen, visuelles Feedback fuer richtige und falsche Antworten erhalten und einen Ergebnisbildschirm anzeigen.
 
@@ -385,6 +410,7 @@ Wiederverwendbare Empty States werden angezeigt, wenn keine lokalen Daten vorhan
 - Dart
 - Flutter
 - ToStore
+- Riverpod
 - get_it
 - Clean-Architecture-inspirierte Schichten
 
