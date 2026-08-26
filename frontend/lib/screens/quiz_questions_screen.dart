@@ -1,59 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/service_locator.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/question.dart';
 import 'package:frontend/models/quiz.dart';
-import 'package:frontend/repositories/contracts/questions_repository.dart';
+import 'package:frontend/controllers/questions_controller.dart';
 import 'package:frontend/screens/new_question.dart';
 import 'package:frontend/screens/question_detail_screen.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/screens/edit_question.dart';
 
-class QuizQuestionsScreen extends StatefulWidget {
+class QuizQuestionsScreen extends ConsumerStatefulWidget {
   const QuizQuestionsScreen({super.key, required this.quiz});
 
   final Quiz quiz;
 
   @override
-  State<QuizQuestionsScreen> createState() {
+  ConsumerState<QuizQuestionsScreen> createState() {
     return _QuizQuestionsScreenState();
   }
 }
 
-class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
-  final QuestionsRepository _questionsRepository = getIt<QuestionsRepository>();
-
-  List<Question> _questions = [];
-
-  bool _isLoading = true;
-
-  Future<void> _loadQuestions() async {
-    final loadedQuestions = await _questionsRepository.getQuestionsByQuizId(
-      widget.quiz.id,
-    );
-
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      _questions = loadedQuestions;
-      _isLoading = false;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadQuestions();
-  }
-
+class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
   Future<void> _addQuestion(String markdownText) async {
-    await _questionsRepository.addQuestion(
-      quizId: widget.quiz.id,
-      markdownText: markdownText,
-    );
-
-    await _loadQuestions();
+    await ref
+        .read(questionsControllerProvider(widget.quiz.id).notifier)
+        .addQuestion(markdownText);
 
     if (!mounted) {
       return;
@@ -84,9 +54,9 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
   }
 
   Future<void> _removeQuestion(Question question) async {
-    await _questionsRepository.removeQuestion(question.id);
-
-    await _loadQuestions();
+    await ref
+        .read(questionsControllerProvider(widget.quiz.id).notifier)
+        .removeQuestion(question.id);
 
     if (!mounted) {
       return;
@@ -138,7 +108,7 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
         return EditQuestion(
           question: question,
           onUpdateQuestion: (markdownText) {
-            _updateQuestion(question: question, markdownText: markdownText);
+            _updateQuestion(id: question.id, markdownText: markdownText);
           },
         );
       },
@@ -146,15 +116,12 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
   }
 
   Future<void> _updateQuestion({
-    required Question question,
+    required String id,
     required String markdownText,
   }) async {
-    await _questionsRepository.updateQuestion(
-      id: question.id,
-      markdownText: markdownText,
-    );
-
-    await _loadQuestions();
+    await ref
+        .read(questionsControllerProvider(widget.quiz.id).notifier)
+        .updateQuestion(id: id, markdownText: markdownText);
 
     if (!mounted) {
       return;
@@ -174,65 +141,51 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget mainContent;
+    final questionsAsync = ref.watch(
+      questionsControllerProvider(widget.quiz.id),
+    );
 
-    if (_isLoading) {
-      mainContent = const Center(child: CircularProgressIndicator());
-    } else if (_questions.isEmpty) {
-      mainContent = EmptyStateMessage(
-        icon: Icons.quiz_outlined,
-        title: 'No questions yet.',
-        message: 'Create your first question for this quiz.',
-        buttonText: 'Add question',
-        onPressed: _openAddQuestionOverlay,
-      );
-    } else {
-      mainContent = ListView.builder(
-        itemCount: _questions.length,
-        itemBuilder: (context, index) {
-          final question = _questions[index];
-          return Dismissible(
-            key: ValueKey(question.id),
-            background: Container(
-              color: const Color(0xFFC53030),
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.only(right: 20),
-              child: const Icon(Icons.delete, color: Colors.white),
-            ),
-            confirmDismiss: (direction) {
-              return _confirmRemoveQuestion(question);
-            },
-            onDismissed: (direction) {
-              _removeQuestion(question);
-            },
-            child: Card(
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          QuestionDetailScreen(question: question),
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Expanded(child: Text(question.markdownText)),
-                      PopupMenuButton<String>(
-                        onSelected: (value) async {
-                          if (value == 'edit') {
-                            _openEditQuestionOverlay(question);
-                          }
+    Widget mainContent = questionsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: ((error, stackTrace) =>
+          const Center(child: Text('Could not load questions.'))),
+      data: (questions) {
+        if (questions.isEmpty) {
+          return EmptyStateMessage(
+            icon: Icons.quiz_outlined,
+            title: 'No questions yet.',
+            message: 'Create your first question for this quiz.',
+            buttonText: 'Add question',
+            onPressed: _openAddQuestionOverlay,
+          );
+        } else {
+          return ListView.builder(
+            itemCount: questions.length,
+            itemBuilder: (context, index) {
+              final question = questions[index];
+              return Card(
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            QuestionDetailScreen(question: question),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Expanded(child: Text(question.markdownText)),
+                        PopupMenuButton<String>(
+                          onSelected: (value) async {
+                            if (value == 'edit') {
+                              _openEditQuestionOverlay(question);
+                            }
 
-                          if (value == 'delete') {
-                            final shouldRemove = await _confirmRemoveQuestion(
-                              question,
-                            );
-
-                            if (shouldRemove == true) {
+                            if (value == 'delete') {
                               final shouldRemove = await _confirmRemoveQuestion(
                                 question,
                               );
@@ -241,23 +194,25 @@ class _QuizQuestionsScreenState extends State<QuizQuestionsScreen> {
                                 _removeQuestion(question);
                               }
                             }
-                          }
-                        },
-                        itemBuilder: (context) => const [
-                          PopupMenuItem(value: 'edit', child: Text('Edit')),
-                          PopupMenuItem(value: 'delete', child: Text('Delete')),
-                        ],
-                      ),
-                    ],
+                          },
+                          itemBuilder: (context) => const [
+                            PopupMenuItem(value: 'edit', child: Text('Edit')),
+                            PopupMenuItem(
+                              value: 'delete',
+                              child: Text('Delete'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           );
-        },
-      );
-    }
-
+        }
+      },
+    );
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.quiz.name),
