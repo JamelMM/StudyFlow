@@ -11,7 +11,7 @@ import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/screens/quiz_play_screen.dart';
 import 'package:frontend/screens/quiz_questions_screen.dart';
-import 'package:frontend/repositories/contracts/answeroptionsrepository.dart';
+import 'package:frontend/repositories/contracts/answer_options_repository.dart';
 
 class QuizzesScreen extends ConsumerStatefulWidget {
   const QuizzesScreen({super.key, required this.topic});

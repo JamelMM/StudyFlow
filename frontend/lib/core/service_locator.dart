@@ -2,7 +2,7 @@ import 'package:frontend/local/tostore/tostore_answer_options_repository.dart';
 import 'package:frontend/local/tostore/tostore_questions_repository.dart';
 import 'package:frontend/local/tostore/tostore_study_notes_repository.dart';
 import 'package:frontend/local/tostore/tostore_topics_repository.dart';
-import 'package:frontend/repositories/contracts/answeroptionsrepository.dart';
+import 'package:frontend/repositories/contracts/answer_options_repository.dart';
 import 'package:frontend/repositories/contracts/quizzes_repository.dart';
 import 'package:get_it/get_it.dart';
 import 'package:frontend/local/tostore/tostore_subjects_repository.dart';

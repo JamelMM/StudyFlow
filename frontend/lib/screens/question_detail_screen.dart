@@ -1,50 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/service_locator.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/answer_option.dart';
 import 'package:frontend/models/question.dart';
-import 'package:frontend/repositories/contracts/answeroptionsrepository.dart';
 import 'package:frontend/screens/edit_answer_option.dart';
 import 'package:frontend/screens/new_answer_option.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
+import 'package:frontend/controllers/answer_options_controller.dart';
 
-class QuestionDetailScreen extends StatefulWidget {
+class QuestionDetailScreen extends ConsumerStatefulWidget {
   const QuestionDetailScreen({super.key, required this.question});
 
   final Question question;
 
   @override
-  State<QuestionDetailScreen> createState() {
+  ConsumerState<QuestionDetailScreen> createState() {
     return _QuestionDetailScreenState();
   }
 }
 
-class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
-  final AnswerOptionsRepository _answerOptionsRepository =
-      getIt<AnswerOptionsRepository>();
-
-  List<AnswerOption> _answerOptions = [];
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadAnswerOptions();
-  }
-
-  Future<void> _loadAnswerOptions() async {
-    final loadedAnswerOptions = await _answerOptionsRepository
-        .getAnswerOptionsByQuestionId(widget.question.id);
-
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      _answerOptions = loadedAnswerOptions;
-      _isLoading = false;
-    });
-  }
-
+class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
   void _openAddAnswerOptionOverlay() {
     showModalBottomSheet(
       context: context,
@@ -52,19 +26,27 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
       useSafeArea: true,
       constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
       builder: (ctx) {
-        return NewAnswerOption(onAddAnswerOption: _addAnswerOption);
+        return NewAnswerOption(
+          onAddAnswerOption: (markdownText, isCorrect) {
+            _addAnswerOption(markdownText: markdownText, isCorrect: isCorrect);
+          },
+        );
       },
     );
   }
 
-  Future<void> _addAnswerOption(String markdownText, bool isCorrect) async {
-    await _answerOptionsRepository.addAnswerOption(
-      questionId: widget.question.id,
+  Future<void> _addAnswerOption({
+    required String markdownText,
+    required bool isCorrect,
+  }) async {
+    final answerOptionsController = ref.read(
+      answerOptionsControllerProvider(widget.question.id).notifier,
+    );
+
+    await answerOptionsController.addAnswerOption(
       markdownText: markdownText,
       isCorrect: isCorrect,
     );
-
-    await _loadAnswerOptions();
 
     if (!mounted) {
       return;
@@ -82,10 +64,12 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
     );
   }
 
-  Future<void> _removeAnswerOption(AnswerOption answerOption) async {
-    await _answerOptionsRepository.removeAnswerOption(answerOption.id);
+  Future<void> _removeAnswerOption(String id) async {
+    final answerOptionsController = ref.read(
+      answerOptionsControllerProvider(widget.question.id).notifier,
+    );
 
-    await _loadAnswerOptions();
+    await answerOptionsController.removeAnswerOption(id);
 
     if (!mounted) {
       return;
@@ -138,7 +122,7 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
           answerOption: answerOption,
           onUpdateAnswerOption: (markdownText, isCorrect) {
             _updateAnswerOption(
-              answerOption: answerOption,
+              id: answerOption.id,
               markdownText: markdownText,
               isCorrect: isCorrect,
             );
@@ -149,17 +133,19 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
   }
 
   Future<void> _updateAnswerOption({
-    required AnswerOption answerOption,
+    required String id,
     required String markdownText,
     required bool isCorrect,
   }) async {
-    await _answerOptionsRepository.updateAnswerOption(
-      id: answerOption.id,
+    final answerOptionsController = ref.read(
+      answerOptionsControllerProvider(widget.question.id).notifier,
+    );
+
+    await answerOptionsController.updateAnswerOption(
+      id: id,
       markdownText: markdownText,
       isCorrect: isCorrect,
     );
-
-    await _loadAnswerOptions();
 
     if (!mounted) {
       return;
@@ -179,39 +165,31 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget mainContent;
+    final answerOptionsAsync = ref.watch(
+      answerOptionsControllerProvider(widget.question.id),
+    );
 
-    if (_isLoading) {
-      mainContent = const Center(child: CircularProgressIndicator());
-    } else if (_answerOptions.isEmpty) {
-      mainContent = EmptyStateMessage(
-        icon: Icons.checklist_outlined,
-        title: 'No answers yet.',
-        message: 'Create answer options for this question.',
-        buttonText: 'Add answer',
-        onPressed: _openAddAnswerOptionOverlay,
-      );
-    } else {
-      mainContent = ListView.builder(
-        itemCount: _answerOptions.length,
-        itemBuilder: (context, index) {
-          final answerOption = _answerOptions[index];
+    final mainContent = answerOptionsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stackTrace) =>
+          const Center(child: Text('Could not load answers.')),
+      data: (answerOptions) {
+        if (answerOptions.isEmpty) {
+          return EmptyStateMessage(
+            icon: Icons.checklist_outlined,
+            title: 'No answers yet.',
+            message: 'Create answer options for this question.',
+            buttonText: 'Add answer',
+            onPressed: _openAddAnswerOptionOverlay,
+          );
+        }
 
-          return Dismissible(
-            key: ValueKey(answerOption.id),
-            background: Container(
-              color: Colors.red,
-              alignment: Alignment.centerRight,
-              padding: const EdgeInsets.only(right: 20),
-              child: const Icon(Icons.delete, color: Colors.white),
-            ),
-            confirmDismiss: (direction) {
-              return _confirmRemoveAnswerOption(answerOption);
-            },
-            onDismissed: (direction) {
-              _removeAnswerOption(answerOption);
-            },
-            child: Card(
+        return ListView.builder(
+          itemCount: answerOptions.length,
+          itemBuilder: (context, index) {
+            final answerOption = answerOptions[index];
+
+            return Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -238,7 +216,7 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
                           );
 
                           if (shouldRemove == true) {
-                            _removeAnswerOption(answerOption);
+                            _removeAnswerOption(answerOption.id);
                           }
                         }
                       },
@@ -250,11 +228,11 @@ class _QuestionDetailScreenState extends State<QuestionDetailScreen> {
                   ],
                 ),
               ),
-            ),
-          );
-        },
-      );
-    }
+            );
+          },
+        );
+      },
+    );
 
     return Scaffold(
       appBar: AppBar(

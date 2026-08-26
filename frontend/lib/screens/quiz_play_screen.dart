@@ -3,7 +3,7 @@ import 'package:frontend/models/quiz.dart';
 import 'package:frontend/core/service_locator.dart';
 import 'package:frontend/models/answer_option.dart';
 import 'package:frontend/models/question.dart';
-import 'package:frontend/repositories/contracts/answeroptionsrepository.dart';
+import 'package:frontend/repositories/contracts/answer_options_repository.dart';
 import 'package:frontend/repositories/contracts/questions_repository.dart';
 import 'package:frontend/screens/quiz_result_screen.dart';
 

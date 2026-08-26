@@ -1,6 +1,6 @@
 import 'package:frontend/local/tostore/studyflow_database.dart';
 import 'package:frontend/models/answer_option.dart';
-import 'package:frontend/repositories/contracts/answeroptionsrepository.dart';
+import 'package:frontend/repositories/contracts/answer_options_repository.dart';
 
 class ToStoreAnswerOptionsRepository implements AnswerOptionsRepository {
   static const _tableName = 'answer_options';
