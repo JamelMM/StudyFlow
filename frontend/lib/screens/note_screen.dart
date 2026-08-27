@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/study_note.dart';
 import 'package:frontend/screens/edit_study_note.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:frontend/repositories/contracts/study_notes_repository.dart';
-import 'package:frontend/core/service_locator.dart';
+import 'package:frontend/controllers/study_notes_controller.dart';
 
-class NoteScreen extends StatefulWidget {
+class NoteScreen extends ConsumerStatefulWidget {
   const NoteScreen({super.key, required this.note});
 
   final StudyNote note;
 
   @override
-  State<NoteScreen> createState() => _NoteScreenState();
+  ConsumerState<NoteScreen> createState() => _NoteScreenState();
 }
 
-class _NoteScreenState extends State<NoteScreen> {
-  final StudyNotesRepository _studyNotesRepository =
-      getIt<StudyNotesRepository>();
-
+class _NoteScreenState extends ConsumerState<NoteScreen> {
   late StudyNote _note;
 
   @override
@@ -38,17 +35,16 @@ class _NoteScreenState extends State<NoteScreen> {
   }
 
   Future<void> _updateStudyNote(String name, String markdownText) async {
-    await _studyNotesRepository.updateStudyNote(
-      id: _note.id,
-      name: name,
-      markdownText: markdownText,
-    );
+    await ref
+        .read(studyNotesControllerProvider(_note.topicId).notifier)
+        .updateStudyNote(id: _note.id, name: name, markdownText: markdownText);
 
     if (!mounted) {
       return;
     }
 
     setState(() {
+      // local copy
       _note = StudyNote(
         id: _note.id,
         topicId: _note.topicId,

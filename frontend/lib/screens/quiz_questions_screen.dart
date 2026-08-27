@@ -7,6 +7,7 @@ import 'package:frontend/screens/new_question.dart';
 import 'package:frontend/screens/question_detail_screen.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/screens/edit_question.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class QuizQuestionsScreen extends ConsumerStatefulWidget {
   const QuizQuestionsScreen({super.key, required this.quiz});
@@ -227,7 +228,14 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
         padding: const EdgeInsets.only(top: 20),
         child: Column(
           children: [
-            Text('Questions'),
+            Text(
+              'Questions',
+              style: GoogleFonts.inter(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
+            ),
             const SizedBox(height: 30),
             Expanded(child: mainContent),
           ],

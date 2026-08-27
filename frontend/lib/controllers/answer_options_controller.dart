@@ -23,11 +23,18 @@ class AnswerOptionsController extends AsyncNotifier<List<AnswerOption>> {
     return answerOptionsRepository.getAnswerOptionsByQuestionId(questionId);
   }
 
-  Future<void> addAnswerOption({
+  Future<String?> addAnswerOption({
     required String markdownText,
     required bool isCorrect,
   }) async {
     final answerOptionsRepository = ref.read(answerOptionsRepositoryProvider);
+
+    final existingAnswers = await answerOptionsRepository
+        .getAnswerOptionsByQuestionId(questionId);
+
+    if (isCorrect && existingAnswers.any((answer) => answer.isCorrect)) {
+      return 'This question already has a correct answer.';
+    }
 
     await answerOptionsRepository.addAnswerOption(
       questionId: questionId,
@@ -36,6 +43,7 @@ class AnswerOptionsController extends AsyncNotifier<List<AnswerOption>> {
     );
 
     ref.invalidateSelf();
+    return null;
   }
 
   Future<void> removeAnswerOption(String id) async {
@@ -46,19 +54,30 @@ class AnswerOptionsController extends AsyncNotifier<List<AnswerOption>> {
     ref.invalidateSelf();
   }
 
-  Future<void> updateAnswerOption({
-    required String id,
+  Future<String?> updateAnswerOption({
+    required AnswerOption answerOption,
     required String markdownText,
     required bool isCorrect,
   }) async {
     final answerOptionsRepository = ref.read(answerOptionsRepositoryProvider);
 
+    final existingAnswers = await answerOptionsRepository
+        .getAnswerOptionsByQuestionId(questionId);
+
+    if (isCorrect &&
+        existingAnswers.any(
+          (answer) => answer.isCorrect && answer.id != answerOption.id,
+        )) {
+      return 'This question already has a correct answer.';
+    }
+
     await answerOptionsRepository.updateAnswerOption(
-      id: id,
+      id: answerOption.id,
       markdownText: markdownText,
       isCorrect: isCorrect,
     );
 
     ref.invalidateSelf();
+    return null;
   }
 }

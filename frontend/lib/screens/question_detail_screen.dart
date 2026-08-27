@@ -6,6 +6,7 @@ import 'package:frontend/screens/edit_answer_option.dart';
 import 'package:frontend/screens/new_answer_option.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/controllers/answer_options_controller.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class QuestionDetailScreen extends ConsumerStatefulWidget {
   const QuestionDetailScreen({super.key, required this.question});
@@ -39,16 +40,19 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
     required String markdownText,
     required bool isCorrect,
   }) async {
-    final answerOptionsController = ref.read(
-      answerOptionsControllerProvider(widget.question.id).notifier,
-    );
-
-    await answerOptionsController.addAnswerOption(
-      markdownText: markdownText,
-      isCorrect: isCorrect,
-    );
+    final errorMessage = await ref
+        .read(answerOptionsControllerProvider(widget.question.id).notifier)
+        .addAnswerOption(markdownText: markdownText, isCorrect: isCorrect);
 
     if (!mounted) {
+      return;
+    }
+
+    if (errorMessage != null) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage, textAlign: TextAlign.center)),
+      );
       return;
     }
 
@@ -122,7 +126,7 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
           answerOption: answerOption,
           onUpdateAnswerOption: (markdownText, isCorrect) {
             _updateAnswerOption(
-              id: answerOption.id,
+              answerOption: answerOption,
               markdownText: markdownText,
               isCorrect: isCorrect,
             );
@@ -133,21 +137,27 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
   }
 
   Future<void> _updateAnswerOption({
-    required String id,
+    required AnswerOption answerOption,
     required String markdownText,
     required bool isCorrect,
   }) async {
-    final answerOptionsController = ref.read(
-      answerOptionsControllerProvider(widget.question.id).notifier,
-    );
-
-    await answerOptionsController.updateAnswerOption(
-      id: id,
-      markdownText: markdownText,
-      isCorrect: isCorrect,
-    );
+    final errorMessage = await ref
+        .read(answerOptionsControllerProvider(widget.question.id).notifier)
+        .updateAnswerOption(
+          answerOption: answerOption,
+          markdownText: markdownText,
+          isCorrect: isCorrect,
+        );
 
     if (!mounted) {
+      return;
+    }
+
+    if (errorMessage != null) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage, textAlign: TextAlign.center)),
+      );
       return;
     }
 
@@ -236,7 +246,14 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Question'),
+        title: Text(
+          'Question',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+          ),
+        ),
         actions: [
           IconButton(
             onPressed: _openAddAnswerOptionOverlay,
