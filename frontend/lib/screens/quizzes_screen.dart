@@ -3,15 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/controllers/quizzes_controller.dart';
-import 'package:frontend/core/service_locator.dart';
 import 'package:frontend/models/quiz.dart';
 import 'package:frontend/models/topic.dart';
-import 'package:frontend/repositories/contracts/questions_repository.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/screens/quiz_play_screen.dart';
 import 'package:frontend/screens/quiz_questions_screen.dart';
-import 'package:frontend/repositories/contracts/answer_options_repository.dart';
+import 'package:frontend/providers/validate_quiz_can_start_provider.dart';
 
 class QuizzesScreen extends ConsumerStatefulWidget {
   const QuizzesScreen({super.key, required this.topic});
@@ -25,10 +23,6 @@ class QuizzesScreen extends ConsumerStatefulWidget {
 }
 
 class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
-  final AnswerOptionsRepository _answerOptionsRepository =
-      getIt<AnswerOptionsRepository>();
-  final QuestionsRepository _questionsRepository = getIt<QuestionsRepository>();
-
   Future<void> _createQuiz() async {
     await ref
         .read(quizzesControllerProvider(widget.topic.id).notifier)
@@ -48,69 +42,20 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
   }
 
   Future<void> _startQuiz(Quiz quiz) async {
-    final questions = await _questionsRepository.getQuestionsByQuizId(quiz.id);
+    final validateQuizCanStart = ref.read(validateQuizCanStartProvider);
 
-    if (questions.isEmpty) {
-      if (!mounted) {
-        return;
-      }
+    final errorMessage = await validateQuizCanStart(quiz.id);
 
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Add at least one question before starting the quiz.',
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-
+    if (!mounted) {
       return;
     }
 
-    for (final question in questions) {
-      final answers = await _answerOptionsRepository
-          .getAnswerOptionsByQuestionId(question.id);
+    if (errorMessage != null) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage, textAlign: TextAlign.center)),
+      );
 
-      if (answers.isEmpty) {
-        if (!mounted) {
-          return;
-        }
-
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Every question needs at least one answer.',
-              textAlign: TextAlign.center,
-            ),
-          ),
-        );
-
-        return;
-      }
-
-      final hasCorrectAnswer = answers.any((answer) => answer.isCorrect);
-
-      if (!hasCorrectAnswer) {
-        if (!mounted) {
-          return;
-        }
-
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Every question needs one correct answer.',
-              textAlign: TextAlign.center,
-            ),
-          ),
-        );
-        return;
-      }
-    }
-
-    if (!mounted) {
       return;
     }
 
