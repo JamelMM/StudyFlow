@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/screens/start_screen.dart';
-import 'package:frontend/core/service_locator.dart';
 
 import 'local/tostore/studyflow_database.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,7 +10,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await StudyFlowDatabase.initialize();
-  setupDependencies();
 
   runApp(
     ProviderScope(
