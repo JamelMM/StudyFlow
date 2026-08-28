@@ -77,7 +77,7 @@ class _NewStudyNoteState extends State<NewStudyNote> {
             children: [
               FilledButton(
                 onPressed: _submitNewStudyNoteData,
-                child: Text('Save Topic'),
+                child: Text('Save Note'),
               ),
               TextButton(
                 child: Text('Cancel'),

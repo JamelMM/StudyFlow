@@ -6,7 +6,10 @@ const subjectSchema = TableSchema(
     name: 'id',
     type: PrimaryKeyType.timestampBased,
   ),
-  fields: [FieldSchema(name: 'name', type: DataType.text, nullable: false)],
+  fields: [
+    FieldSchema(name: 'name', type: DataType.text, nullable: false),
+    FieldSchema(name: 'createdAt', type: DataType.text, nullable: false),
+  ],
 );
 
 final topicSchema = TableSchema(

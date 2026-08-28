@@ -36,7 +36,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
 
   Future<void> _updateStudyNote(String name, String markdownText) async {
     await ref
-        .read(studyNotesControllerProvider(_note.topicId).notifier)
+        .read(studyNotesControllerProvider(_note.topicId))
         .updateStudyNote(id: _note.id, name: name, markdownText: markdownText);
 
     if (!mounted) {
