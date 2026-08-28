@@ -18,7 +18,6 @@ StudyFlow/
 |   |-- ios/
 |   |-- lib/
 |   |   |-- application/
-|   |   |-- core/
 |   |   |-- controllers/
 |   |   |-- data/
 |   |   |-- local/
@@ -35,7 +34,7 @@ StudyFlow/
 `-- README.md
 ```
 
-The backend is in progress and already exposes the first API endpoints. The Flutter frontend has also been started and currently provides a visual, navigable, local-first version of StudyFlow using repository contracts and ToStore-backed local persistence.
+The backend is in progress and already exposes the first API endpoints. The Flutter frontend has also been started and currently provides a visual, navigable, local-first version of StudyFlow using repository contracts, Riverpod, stream-based providers, and ToStore-backed local persistence.
 
 ---
 
@@ -108,8 +107,9 @@ Current frontend features:
 - Cascade deletion support through ToStore relationships
 - Repository contracts with ToStore-backed implementations
 - Riverpod migration for the main local-first study and quiz flows
-- Riverpod controllers for async state, create/edit/delete actions, quiz validation, and quiz play data loading
-- Legacy get_it setup still present from the previous dependency registration approach
+- Stream-based Riverpod providers for automatic UI updates in migrated local lists
+- Riverpod controllers for create/edit/delete actions
+- Application-level helpers for quiz validation and quiz play data loading
 - String-based frontend IDs prepared for local persistence and backend/API integration
 - Basic navigation between screens
 - Basic app theming with a custom color scheme
@@ -124,20 +124,17 @@ StudyFlow frontend is currently organized as a small Flutter application:
 StudyFlow/frontend/
 -> Flutter mobile application
 
-lib/core
--> App-level setup and legacy service locator from the earlier implementation
-
 lib/application
 -> Application-level use cases and data loading helpers, such as quiz validation and quiz play data loading
 
 lib/controllers
--> Riverpod controllers for async state and user actions
+-> Riverpod controllers for user actions such as create, edit, and delete
 
 lib/models
 -> Frontend data models such as Subject, Topic, StudyNote, Quiz, Question, and AnswerOption
 
 lib/providers
--> Riverpod providers for repositories and async state
+-> Riverpod providers for repositories, stream-based list state, and application-level helpers
 
 lib/repositories/contracts
 -> Repository contracts for frontend data access
@@ -179,7 +176,7 @@ StartScreen
 - ToStore for local persistence
 - Repository pattern with local ToStore implementations
 - Riverpod for state management, dependency access, and controller-based screen logic
-- get_it remains from the earlier implementation and is being phased out
+- StreamProvider for automatic UI updates in migrated local lists
 - Flutter Navigator for screen navigation
 - Local widget state with StatefulWidget and setState where the state is purely visual
 
@@ -189,7 +186,9 @@ The current frontend sprint focuses on building a visual, navigable, local-first
 
 The frontend currently uses repository contracts with ToStore-backed local persistence for subjects, topics, study notes, quizzes, questions, and answer options. The main study entities now support local create, edit, and delete flows.
 
-The frontend has been migrated from screen-owned list state and direct get_it-based screen access to Riverpod providers and controllers for the main local-first flows. Subjects, topics, study notes, quizzes, questions, answer options, quiz validation, and quiz play data loading now use Riverpod-based access patterns.
+The frontend has been migrated from screen-owned list state and direct screen-level dependency access to Riverpod providers and controllers for the main local-first flows. Subjects, topics, study notes, quizzes, questions, answer options, quiz validation, and quiz play data loading now use Riverpod-based access patterns.
+
+Subjects, topics, and study notes now use stream-based Riverpod providers backed by ToStore watchers. Their screens observe live provider state, while controllers focus on user actions such as create, edit, and delete. The remaining quiz-related lists are still being reviewed for the same stream/listener pattern.
 
 The quiz area supports a first usable local quiz flow. Users can create questions, add answer options, mark the correct answer, prevent multiple correct answers for the same question, edit quiz content, validate quiz readiness before starting, start a quiz, select answers, receive visual feedback for correct and incorrect answers, and view a final result screen.
 
@@ -205,7 +204,6 @@ Reusable empty states are shown when no local data is available. The frontend mo
 - Flutter
 - ToStore
 - Riverpod
-- get_it
 - Clean Architecture inspired layering
 
 ### Local Backend Setup
@@ -323,8 +321,9 @@ Aktuelle Frontend-Funktionen:
 - Cascade Delete ueber ToStore-Beziehungen
 - Repository-Contracts mit ToStore-basierten Implementierungen
 - Riverpod-Migration fuer die wichtigsten lokalen Study- und Quiz-Flows
-- Riverpod-Controller fuer asynchronen State, Create/Edit/Delete-Aktionen, Quiz-Validierung und Quiz-Play-Daten
-- Legacy-get_it-Setup aus der frueheren Dependency-Registrierung ist noch vorhanden
+- Stream-basierte Riverpod-Provider fuer automatische UI-Updates in den migrierten lokalen Listen
+- Riverpod-Controller fuer Create/Edit/Delete-Aktionen
+- Application-Level-Helfer fuer Quiz-Validierung und Quiz-Play-Daten
 - String-basierte IDs fuer lokale Persistenz und spaetere Backend/API-Integration
 - Einfache Navigation zwischen Screens
 - Einfaches App-Theming mit eigenem Farbschema
@@ -339,20 +338,17 @@ Das StudyFlow-Frontend ist aktuell als kleine Flutter-Anwendung organisiert:
 StudyFlow/frontend/
 -> Flutter Mobile Application
 
-lib/core
--> App-weites Setup und Legacy-Service-Locator aus der frueheren Implementierung
-
 lib/application
 -> Use Cases und Lade-Helfer auf Application-Ebene, zum Beispiel Quiz-Validierung und Quiz-Play-Daten
 
 lib/controllers
--> Riverpod-Controller fuer asynchronen State und Benutzeraktionen
+-> Riverpod-Controller fuer Benutzeraktionen wie Create, Edit und Delete
 
 lib/models
 -> Frontend-Datenmodelle wie Subject, Topic, StudyNote, Quiz, Question und AnswerOption
 
 lib/providers
--> Riverpod-Provider fuer Repositories und asynchronen State
+-> Riverpod-Provider fuer Repositories, stream-basierten Listen-State und Application-Level-Helfer
 
 lib/repositories/contracts
 -> Repository-Vertraege fuer den Datenzugriff im Frontend
@@ -394,7 +390,7 @@ StartScreen
 - ToStore fuer lokale Persistenz
 - Repository Pattern mit lokalen ToStore-Implementierungen
 - Riverpod fuer State Management, Dependency-Zugriff und Controller-basierte Screen-Logik
-- get_it ist noch aus der frueheren Implementierung vorhanden und wird schrittweise entfernt
+- StreamProvider fuer automatische UI-Updates in migrierten lokalen Listen
 - Flutter Navigator fuer die Navigation zwischen Screens
 - Lokaler Widget-State mit StatefulWidget und setState, wenn der State rein visuell ist
 
@@ -404,7 +400,9 @@ Der aktuelle Frontend-Sprint konzentriert sich darauf, eine visuelle, navigierba
 
 Das Frontend verwendet aktuell Repository-Vertraege mit ToStore-basierter lokaler Persistenz fuer Subjects, Topics, Study Notes, Quizzes, Questions und Answer Options. Die wichtigsten Lern-Entitaeten unterstuetzen jetzt lokale Create-, Edit- und Delete-Flows.
 
-Das Frontend wurde fuer die wichtigsten lokalen Flows von Screen-eigenem Listen-State und direktem get_it-basiertem Screen-Zugriff auf Riverpod-Provider und Controller migriert. Subjects, Topics, Study Notes, Quizze, Questions, Answer Options, Quiz-Validierung und Quiz-Play-Daten verwenden jetzt Riverpod-basierte Zugriffsmuster.
+Das Frontend wurde fuer die wichtigsten lokalen Flows von Screen-eigenem Listen-State und direktem Dependency-Zugriff in Screens auf Riverpod-Provider und Controller migriert. Subjects, Topics, Study Notes, Quizze, Questions, Answer Options, Quiz-Validierung und Quiz-Play-Daten verwenden jetzt Riverpod-basierte Zugriffsmuster.
+
+Subjects, Topics und Study Notes verwenden jetzt stream-basierte Riverpod-Provider mit ToStore-Watchern. Die Screens beobachten live den Provider-State, waehrend Controller sich auf Benutzeraktionen wie Create, Edit und Delete konzentrieren. Die restlichen Quiz-bezogenen Listen werden noch fuer dasselbe Stream/Listener-Muster ueberprueft.
 
 Der Quiz-Bereich unterstuetzt jetzt einen ersten nutzbaren lokalen Quiz-Flow. Benutzer koennen Fragen erstellen, Antwortoptionen hinzufuegen, die richtige Antwort markieren, mehrere richtige Antworten pro Frage verhindern, Quiz-Inhalte bearbeiten, ein Quiz vor dem Start validieren, ein Quiz starten, Antworten auswaehlen, visuelles Feedback fuer richtige und falsche Antworten erhalten und einen Ergebnisbildschirm anzeigen.
 
@@ -420,7 +418,6 @@ Wiederverwendbare Empty States werden angezeigt, wenn keine lokalen Daten vorhan
 - Flutter
 - ToStore
 - Riverpod
-- get_it
 - Clean-Architecture-inspirierte Schichten
 
 ### Lokales Backend Setup

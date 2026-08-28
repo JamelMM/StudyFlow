@@ -4,7 +4,7 @@ This folder contains the Flutter frontend for StudyFlow.
 
 The current frontend is a local-first prototype. It uses repository contracts with ToStore-backed local persistence and is not connected to the ASP.NET Core backend yet.
 
-The app has been migrated from screen-owned list state and direct get_it-based screen access to Riverpod providers and controllers for the main local-first study and quiz flows. Riverpod now handles the async access patterns for subjects, topics, study notes, quizzes, questions, answer options, quiz validation, and quiz play data loading.
+The app has been migrated from screen-owned list state and direct screen-level dependency access to Riverpod providers and controllers for the main local-first study and quiz flows. Riverpod now handles the async access patterns for subjects, topics, study notes, quizzes, questions, answer options, quiz validation, and quiz play data loading. Subjects, topics, and study notes already use stream-based providers for automatic local UI updates.
 
 ## Current Features
 
@@ -27,9 +27,10 @@ The app has been migrated from screen-owned list state and direct get_it-based s
 - Cascade deletion support through ToStore relationships
 - Repository contracts for local-first data access
 - Riverpod migration for the main local-first study and quiz flows
-- Riverpod controllers for async state, create/edit/delete actions, quiz validation, and quiz play data loading
+- Stream-based Riverpod providers for automatic UI updates in migrated local lists
+- Riverpod controllers for create/edit/delete actions
+- Application-level helpers for quiz validation and quiz play data loading
 - String-based IDs prepared for ToStore and backend integration
-- Legacy get_it setup still present from the previous dependency registration approach
 - Basic Material Design UI
 - Custom color scheme
 - Reusable list item and empty state widgets
@@ -86,8 +87,6 @@ frontend/
 |   |       |-- load_quiz_play_data.dart
 |   |       |-- quiz_play_data.dart
 |   |       `-- validate_quiz_can_start.dart
-|   |-- core/
-|   |   `-- service_locator.dart
 |   |-- controllers/
 |   |   |-- subjects_controller.dart
 |   |   |-- topics_controller.dart
@@ -118,8 +117,11 @@ frontend/
 |   |   |-- questions_repository_provider.dart
 |   |   |-- quizzes_repository_provider.dart
 |   |   |-- study_notes_repository_provider.dart
+|   |   |-- study_notes_stream_provider.dart
 |   |   |-- subjects_repository_provider.dart
+|   |   |-- subjects_stream_provider.dart
 |   |   |-- topics_repository_provider.dart
+|   |   |-- topics_stream_provider.dart
 |   |   `-- validate_quiz_can_start_provider.dart
 |   |-- repositories/
 |   |   `-- contracts/
@@ -137,7 +139,7 @@ frontend/
 - ToStore for local persistence
 - Repository pattern with local ToStore implementations
 - Riverpod for state management, dependency access, and controller-based screen logic
-- get_it remains from the earlier implementation and is being phased out
+- StreamProvider for automatic UI updates in migrated local lists
 - StatefulWidget and setState for purely local visual UI state
 - Flutter Navigator for screen navigation
 
@@ -167,7 +169,7 @@ The frontend is intentionally local-first at this stage.
 
 Screens access data through repository contracts, and the active implementations use ToStore for local persistence. Subjects, topics, study notes, quizzes, questions, and answer options are stored locally.
 
-Subjects, topics, study notes, quizzes, questions, answer options, quiz validation, and quiz play data loading have been migrated to Riverpod-based providers, controllers, and application-level helpers. Controllers own the async state and delegate persistence operations to the ToStore-backed repositories. Screens now observe provider state and forward user actions to controllers instead of loading and storing entity lists manually.
+Subjects, topics, study notes, quizzes, questions, answer options, quiz validation, and quiz play data loading have been migrated to Riverpod-based providers, controllers, and application-level helpers. Subjects, topics, and study notes now use stream-based providers backed by ToStore watchers, so their lists update automatically when local data changes. Controllers delegate persistence operations to the ToStore-backed repositories, while screens observe provider state and forward user actions to controllers instead of loading and storing entity lists manually.
 
 The app now supports local create, edit, and delete flows for the main study entities: subjects, topics, study notes, quiz questions, and answer options. Larger deletion flows, such as subjects and topics, use confirmation dialogs because related data can be removed through ToStore cascade relationships.
 
@@ -175,16 +177,15 @@ The quiz area has a first usable local flow. Users can create quiz questions, ad
 
 The frontend models use string-based IDs to prepare the app for local persistence and later backend synchronization.
 
-The next major step is adding stream/listener-based list updates with ToStore.
+The next major step is continuing the stream/listener migration for quiz-related lists with ToStore.
 
 ## Next Steps
 
-- Add stream/listener-based list updates with ToStore
+- Continue stream/listener-based list updates for quiz-related flows
 - Preserve list position when items are edited
 - Improve form validation
 - Add an initial seed with public demo learning content
 - Add JSON import for loading study and exam content
-- Remove the remaining legacy get_it setup once Riverpod fully owns dependency access
 - Prepare API service classes
 - Connect the Flutter frontend to the ASP.NET Core backend
 - Add synchronization between local data and backend data
