@@ -9,6 +9,8 @@ abstract class StudyNotesRepository {
     required String markdownText,
   });
 
+  Stream<List<StudyNote>> watchStudyNotesByTopicId(String topicId);
+
   Future<void> removeStudyNote(String id);
 
   Future<void> updateStudyNote({

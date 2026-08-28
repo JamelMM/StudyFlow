@@ -1,6 +1,5 @@
 import 'package:frontend/local/tostore/studyflow_database.dart';
 import 'package:frontend/models/study_note.dart';
-
 import 'package:frontend/repositories/contracts/study_notes_repository.dart';
 
 class ToStoreStudyNotesRepository implements StudyNotesRepository {
@@ -57,6 +56,26 @@ class ToStoreStudyNotesRepository implements StudyNotesRepository {
         );
       },
     ).toList();
+  }
+
+  @override
+  Stream<List<StudyNote>> watchStudyNotesByTopicId(String topicId) {
+    return StudyFlowDatabase.db.query(_tableName).watch().map((rows) {
+      return rows.where((row) => row['topicId'].toString() == topicId).map((
+        row,
+      ) {
+        return StudyNote(
+          id: row['id'].toString(),
+          topicId: row['topicId'].toString(),
+          name: row['name'].toString(),
+          markdownText: row['markdownText'].toString(),
+          createdAt: DateTime.parse(row['createdAt'].toString()),
+          updatedAt: row['updatedAt'] == null
+              ? null
+              : DateTime.parse(row['updatedAt'].toString()),
+        );
+      }).toList();
+    });
   }
 
   @override

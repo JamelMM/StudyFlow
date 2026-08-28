@@ -1,45 +1,39 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/providers/study_notes_repository_provider.dart';
-import 'package:frontend/models/study_note.dart';
+import 'package:frontend/repositories/contracts/study_notes_repository.dart';
 
 final studyNotesControllerProvider =
-    AsyncNotifierProvider.family<StudyNotesController, List<StudyNote>, String>(
-      StudyNotesController.new,
-    );
+    Provider.family<StudyNotesController, String>((ref, topicId) {
+      final studyNotesRepository = ref.watch(studyNotesRepositoryProvider);
 
-class StudyNotesController extends AsyncNotifier<List<StudyNote>> {
-  StudyNotesController(this.topicId);
+      return StudyNotesController(
+        studyNotesRepository: studyNotesRepository,
+        topicId: topicId,
+      );
+    });
 
+class StudyNotesController {
+  const StudyNotesController({
+    required this.studyNotesRepository,
+    required this.topicId,
+  });
+
+  final StudyNotesRepository studyNotesRepository;
   final String topicId;
-
-  @override
-  Future<List<StudyNote>> build() async {
-    final studyNotesRepository = ref.watch(studyNotesRepositoryProvider);
-
-    return studyNotesRepository.getStudyNotesByTopicId(topicId);
-  }
 
   Future<void> addStudyNote({
     required String name,
     required String markdownText,
   }) async {
-    final studyNotesRepository = ref.read(studyNotesRepositoryProvider);
-
     await studyNotesRepository.addStudyNote(
       topicId: topicId,
       name: name,
       markdownText: markdownText,
     );
-
-    ref.invalidateSelf();
   }
 
   Future<void> removeStudyNote(String id) async {
-    final studyNotesRepository = ref.read(studyNotesRepositoryProvider);
-
     await studyNotesRepository.removeStudyNote(id);
-
-    ref.invalidateSelf();
   }
 
   Future<void> updateStudyNote({
@@ -47,13 +41,10 @@ class StudyNotesController extends AsyncNotifier<List<StudyNote>> {
     required String name,
     required String markdownText,
   }) async {
-    final studyNotesRepository = ref.read(studyNotesRepositoryProvider);
-
     await studyNotesRepository.updateStudyNote(
       id: id,
       name: name,
       markdownText: markdownText,
     );
-    ref.invalidateSelf();
   }
 }
