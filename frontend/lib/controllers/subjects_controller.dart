@@ -1,41 +1,27 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/models/subject.dart';
 import 'package:frontend/providers/subjects_repository_provider.dart';
+import 'package:frontend/repositories/contracts/subjects_repository.dart';
 
-final subjectsControllerProvider =
-    AsyncNotifierProvider<SubjectsController, List<Subject>>(
-      SubjectsController.new,
-    );
+final subjectsControllerProvider = Provider<SubjectsController>((ref) {
+  final subjectsRepository = ref.watch(subjectsRepositoryProvider);
 
-class SubjectsController extends AsyncNotifier<List<Subject>> {
-  @override
-  Future<List<Subject>> build() async {
-    final subjectsRepository = ref.watch(subjectsRepositoryProvider);
+  return SubjectsController(subjectsRepository);
+});
 
-    return subjectsRepository.getSubjects();
-  }
+class SubjectsController {
+  const SubjectsController(this.subjectsRepository);
+
+  final SubjectsRepository subjectsRepository;
 
   Future<void> addSubject(String name) async {
-    final subjectsRepository = ref.read(subjectsRepositoryProvider);
-
     await subjectsRepository.addSubject(name);
-
-    ref.invalidateSelf();
   }
 
   Future<void> removeSubject(String id) async {
-    final subjectsRepository = ref.read(subjectsRepositoryProvider);
-
     await subjectsRepository.removeSubject(id);
-
-    ref.invalidateSelf();
   }
 
   Future<void> updateSubject({required String id, required String name}) async {
-    final subjectsRepository = ref.read(subjectsRepositoryProvider);
-
     await subjectsRepository.updateSubject(id: id, name: name);
-
-    ref.invalidateSelf();
   }
 }

@@ -10,14 +10,34 @@ class ToStoreSubjectsRepository implements SubjectsRepository {
     final result = await StudyFlowDatabase.db.query(_tableName);
 
     return result.data.map((row) {
-      return Subject(id: row['id'].toString(), name: row['name'].toString());
+      return Subject(
+        id: row['id'].toString(),
+        name: row['name'].toString(),
+        createdAt: DateTime.parse(row['createdAt'].toString()),
+      );
     }).toList();
   }
 
   @override
+  Stream<List<Subject>> watchSubjects() {
+    return StudyFlowDatabase.db.query(_tableName).watch().map((rows) {
+      return rows.map((row) {
+        return Subject(
+          id: row['id'].toString(),
+          name: row['name'].toString(),
+          createdAt: DateTime.parse(row['createdAt'].toString()),
+        );
+      }).toList();
+    });
+  }
+
+  @override
   Future<Subject> addSubject(String name) async {
+    final createdAt = DateTime.now();
+
     final result = await StudyFlowDatabase.db.insert(_tableName, {
       'name': name,
+      'createdAt': createdAt.toIso8601String(),
     });
 
     if (!result.isSuccess) {
@@ -26,7 +46,7 @@ class ToStoreSubjectsRepository implements SubjectsRepository {
 
     final generatedId = result.successKeys.first.toString();
 
-    return Subject(id: generatedId, name: name);
+    return Subject(id: generatedId, name: name, createdAt: createdAt);
   }
 
   @override

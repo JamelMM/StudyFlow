@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/providers/subjects_stream_provider.dart';
 import 'package:frontend/screens/edit_subject.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/screens/topics_screen.dart';
@@ -29,7 +30,7 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
   }
 
   Future<void> _addSubject(String name) async {
-    await ref.read(subjectsControllerProvider.notifier).addSubject(name);
+    await ref.read(subjectsControllerProvider).addSubject(name);
 
     if (!mounted) {
       return;
@@ -48,9 +49,7 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
   }
 
   Future<void> _removeSubject(Subject subject) async {
-    await ref
-        .read(subjectsControllerProvider.notifier)
-        .removeSubject(subject.id);
+    await ref.read(subjectsControllerProvider).removeSubject(subject.id);
 
     if (!mounted) {
       return;
@@ -116,7 +115,7 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
     required String name,
   }) async {
     await ref
-        .read(subjectsControllerProvider.notifier)
+        .read(subjectsControllerProvider)
         .updateSubject(id: subject.id, name: name);
 
     if (!mounted) {
@@ -137,7 +136,7 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final subjectsAsync = ref.watch(subjectsControllerProvider);
+    final subjectsAsync = ref.watch(subjectsStreamProvider);
 
     final mainContent = subjectsAsync.when(
       loading: () {
