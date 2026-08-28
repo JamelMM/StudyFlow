@@ -1,45 +1,37 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/models/topic.dart';
 import 'package:frontend/providers/topics_repository_provider.dart';
+import 'package:frontend/repositories/contracts/topics_repository.dart';
 
-final topicsControllerProvider =
-    AsyncNotifierProvider.family<TopicsController, List<Topic>, String>(
-      TopicsController.new,
-    );
+final topicsControllerProvider = Provider.family<TopicsController, String>((
+  ref,
+  subjectId,
+) {
+  final topicsRepository = ref.watch(topicsRepositoryProvider);
 
-class TopicsController extends AsyncNotifier<List<Topic>> {
-  TopicsController(this.subjectId);
+  return TopicsController(
+    topicsRepository: topicsRepository,
+    subjectId: subjectId,
+  );
+});
 
+class TopicsController {
+  const TopicsController({
+    required this.topicsRepository,
+    required this.subjectId,
+  });
+
+  final TopicsRepository topicsRepository;
   final String subjectId;
 
-  @override
-  Future<List<Topic>> build() async {
-    final topicsRepository = ref.watch(topicsRepositoryProvider);
-
-    return topicsRepository.getTopicsBySubjectId(subjectId);
-  }
-
   Future<void> addTopic({required String name}) async {
-    final topicsRepository = ref.read(topicsRepositoryProvider);
-
     await topicsRepository.addTopic(subjectId: subjectId, name: name);
-
-    ref.invalidateSelf();
   }
 
   Future<void> removeTopic(String id) async {
-    final topicsRepository = ref.read(topicsRepositoryProvider);
-
     await topicsRepository.removeTopic(id);
-
-    ref.invalidateSelf();
   }
 
   Future<void> updateTopic({required String id, required String name}) async {
-    final topicsRepository = ref.read(topicsRepositoryProvider);
-
     await topicsRepository.updateTopic(id: id, name: name);
-
-    ref.invalidateSelf();
   }
 }

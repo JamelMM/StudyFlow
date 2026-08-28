@@ -8,6 +8,7 @@ import 'package:frontend/screens/topic_detail_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/controllers/topics_controller.dart';
+import 'package:frontend/providers/topics_stream_provider.dart';
 
 class TopicsScreen extends ConsumerStatefulWidget {
   const TopicsScreen({super.key, required this.subject});
@@ -33,7 +34,7 @@ class _TopicsScreenState extends ConsumerState<TopicsScreen> {
 
   Future<void> _addTopic(String name) async {
     await ref
-        .read(topicsControllerProvider(widget.subject.id).notifier)
+        .read(topicsControllerProvider(widget.subject.id))
         .addTopic(name: name);
 
     if (!mounted) {
@@ -54,7 +55,7 @@ class _TopicsScreenState extends ConsumerState<TopicsScreen> {
 
   Future<void> _removeTopic(Topic topic) async {
     await ref
-        .read(topicsControllerProvider(widget.subject.id).notifier)
+        .read(topicsControllerProvider(widget.subject.id))
         .removeTopic(topic.id);
 
     if (!mounted) {
@@ -121,7 +122,7 @@ class _TopicsScreenState extends ConsumerState<TopicsScreen> {
     required String name,
   }) async {
     await ref
-        .read(topicsControllerProvider(widget.subject.id).notifier)
+        .read(topicsControllerProvider(widget.subject.id))
         .updateTopic(id: topic.id, name: name);
 
     if (!mounted) {
@@ -142,7 +143,7 @@ class _TopicsScreenState extends ConsumerState<TopicsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final topicsAsync = ref.watch(topicsControllerProvider(widget.subject.id));
+    final topicsAsync = ref.watch(topicsStreamProvider(widget.subject.id));
 
     Widget mainContent = topicsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),

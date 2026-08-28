@@ -50,6 +50,22 @@ class ToStoreTopicsRepository implements TopicsRepository {
   }
 
   @override
+  Stream<List<Topic>> watchTopicsBySubjectId(String subjectId) {
+    return StudyFlowDatabase.db.query(_tableName).watch().map((rows) {
+      return rows.where((row) => row['subjectId'].toString() == subjectId).map((
+        row,
+      ) {
+        return Topic(
+          id: row['id'].toString(),
+          subjectId: row['subjectId'].toString(),
+          name: row['name'].toString(),
+          createdAt: DateTime.parse(row['createdAt'].toString()),
+        );
+      }).toList();
+    });
+  }
+
+  @override
   Future<void> removeTopic(String id) async {
     final result = await StudyFlowDatabase.db
         .delete(_tableName)
