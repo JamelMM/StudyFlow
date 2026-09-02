@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/controllers/quizzes_controller.dart';
 import 'package:frontend/models/quiz.dart';
 import 'package:frontend/models/topic.dart';
+import 'package:frontend/providers/quizzes_stream_provider.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/screens/quiz_play_screen.dart';
@@ -25,7 +26,7 @@ class QuizzesScreen extends ConsumerStatefulWidget {
 class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
   Future<void> _createQuiz() async {
     await ref
-        .read(quizzesControllerProvider(widget.topic.id).notifier)
+        .read(quizzesControllerProvider(widget.topic.id))
         .addQuiz(name: widget.topic.name);
 
     if (!mounted) {
@@ -67,7 +68,7 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final quizzesAsync = ref.watch(quizzesControllerProvider(widget.topic.id));
+    final quizzesAsync = ref.watch(quizzesStreamProvider(widget.topic.id));
 
     Widget mainContent = quizzesAsync.when(
       error: (error, stackTrace) =>

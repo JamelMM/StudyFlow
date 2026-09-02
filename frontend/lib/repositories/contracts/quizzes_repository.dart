@@ -4,4 +4,5 @@ abstract class QuizzesRepository {
   Future<Quiz?> getQuizByTopicId(String topicId);
   Future<Quiz> addQuiz({required String name, required String topicId});
   Future<void> removeQuiz(String id);
+  Stream<Quiz?> watchQuizByTopicId(String topicId);
 }

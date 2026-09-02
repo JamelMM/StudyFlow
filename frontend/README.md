@@ -4,7 +4,7 @@ This folder contains the Flutter frontend for StudyFlow.
 
 The current frontend is a local-first prototype. It uses repository contracts with ToStore-backed local persistence and is not connected to the ASP.NET Core backend yet.
 
-The app has been migrated from screen-owned list state and direct screen-level dependency access to Riverpod providers and controllers for the main local-first study and quiz flows. Riverpod now handles the async access patterns for subjects, topics, study notes, quizzes, questions, answer options, quiz validation, and quiz play data loading. Subjects, topics, and study notes already use stream-based providers for automatic local UI updates.
+The app has been migrated from screen-owned list state and direct screen-level dependency access to Riverpod providers and controllers for the main local-first study and quiz flows. Riverpod now handles the async access patterns for subjects, topics, study notes, quizzes, questions, answer options, quiz validation, and quiz play data loading. Subjects, topics, study notes, quizzes, quiz questions, and answer options already use stream-based providers for automatic local UI updates.
 
 ## Current Features
 
@@ -113,9 +113,12 @@ frontend/
 |   |   `-- answer_option.dart
 |   |-- providers/
 |   |   |-- answer_options_repository_provider.dart
+|   |   |-- answer_options_stream_provider.dart
 |   |   |-- load_quiz_play_data_provider.dart
 |   |   |-- questions_repository_provider.dart
+|   |   |-- questions_stream_provider.dart
 |   |   |-- quizzes_repository_provider.dart
+|   |   |-- quizzes_stream_provider.dart
 |   |   |-- study_notes_repository_provider.dart
 |   |   |-- study_notes_stream_provider.dart
 |   |   |-- subjects_repository_provider.dart
@@ -169,7 +172,7 @@ The frontend is intentionally local-first at this stage.
 
 Screens access data through repository contracts, and the active implementations use ToStore for local persistence. Subjects, topics, study notes, quizzes, questions, and answer options are stored locally.
 
-Subjects, topics, study notes, quizzes, questions, answer options, quiz validation, and quiz play data loading have been migrated to Riverpod-based providers, controllers, and application-level helpers. Subjects, topics, and study notes now use stream-based providers backed by ToStore watchers, so their lists update automatically when local data changes. Controllers delegate persistence operations to the ToStore-backed repositories, while screens observe provider state and forward user actions to controllers instead of loading and storing entity lists manually.
+Subjects, topics, study notes, quizzes, questions, answer options, quiz validation, and quiz play data loading have been migrated to Riverpod-based providers, controllers, and application-level helpers. Subjects, topics, study notes, quizzes, quiz questions, and answer options now use stream-based providers backed by ToStore watchers, so their lists update automatically when local data changes. Controllers delegate persistence operations to the ToStore-backed repositories, while screens observe provider state and forward user actions to controllers instead of loading and storing entity lists manually.
 
 The app now supports local create, edit, and delete flows for the main study entities: subjects, topics, study notes, quiz questions, and answer options. Larger deletion flows, such as subjects and topics, use confirmation dialogs because related data can be removed through ToStore cascade relationships.
 
@@ -177,11 +180,11 @@ The quiz area has a first usable local flow. Users can create quiz questions, ad
 
 The frontend models use string-based IDs to prepare the app for local persistence and later backend synchronization.
 
-The next major step is continuing the stream/listener migration for quiz-related lists with ToStore.
+The next major step is improving quiz practice behavior and preparing import/export features for local study content.
 
 ## Next Steps
 
-- Continue stream/listener-based list updates for quiz-related flows
+- Randomize quiz questions and answer options during quiz play
 - Preserve list position when items are edited
 - Improve form validation
 - Add an initial seed with public demo learning content

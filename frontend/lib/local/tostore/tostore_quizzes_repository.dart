@@ -31,6 +31,32 @@ class ToStoreQuizzesRepository implements QuizzesRepository {
   }
 
   @override
+  Stream<Quiz?> watchQuizByTopicId(String topicId) {
+    return StudyFlowDatabase.db.query(_tableName).watch().map((rows) {
+      final matchingRows = rows
+          .where((row) => row['topicId'].toString() == topicId)
+          .toList();
+
+      if (matchingRows.isEmpty) {
+        return null;
+      }
+
+      final row = matchingRows.first;
+      final updatedAtValue = row['updatedAt'];
+
+      return Quiz(
+        id: row['id'].toString(),
+        topicId: row['topicId'].toString(),
+        name: row['name'].toString(),
+        createdAt: DateTime.parse(row['createdAt'].toString()),
+        updatedAt: updatedAtValue == null
+            ? null
+            : DateTime.parse(updatedAtValue.toString()),
+      );
+    });
+  }
+
+  @override
   Future<Quiz?> getQuizByTopicId(String topicId) async {
     final result = await StudyFlowDatabase.db.query(_tableName);
 

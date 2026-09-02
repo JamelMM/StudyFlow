@@ -188,7 +188,7 @@ The frontend currently uses repository contracts with ToStore-backed local persi
 
 The frontend has been migrated from screen-owned list state and direct screen-level dependency access to Riverpod providers and controllers for the main local-first flows. Subjects, topics, study notes, quizzes, questions, answer options, quiz validation, and quiz play data loading now use Riverpod-based access patterns.
 
-Subjects, topics, and study notes now use stream-based Riverpod providers backed by ToStore watchers. Their screens observe live provider state, while controllers focus on user actions such as create, edit, and delete. The remaining quiz-related lists are still being reviewed for the same stream/listener pattern.
+Subjects, topics, study notes, quizzes, quiz questions, and answer options now use stream-based Riverpod providers backed by ToStore watchers. Their screens observe live provider state, while controllers focus on user actions such as create, edit, and delete.
 
 The quiz area supports a first usable local quiz flow. Users can create questions, add answer options, mark the correct answer, prevent multiple correct answers for the same question, edit quiz content, validate quiz readiness before starting, start a quiz, select answers, receive visual feedback for correct and incorrect answers, and view a final result screen.
 
@@ -402,7 +402,7 @@ Das Frontend verwendet aktuell Repository-Vertraege mit ToStore-basierter lokale
 
 Das Frontend wurde fuer die wichtigsten lokalen Flows von Screen-eigenem Listen-State und direktem Dependency-Zugriff in Screens auf Riverpod-Provider und Controller migriert. Subjects, Topics, Study Notes, Quizze, Questions, Answer Options, Quiz-Validierung und Quiz-Play-Daten verwenden jetzt Riverpod-basierte Zugriffsmuster.
 
-Subjects, Topics und Study Notes verwenden jetzt stream-basierte Riverpod-Provider mit ToStore-Watchern. Die Screens beobachten live den Provider-State, waehrend Controller sich auf Benutzeraktionen wie Create, Edit und Delete konzentrieren. Die restlichen Quiz-bezogenen Listen werden noch fuer dasselbe Stream/Listener-Muster ueberprueft.
+Subjects, Topics, Study Notes, Quizze, Quiz Questions und Answer Options verwenden jetzt stream-basierte Riverpod-Provider mit ToStore-Watchern. Die Screens beobachten live den Provider-State, waehrend Controller sich auf Benutzeraktionen wie Create, Edit und Delete konzentrieren.
 
 Der Quiz-Bereich unterstuetzt jetzt einen ersten nutzbaren lokalen Quiz-Flow. Benutzer koennen Fragen erstellen, Antwortoptionen hinzufuegen, die richtige Antwort markieren, mehrere richtige Antworten pro Frage verhindern, Quiz-Inhalte bearbeiten, ein Quiz vor dem Start validieren, ein Quiz starten, Antworten auswaehlen, visuelles Feedback fuer richtige und falsche Antworten erhalten und einen Ergebnisbildschirm anzeigen.
 
