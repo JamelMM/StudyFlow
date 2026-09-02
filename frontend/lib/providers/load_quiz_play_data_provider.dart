@@ -11,11 +11,9 @@ final loadQuizPlayDataProvider = Provider<LoadQuizPlayData>((ref) {
   );
 });
 
-final quizPlayDataProvider = FutureProvider.family<QuizPlayData, String>((
-  ref,
-  quizId,
-) {
-  final loadQuizPlayData = ref.watch(loadQuizPlayDataProvider);
+final quizPlayDataProvider = FutureProvider.autoDispose
+    .family<QuizPlayData, String>((ref, quizId) {
+      final loadQuizPlayData = ref.watch(loadQuizPlayDataProvider);
 
-  return loadQuizPlayData(quizId);
-});
+      return loadQuizPlayData(quizId);
+    });

@@ -13,13 +13,21 @@ class LoadQuizPlayData {
   final AnswerOptionsRepository answerOptionsRepository;
 
   Future<QuizPlayData> call(String quizId) async {
-    final questions = await questionsRepository.getQuestionsByQuizId(quizId);
+    final loadedQuestions = await questionsRepository.getQuestionsByQuizId(
+      quizId,
+    );
+    final questions = [...loadedQuestions]..shuffle();
+
+    //final questions = [...loadedQuestions];
+    //questions.shuffle();
 
     final answerOptionsByQuestionId = <String, List<AnswerOption>>{};
 
     for (final question in questions) {
-      final answers = await answerOptionsRepository
+      final loadedAnswers = await answerOptionsRepository
           .getAnswerOptionsByQuestionId(question.id);
+
+      final answers = [...loadedAnswers]..shuffle();
 
       answerOptionsByQuestionId[question.id] = answers;
     }
