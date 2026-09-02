@@ -94,4 +94,29 @@ class ToStoreAnswerOptionsRepository implements AnswerOptionsRepository {
       throw Exception('Could not update answer.');
     }
   }
+
+  @override
+  Stream<List<AnswerOption>> watchAnswerOptionsByQuestionId(String questionId) {
+    return StudyFlowDatabase.db.query(_tableName).watch().map((rows) {
+      return rows
+          .where((row) => row['questionId'].toString() == questionId)
+          .map((row) {
+            final updatedAtValue = row['updatedAt'];
+
+            return AnswerOption(
+              id: row['id'].toString(),
+              questionId: row['questionId'].toString(),
+              markdownText: row['markdownText'].toString(),
+              isCorrect:
+                  row['isCorrect'] == true ||
+                  row['isCorrect'].toString() == 'true',
+              createdAt: DateTime.parse(row['createdAt'].toString()),
+              updatedAt: updatedAtValue == null
+                  ? null
+                  : DateTime.parse(updatedAtValue.toString()),
+            );
+          })
+          .toList();
+    });
+  }
 }

@@ -7,6 +7,7 @@ import 'package:frontend/screens/new_answer_option.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/controllers/answer_options_controller.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/providers/answer_options_stream_provider.dart';
 
 class QuestionDetailScreen extends ConsumerStatefulWidget {
   const QuestionDetailScreen({super.key, required this.question});
@@ -41,7 +42,7 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
     required bool isCorrect,
   }) async {
     final errorMessage = await ref
-        .read(answerOptionsControllerProvider(widget.question.id).notifier)
+        .read(answerOptionsControllerProvider(widget.question.id))
         .addAnswerOption(markdownText: markdownText, isCorrect: isCorrect);
 
     if (!mounted) {
@@ -70,7 +71,7 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
 
   Future<void> _removeAnswerOption(String id) async {
     final answerOptionsController = ref.read(
-      answerOptionsControllerProvider(widget.question.id).notifier,
+      answerOptionsControllerProvider(widget.question.id),
     );
 
     await answerOptionsController.removeAnswerOption(id);
@@ -142,9 +143,9 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
     required bool isCorrect,
   }) async {
     final errorMessage = await ref
-        .read(answerOptionsControllerProvider(widget.question.id).notifier)
+        .read(answerOptionsControllerProvider(widget.question.id))
         .updateAnswerOption(
-          answerOption: answerOption,
+          id: answerOption.id,
           markdownText: markdownText,
           isCorrect: isCorrect,
         );
@@ -176,7 +177,7 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final answerOptionsAsync = ref.watch(
-      answerOptionsControllerProvider(widget.question.id),
+      answerOptionsStreamProvider(widget.question.id),
     );
 
     final mainContent = answerOptionsAsync.when(

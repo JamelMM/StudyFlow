@@ -7,6 +7,9 @@ abstract class QuestionsRepository {
     required String quizId,
     required String markdownText,
   });
+
+  Stream<List<Question>> watchQuestionsByQuizId(String quizId);
+
   Future<void> removeQuestion(String id);
 
   Future<void> updateQuestion({

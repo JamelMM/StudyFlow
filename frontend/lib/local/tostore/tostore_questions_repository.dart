@@ -83,4 +83,18 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
       throw Exception('Could not update question.');
     }
   }
+
+  @override
+  Stream<List<Question>> watchQuestionsByQuizId(String quizId) {
+    return StudyFlowDatabase.db.query(_tableName).watch().map((rows) {
+      return rows.where((row) => row['quizId'].toString() == quizId).map((row) {
+        return Question(
+          id: row['id'].toString(),
+          quizId: row['quizId'].toString(),
+          markdownText: row['markdownText'].toString(),
+          createdAt: DateTime.parse(row['createdAt'].toString()),
+        );
+      }).toList();
+    });
+  }
 }

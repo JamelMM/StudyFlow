@@ -1,39 +1,45 @@
-import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/providers/answer_options_repository_provider.dart';
-import 'package:frontend/models/answer_option.dart';
+import 'package:frontend/repositories/contracts/answer_options_repository.dart';
 
 final answerOptionsControllerProvider =
-    AsyncNotifierProvider.family<
-      AnswerOptionsController,
-      List<AnswerOption>,
-      String
-    >(AnswerOptionsController.new);
+    Provider.family<AnswerOptionsController, String>((ref, questionId) {
+      final answerOptionsRepository = ref.watch(
+        answerOptionsRepositoryProvider,
+      );
 
-class AnswerOptionsController extends AsyncNotifier<List<AnswerOption>> {
-  AnswerOptionsController(this.questionId);
+      return AnswerOptionsController(
+        answerOptionsRepository: answerOptionsRepository,
+        questionId: questionId,
+      );
+    });
 
+class AnswerOptionsController {
+  const AnswerOptionsController({
+    required this.answerOptionsRepository,
+    required this.questionId,
+  });
+
+  final AnswerOptionsRepository answerOptionsRepository;
   final String questionId;
-
-  @override
-  Future<List<AnswerOption>> build() async {
-    final answerOptionsRepository = ref.watch(answerOptionsRepositoryProvider);
-
-    return answerOptionsRepository.getAnswerOptionsByQuestionId(questionId);
-  }
 
   Future<String?> addAnswerOption({
     required String markdownText,
     required bool isCorrect,
   }) async {
-    final answerOptionsRepository = ref.read(answerOptionsRepositoryProvider);
-
     final existingAnswers = await answerOptionsRepository
         .getAnswerOptionsByQuestionId(questionId);
 
-    if (isCorrect && existingAnswers.any((answer) => answer.isCorrect)) {
-      return 'This question already has a correct answer.';
+    if (existingAnswers.length >= 4) {
+      return 'A question can have a maximum of 4 answers.';
+    }
+
+    final alreadyHasCorrectAnswer = existingAnswers.any(
+      (answer) => answer.isCorrect,
+    );
+
+    if (isCorrect && alreadyHasCorrectAnswer) {
+      return 'A question can only have one correct answer.';
     }
 
     await answerOptionsRepository.addAnswerOption(
@@ -42,42 +48,35 @@ class AnswerOptionsController extends AsyncNotifier<List<AnswerOption>> {
       isCorrect: isCorrect,
     );
 
-    ref.invalidateSelf();
     return null;
   }
 
   Future<void> removeAnswerOption(String id) async {
-    final answerOptionsRepository = ref.read(answerOptionsRepositoryProvider);
-
     await answerOptionsRepository.removeAnswerOption(id);
-
-    ref.invalidateSelf();
   }
 
   Future<String?> updateAnswerOption({
-    required AnswerOption answerOption,
+    required String id,
     required String markdownText,
     required bool isCorrect,
   }) async {
-    final answerOptionsRepository = ref.read(answerOptionsRepositoryProvider);
-
     final existingAnswers = await answerOptionsRepository
         .getAnswerOptionsByQuestionId(questionId);
 
-    if (isCorrect &&
-        existingAnswers.any(
-          (answer) => answer.isCorrect && answer.id != answerOption.id,
-        )) {
-      return 'This question already has a correct answer.';
+    final alreadyHasAnotherCorrectAnswer = existingAnswers.any(
+      (answer) => answer.id != id && answer.isCorrect,
+    );
+
+    if (isCorrect && alreadyHasAnotherCorrectAnswer) {
+      return 'A question can only have one correct answer.';
     }
 
     await answerOptionsRepository.updateAnswerOption(
-      id: answerOption.id,
+      id: id,
       markdownText: markdownText,
       isCorrect: isCorrect,
     );
 
-    ref.invalidateSelf();
     return null;
   }
 }

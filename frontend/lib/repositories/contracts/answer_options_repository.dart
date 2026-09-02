@@ -7,6 +7,9 @@ abstract class AnswerOptionsRepository {
     required String markdownText,
     required bool isCorrect,
   });
+
+  Stream<List<AnswerOption>> watchAnswerOptionsByQuestionId(String questionId);
+
   Future<void> removeAnswerOption(String id);
 
   Future<void> updateAnswerOption({

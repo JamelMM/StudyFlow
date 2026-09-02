@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/question.dart';
 import 'package:frontend/models/quiz.dart';
 import 'package:frontend/controllers/questions_controller.dart';
+import 'package:frontend/providers/question_stream_provider.dart';
 import 'package:frontend/screens/new_question.dart';
 import 'package:frontend/screens/question_detail_screen.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
@@ -23,7 +24,7 @@ class QuizQuestionsScreen extends ConsumerStatefulWidget {
 class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
   Future<void> _addQuestion(String markdownText) async {
     await ref
-        .read(questionsControllerProvider(widget.quiz.id).notifier)
+        .read(questionsControllerProvider(widget.quiz.id))
         .addQuestion(markdownText);
 
     if (!mounted) {
@@ -56,7 +57,7 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
 
   Future<void> _removeQuestion(Question question) async {
     await ref
-        .read(questionsControllerProvider(widget.quiz.id).notifier)
+        .read(questionsControllerProvider(widget.quiz.id))
         .removeQuestion(question.id);
 
     if (!mounted) {
@@ -121,7 +122,7 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
     required String markdownText,
   }) async {
     await ref
-        .read(questionsControllerProvider(widget.quiz.id).notifier)
+        .read(questionsControllerProvider(widget.quiz.id))
         .updateQuestion(id: id, markdownText: markdownText);
 
     if (!mounted) {
@@ -142,9 +143,7 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final questionsAsync = ref.watch(
-      questionsControllerProvider(widget.quiz.id),
-    );
+    final questionsAsync = ref.watch(questionsStreamProvider(widget.quiz.id));
 
     Widget mainContent = questionsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),

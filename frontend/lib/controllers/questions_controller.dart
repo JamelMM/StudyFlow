@@ -1,54 +1,44 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/providers/questions_repository_provider.dart';
-import 'package:frontend/models/question.dart';
+import 'package:frontend/repositories/contracts/questions_repository.dart';
 
 final questionsControllerProvider =
-    AsyncNotifierProvider.family<QuestionsController, List<Question>, String>(
-      QuestionsController.new,
-    );
+    Provider.family<QuestionsController, String>((ref, quizId) {
+      final questionsRepository = ref.watch(questionsRepositoryProvider);
 
-class QuestionsController extends AsyncNotifier<List<Question>> {
-  QuestionsController(this.quizId);
+      return QuestionsController(
+        questionsRepository: questionsRepository,
+        quizId: quizId,
+      );
+    });
 
+class QuestionsController {
+  const QuestionsController({
+    required this.questionsRepository,
+    required this.quizId,
+  });
+
+  final QuestionsRepository questionsRepository;
   final String quizId;
 
-  @override
-  Future<List<Question>> build() async {
-    final questionsRepository = ref.watch(questionsRepositoryProvider);
-
-    return questionsRepository.getQuestionsByQuizId(quizId);
-  }
-
   Future<void> addQuestion(String markdownText) async {
-    final questionsRepository = ref.read(questionsRepositoryProvider);
-
     await questionsRepository.addQuestion(
       markdownText: markdownText,
       quizId: quizId,
     );
-
-    ref.invalidateSelf();
   }
 
   Future<void> removeQuestion(String id) async {
-    final questionsRepository = ref.read(questionsRepositoryProvider);
-
     await questionsRepository.removeQuestion(id);
-
-    ref.invalidateSelf();
   }
 
   Future<void> updateQuestion({
     required String id,
     required String markdownText,
   }) async {
-    final questionsRepository = ref.read(questionsRepositoryProvider);
-
     await questionsRepository.updateQuestion(
       id: id,
       markdownText: markdownText,
     );
-
-    ref.invalidateSelf();
   }
 }
