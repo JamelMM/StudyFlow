@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/question.dart';
 import 'package:frontend/models/quiz.dart';
 import 'package:frontend/controllers/questions_controller.dart';
-import 'package:frontend/providers/question_stream_provider.dart';
+import 'package:frontend/providers/questions_stream_provider.dart';
 import 'package:frontend/screens/new_question.dart';
 import 'package:frontend/screens/question_detail_screen.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
