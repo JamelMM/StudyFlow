@@ -8,6 +8,7 @@ import 'package:frontend/screens/new_subject.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/controllers/subjects_controller.dart';
+import 'package:frontend/screens/import_seed_screen.dart';
 
 class SubjectScreen extends ConsumerStatefulWidget {
   const SubjectScreen({super.key});
@@ -213,6 +214,15 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
       appBar: AppBar(
         title: const Text('StudyFlow'),
         centerTitle: true,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ImportSeedScreen()),
+            );
+          },
+          icon: const Icon(Icons.upload_file),
+        ),
         actions: [
           IconButton(onPressed: _openAddSubjectOverlay, icon: Icon(Icons.add)),
         ],

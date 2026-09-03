@@ -103,13 +103,15 @@ Current frontend features:
 - Validate quiz readiness before starting
 - Play quizzes with visual answer feedback
 - Show final quiz results with score, percentage, and retry option
+- Import structured study content from pasted JSON seed data
+- Reuse existing subjects and topics during JSON seed import to avoid duplicates
 - Local persistence with ToStore for subjects, topics, study notes, quizzes, questions, and answer options
 - Cascade deletion support through ToStore relationships
 - Repository contracts with ToStore-backed implementations
 - Riverpod migration for the main local-first study and quiz flows
 - Stream-based Riverpod providers for automatic UI updates in migrated local lists
 - Riverpod controllers for create/edit/delete actions
-- Application-level helpers for quiz validation and quiz play data loading
+- Application-level helpers for quiz validation, quiz play data loading, and JSON seed import
 - String-based frontend IDs prepared for local persistence and backend/API integration
 - Basic navigation between screens
 - Basic app theming with a custom color scheme
@@ -125,7 +127,7 @@ StudyFlow/frontend/
 -> Flutter mobile application
 
 lib/application
--> Application-level use cases and data loading helpers, such as quiz validation and quiz play data loading
+-> Application-level use cases, seed import logic, and data loading helpers, such as quiz validation and quiz play data loading
 
 lib/controllers
 -> Riverpod controllers for user actions such as create, edit, and delete
@@ -146,7 +148,7 @@ lib/local/tostore
 -> ToStore database setup, schemas, and ToStore repository implementations
 
 lib/screens
--> App screens for start, subjects, topics, topic details, study notes, quizzes, questions, answer options, note details, and local creation flows
+-> App screens for start, subjects, topics, topic details, study notes, quizzes, questions, answer options, note details, JSON seed import, and local creation flows
 
 lib/widgets
 -> Reusable UI widgets such as shared screen layout, empty state messages, and study note list items
@@ -191,6 +193,8 @@ The frontend has been migrated from screen-owned list state and direct screen-le
 Subjects, topics, study notes, quizzes, quiz questions, and answer options now use stream-based Riverpod providers backed by ToStore watchers. Their screens observe live provider state, while controllers focus on user actions such as create, edit, and delete.
 
 The quiz area supports a first usable local quiz flow. Users can create questions, add answer options, mark the correct answer, prevent multiple correct answers for the same question, edit quiz content, validate quiz readiness before starting, start a quiz, select answers, receive visual feedback for correct and incorrect answers, and view a final result screen.
+
+The frontend now includes an initial JSON seed import flow. Users can paste structured JSON content into an import screen and create subjects, topics, study notes, quizzes, questions, and answer options locally. Existing subjects and topics are reused by normalized name comparison, so imports can add content to existing study areas without duplicating the main structure.
 
 Reusable empty states are shown when no local data is available. The frontend models use string-based IDs, which prepares the app for local persistence and later ASP.NET Core API integration.
 
@@ -317,13 +321,15 @@ Aktuelle Frontend-Funktionen:
 - Quiz vor dem Start validieren
 - Quizze mit richtig/falsch-Feedback spielen
 - Ergebnisbildschirm mit Punktzahl, Prozentanzeige und Wiederholen-Option anzeigen
+- Strukturierte Lerninhalte aus eingefuegten JSON-Seed-Daten importieren
+- Vorhandene Subjects und Topics beim JSON-Import wiederverwenden, um Duplikate zu vermeiden
 - Lokale Persistenz mit ToStore fuer Subjects, Topics, Study Notes, Quizze, Fragen und Antwortoptionen
 - Cascade Delete ueber ToStore-Beziehungen
 - Repository-Contracts mit ToStore-basierten Implementierungen
 - Riverpod-Migration fuer die wichtigsten lokalen Study- und Quiz-Flows
 - Stream-basierte Riverpod-Provider fuer automatische UI-Updates in den migrierten lokalen Listen
 - Riverpod-Controller fuer Create/Edit/Delete-Aktionen
-- Application-Level-Helfer fuer Quiz-Validierung und Quiz-Play-Daten
+- Application-Level-Helfer fuer Quiz-Validierung, Quiz-Play-Daten und JSON-Seed-Import
 - String-basierte IDs fuer lokale Persistenz und spaetere Backend/API-Integration
 - Einfache Navigation zwischen Screens
 - Einfaches App-Theming mit eigenem Farbschema
@@ -339,7 +345,7 @@ StudyFlow/frontend/
 -> Flutter Mobile Application
 
 lib/application
--> Use Cases und Lade-Helfer auf Application-Ebene, zum Beispiel Quiz-Validierung und Quiz-Play-Daten
+-> Use Cases, Seed-Import-Logik und Lade-Helfer auf Application-Ebene, zum Beispiel Quiz-Validierung und Quiz-Play-Daten
 
 lib/controllers
 -> Riverpod-Controller fuer Benutzeraktionen wie Create, Edit und Delete
@@ -360,7 +366,7 @@ lib/local/tostore
 -> ToStore-Datenbank-Setup, Schemas und ToStore-Repository-Implementierungen
 
 lib/screens
--> App-Screens fuer Start, Subjects, Topics, Topic Details, Study Notes, Quizzes, Questions, Answer Options, Note Details und lokale Creation Flows
+-> App-Screens fuer Start, Subjects, Topics, Topic Details, Study Notes, Quizzes, Questions, Answer Options, Note Details, JSON-Seed-Import und lokale Creation Flows
 
 lib/widgets
 -> Wiederverwendbare UI-Widgets wie Empty-State-Meldungen und Study Note List Items
@@ -405,6 +411,8 @@ Das Frontend wurde fuer die wichtigsten lokalen Flows von Screen-eigenem Listen-
 Subjects, Topics, Study Notes, Quizze, Quiz Questions und Answer Options verwenden jetzt stream-basierte Riverpod-Provider mit ToStore-Watchern. Die Screens beobachten live den Provider-State, waehrend Controller sich auf Benutzeraktionen wie Create, Edit und Delete konzentrieren.
 
 Der Quiz-Bereich unterstuetzt jetzt einen ersten nutzbaren lokalen Quiz-Flow. Benutzer koennen Fragen erstellen, Antwortoptionen hinzufuegen, die richtige Antwort markieren, mehrere richtige Antworten pro Frage verhindern, Quiz-Inhalte bearbeiten, ein Quiz vor dem Start validieren, ein Quiz starten, Antworten auswaehlen, visuelles Feedback fuer richtige und falsche Antworten erhalten und einen Ergebnisbildschirm anzeigen.
+
+Das Frontend enthaelt jetzt einen ersten JSON-Seed-Import-Flow. Benutzer koennen strukturierte JSON-Inhalte in einen Import-Screen einfuegen und lokal Subjects, Topics, Study Notes, Quizze, Questions und Answer Options erstellen. Vorhandene Subjects und Topics werden ueber normalisierte Namensvergleiche wiederverwendet, damit Imports neue Inhalte zu bestehenden Lernbereichen hinzufuegen koennen, ohne die Hauptstruktur zu duplizieren.
 
 Wiederverwendbare Empty States werden angezeigt, wenn keine lokalen Daten vorhanden sind. Die Frontend-Modelle verwenden String-basierte IDs. Dadurch wird die App auf lokale Persistenz und eine spaetere ASP.NET Core API-Anbindung vorbereitet.
 

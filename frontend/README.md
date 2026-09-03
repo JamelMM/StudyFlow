@@ -4,7 +4,7 @@ This folder contains the Flutter frontend for StudyFlow.
 
 The current frontend is a local-first prototype. It uses repository contracts with ToStore-backed local persistence and is not connected to the ASP.NET Core backend yet.
 
-The app has been migrated from screen-owned list state and direct screen-level dependency access to Riverpod providers and controllers for the main local-first study and quiz flows. Riverpod now handles the async access patterns for subjects, topics, study notes, quizzes, questions, answer options, quiz validation, and quiz play data loading. Subjects, topics, study notes, quizzes, quiz questions, and answer options already use stream-based providers for automatic local UI updates.
+The app has been migrated from screen-owned list state and direct screen-level dependency access to Riverpod providers and controllers for the main local-first study and quiz flows. Riverpod now handles the async access patterns for subjects, topics, study notes, quizzes, questions, answer options, quiz validation, quiz play data loading, and JSON seed import. Subjects, topics, study notes, quizzes, quiz questions, and answer options already use stream-based providers for automatic local UI updates.
 
 ## Current Features
 
@@ -21,15 +21,18 @@ The app has been migrated from screen-owned list state and direct screen-level d
 - Mark answer options as correct
 - Validate quiz readiness before starting
 - Start a quiz and answer questions
+- Randomize quiz questions and answer options during quiz play
 - Show visual feedback for correct and incorrect quiz answers
 - View final quiz results with score, percentage, and retry option
+- Import structured study content from pasted JSON seed data
+- Reuse existing subjects and topics during JSON seed import to avoid duplicates
 - ToStore-backed local persistence for subjects, topics, study notes, quizzes, questions, and answer options
 - Cascade deletion support through ToStore relationships
 - Repository contracts for local-first data access
 - Riverpod migration for the main local-first study and quiz flows
 - Stream-based Riverpod providers for automatic UI updates in migrated local lists
 - Riverpod controllers for create/edit/delete actions
-- Application-level helpers for quiz validation and quiz play data loading
+- Application-level helpers for quiz validation, quiz play data loading, and JSON seed import
 - String-based IDs prepared for ToStore and backend integration
 - Basic Material Design UI
 - Custom color scheme
@@ -83,6 +86,11 @@ frontend/
 |   `-- screenshots/
 |-- lib/
 |   |-- application/
+|   |   |-- import/
+|   |   |   |-- import_study_seed.dart
+|   |   |   |-- study_seed.dart
+|   |   |   |-- study_seed_parser.dart
+|   |   |   `-- study_seed_validation.dart
 |   |   `-- quiz/
 |   |       |-- load_quiz_play_data.dart
 |   |       |-- quiz_play_data.dart
@@ -114,6 +122,7 @@ frontend/
 |   |-- providers/
 |   |   |-- answer_options_repository_provider.dart
 |   |   |-- answer_options_stream_provider.dart
+|   |   |-- import_study_seed_provider.dart
 |   |   |-- load_quiz_play_data_provider.dart
 |   |   |-- questions_repository_provider.dart
 |   |   |-- questions_stream_provider.dart
@@ -176,19 +185,21 @@ Subjects, topics, study notes, quizzes, questions, answer options, quiz validati
 
 The app now supports local create, edit, and delete flows for the main study entities: subjects, topics, study notes, quiz questions, and answer options. Larger deletion flows, such as subjects and topics, use confirmation dialogs because related data can be removed through ToStore cascade relationships.
 
-The quiz area has a first usable local flow. Users can create quiz questions, add answer options, mark correct answers, prevent multiple correct answers for the same question, edit quiz content, validate quiz readiness before starting, play quizzes, receive visual feedback for correct and incorrect answers, and view a final result screen with score and percentage.
+The quiz area has a first usable local flow. Users can create quiz questions, add answer options, mark correct answers, prevent multiple correct answers for the same question, edit quiz content, validate quiz readiness before starting, play quizzes with randomized questions and answer options, receive visual feedback for correct and incorrect answers, and view a final result screen with score and percentage.
+
+The frontend now includes an initial JSON seed import flow. Users can paste structured JSON into a temporary import screen and create subjects, topics, study notes, quizzes, questions, and answer options locally. Existing subjects and topics are reused by normalized name comparison, so imports can add content to existing study areas without duplicating the main structure.
 
 The frontend models use string-based IDs to prepare the app for local persistence and later backend synchronization.
 
-The next major step is improving quiz practice behavior and preparing import/export features for local study content.
+The next major step is improving the JSON import UX, moving import access into a better navigation surface, and preparing import/export features for local study content.
 
 ## Next Steps
 
-- Randomize quiz questions and answer options during quiz play
 - Preserve list position when items are edited
 - Improve form validation
 - Add an initial seed with public demo learning content
-- Add JSON import for loading study and exam content
+- Improve JSON import with file picker support
+- Add JSON export for study content
 - Prepare API service classes
 - Connect the Flutter frontend to the ASP.NET Core backend
 - Add synchronization between local data and backend data
