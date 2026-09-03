@@ -8,6 +8,7 @@ import 'package:frontend/screens/new_question.dart';
 import 'package:frontend/screens/question_detail_screen.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/screens/edit_question.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class QuizQuestionsScreen extends ConsumerStatefulWidget {
@@ -178,7 +179,9 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
                     padding: const EdgeInsets.all(16),
                     child: Row(
                       children: [
-                        Expanded(child: Text(question.markdownText)),
+                        Expanded(
+                          child: MarkdownBody(data: question.markdownText),
+                        ),
                         PopupMenuButton<String>(
                           onSelected: (value) async {
                             if (value == 'edit') {

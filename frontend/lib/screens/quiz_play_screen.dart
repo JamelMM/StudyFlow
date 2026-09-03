@@ -5,6 +5,7 @@ import 'package:frontend/models/answer_option.dart';
 import 'package:frontend/models/quiz.dart';
 import 'package:frontend/providers/load_quiz_play_data_provider.dart';
 import 'package:frontend/screens/quiz_result_screen.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class QuizPlayScreen extends ConsumerStatefulWidget {
@@ -95,13 +96,15 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                 color: const Color(0xFFFFF3B0),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text(
-                    currentQuestion.markdownText,
-                    style: GoogleFonts.sourceSans3(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      height: 1.35,
-                      color: Theme.of(context).colorScheme.onSurface,
+                  child: MarkdownBody(
+                    data: currentQuestion.markdownText,
+                    styleSheet: MarkdownStyleSheet(
+                      p: GoogleFonts.sourceSans3(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                        height: 1.35,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                   ),
                 ),
@@ -142,7 +145,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                                   context,
                                 ).colorScheme.onPrimaryContainer,
                         ),
-                        title: Text(answerOption.markdownText),
+                        title: MarkdownBody(data: answerOption.markdownText),
                         onTap: () {
                           _selectAnswer(answerOption);
                         },

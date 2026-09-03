@@ -227,7 +227,9 @@ Rules:
 - Use only these field names: version, subjects, name, topics, studyNotes, markdownText, quiz, questions, answerOptions, isCorrect.
 - Create clear and short subject names.
 - Create clear topic names.
-- Create atomic study notes, not very long notes.
+- Create enough atomic study notes to cover the important concepts of the material.
+- Create as many quiz questions as necessary to help the user master the topic.
+- Create at least 5 questions when the material contains enough information.
 - Each study note must have name and markdownText.
 - quiz can be null only if there is not enough material to create questions.
 - Each quiz must have at least 1 question.
@@ -237,6 +239,68 @@ Rules:
 - Use isCorrect: false for all other answers.
 - Keep markdownText concise but useful.
 - Do not use trailing commas.
+
+Learning material:
+
+[PASTE MATERIAL HERE]
+```
+
+## AI Prompt With Fixed Subject And Topic
+
+Use this prompt when you already know where the material belongs.
+
+This is usually better than asking the AI to organize everything by itself. You decide the knowledge structure, and the AI only transforms the material into notes, quiz questions, and answer options.
+
+```text
+Convert the following learning material into a valid StudyFlow JSON seed.
+
+Use this subject and topic exactly:
+
+Subject: [SUBJECT NAME]
+Topic: [TOPIC NAME]
+
+Return only valid JSON. Do not include explanations outside the JSON.
+
+Rules:
+- Do not create IDs.
+- Use version: 1.
+- Use exactly the provided subject name.
+- Use exactly the provided topic name.
+- Do not create additional subjects.
+- Do not create additional topics.
+- Create enough atomic study notes to cover the important concepts of the material.
+- Each study note must have name and markdownText.
+- Create one quiz for the topic.
+- Create as many quiz questions as necessary to help the user master the topic.
+- Create at least 5 questions when the material contains enough information.
+- Prefer clear, practical questions that test understanding, not only memorization.
+- Each question must have 4 answer options.
+- Each question must have exactly 1 correct answer.
+- Use isCorrect: true only for the correct answer.
+- Use isCorrect: false for all other answers.
+- Use only these field names: version, subjects, name, topics, studyNotes, markdownText, quiz, questions, answerOptions, isCorrect.
+- Return valid JSON with no trailing commas.
+
+Use this exact JSON structure:
+
+{
+  "version": 1,
+  "subjects": [
+    {
+      "name": "[SUBJECT NAME]",
+      "topics": [
+        {
+          "name": "[TOPIC NAME]",
+          "studyNotes": [],
+          "quiz": {
+            "name": "[TOPIC NAME] Quiz",
+            "questions": []
+          }
+        }
+      ]
+    }
+  ]
+}
 
 Learning material:
 

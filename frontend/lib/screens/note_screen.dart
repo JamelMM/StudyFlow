@@ -4,6 +4,7 @@ import 'package:frontend/models/study_note.dart';
 import 'package:frontend/screens/edit_study_note.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/controllers/study_notes_controller.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class NoteScreen extends ConsumerStatefulWidget {
   const NoteScreen({super.key, required this.note});
@@ -94,7 +95,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Text(_note.markdownText),
+                child: MarkdownBody(data: _note.markdownText),
               ),
             ),
           ],

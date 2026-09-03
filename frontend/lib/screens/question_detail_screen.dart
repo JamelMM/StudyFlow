@@ -6,6 +6,7 @@ import 'package:frontend/screens/edit_answer_option.dart';
 import 'package:frontend/screens/new_answer_option.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/controllers/answer_options_controller.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/providers/answer_options_stream_provider.dart';
 
@@ -214,7 +215,9 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
                           : Theme.of(context).colorScheme.onPrimaryContainer,
                     ),
                     const SizedBox(width: 12),
-                    Expanded(child: Text(answerOption.markdownText)),
+                    Expanded(
+                      child: MarkdownBody(data: answerOption.markdownText),
+                    ),
                     PopupMenuButton<String>(
                       onSelected: (value) async {
                         if (value == 'edit') {
@@ -272,7 +275,7 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Text(widget.question.markdownText),
+                child: MarkdownBody(data: widget.question.markdownText),
               ),
             ),
             const SizedBox(height: 30),
