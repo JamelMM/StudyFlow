@@ -4,6 +4,7 @@ import 'package:frontend/models/topic.dart';
 import 'package:frontend/providers/study_notes_stream_provider.dart';
 import 'package:frontend/screens/note_screen.dart';
 import 'package:frontend/widgets/study_notes/study_note_list_item.dart';
+import 'package:frontend/widgets/app_snack_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -63,10 +64,7 @@ class _StudyNotesScreenState extends ConsumerState<StudyNotesScreen> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Note successfully updated', textAlign: TextAlign.center),
-        backgroundColor: Color(0xFF2F855A),
-      ),
+      appSuccessSnackBar('Note successfully updated'),
     );
   }
 
@@ -113,9 +111,7 @@ class _StudyNotesScreenState extends ConsumerState<StudyNotesScreen> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Note deleted', textAlign: TextAlign.center),
-      ),
+      appDeleteSnackBar('Note deleted'),
     );
   }
 

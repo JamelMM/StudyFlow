@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/models/study_note.dart';
 import 'package:frontend/screens/edit_study_note.dart';
+import 'package:frontend/widgets/app_snack_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/controllers/study_notes_controller.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -58,10 +59,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Note successfully updated', textAlign: TextAlign.center),
-        backgroundColor: Color(0xFF2F855A),
-      ),
+      appSuccessSnackBar('Note successfully updated'),
     );
   }
 

@@ -5,6 +5,7 @@ import 'package:frontend/models/topic.dart';
 import 'package:frontend/screens/new_study_note.dart';
 import 'package:frontend/screens/quizzes_screen.dart';
 import 'package:frontend/screens/study_notes_screen.dart';
+import 'package:frontend/widgets/app_snack_bar.dart';
 
 class TopicDetailScreen extends ConsumerStatefulWidget {
   const TopicDetailScreen({super.key, required this.topic});
@@ -45,10 +46,7 @@ class _TopicDetailScreenState extends ConsumerState<TopicDetailScreen> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Note successfully created', textAlign: TextAlign.center),
-        backgroundColor: Color(0xFF2F855A),
-      ),
+      appSuccessSnackBar('Note successfully created'),
     );
   }
 
@@ -75,11 +73,6 @@ class _TopicDetailScreenState extends ConsumerState<TopicDetailScreen> {
       ),
       body: IndexedStack(index: _selectedPageIndex, children: pages),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
-        selectedItemColor: Theme.of(context).colorScheme.primaryContainer,
-        unselectedItemColor: Theme.of(
-          context,
-        ).colorScheme.primaryContainer.withAlpha(150),
         currentIndex: _selectedPageIndex,
         onTap: _onSelectedPage,
         items: const [

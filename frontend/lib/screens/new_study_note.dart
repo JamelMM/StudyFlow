@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/widgets/app_button_styles.dart';
 
 class NewStudyNote extends StatefulWidget {
   const NewStudyNote({super.key, required this.onAddNote});
@@ -76,6 +77,7 @@ class _NewStudyNoteState extends State<NewStudyNote> {
           Row(
             children: [
               FilledButton(
+                style: appPrimaryButtonStyle(context),
                 onPressed: _submitNewStudyNoteData,
                 child: Text('Save Note'),
               ),

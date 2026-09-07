@@ -17,6 +17,9 @@ class QuizResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appBarTheme = Theme.of(context).appBarTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
     final percentage = totalQuestions == 0
         ? 0
         : ((correctAnswersCount / totalQuestions) * 100).round();
@@ -63,7 +66,13 @@ class QuizResultScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Text(resultMessage, style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 96),
-            FilledButton(
+            FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor:
+                    appBarTheme.backgroundColor ?? colorScheme.primary,
+                foregroundColor:
+                    appBarTheme.foregroundColor ?? colorScheme.onPrimary,
+              ),
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
@@ -72,7 +81,8 @@ class QuizResultScreen extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text('Try again'),
+              icon: const Icon(Icons.replay),
+              label: const Text('Retry quiz'),
             ),
             const SizedBox(height: 12),
             TextButton(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/widgets/app_button_styles.dart';
 
 class NewAnswerOption extends StatefulWidget {
   const NewAnswerOption({super.key, required this.onAddAnswerOption});
@@ -79,7 +80,8 @@ class _NewAnswerOptionState extends State<NewAnswerOption> {
                 },
                 child: const Text('Cancel'),
               ),
-              ElevatedButton(
+              FilledButton(
+                style: appPrimaryButtonStyle(context),
                 onPressed: _submitAnswerOptionData,
                 child: const Text('Save answer'),
               ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/study_note.dart';
+import 'package:frontend/widgets/app_button_styles.dart';
 
 class EditStudyNote extends StatefulWidget {
   const EditStudyNote({
@@ -92,8 +93,9 @@ class _EditStudyNoteState extends State<EditStudyNote> {
           Row(
             children: [
               FilledButton(
+                style: appPrimaryButtonStyle(context),
                 onPressed: _submitNewStudyNoteData,
-                child: Text('Save Topic'),
+                child: Text('Save Note'),
               ),
               TextButton(
                 child: Text('Cancel'),

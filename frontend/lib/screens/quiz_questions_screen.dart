@@ -7,6 +7,7 @@ import 'package:frontend/providers/questions_stream_provider.dart';
 import 'package:frontend/screens/new_question.dart';
 import 'package:frontend/screens/question_detail_screen.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
+import 'package:frontend/widgets/app_snack_bar.dart';
 import 'package:frontend/screens/edit_question.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -34,13 +35,7 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Question successfully created',
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Color(0xFF2F855A),
-      ),
+      appSuccessSnackBar('Question successfully created'),
     );
   }
 
@@ -67,9 +62,7 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Question deleted', textAlign: TextAlign.center),
-      ),
+      appDeleteSnackBar('Question deleted'),
     );
   }
 
@@ -132,13 +125,7 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Question successfully updated',
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Color(0xFF2F855A),
-      ),
+      appSuccessSnackBar('Question successfully updated'),
     );
   }
 

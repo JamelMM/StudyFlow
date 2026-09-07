@@ -5,6 +5,7 @@ import 'package:frontend/models/topic.dart';
 import 'package:frontend/screens/edit_topic.dart';
 import 'package:frontend/screens/new_topic.dart';
 import 'package:frontend/screens/topic_detail_screen.dart';
+import 'package:frontend/widgets/app_snack_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/controllers/topics_controller.dart';
@@ -43,13 +44,7 @@ class _TopicsScreenState extends ConsumerState<TopicsScreen> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Topic successfully created',
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Color(0xFF2F855A),
-      ),
+      appSuccessSnackBar('Topic successfully created'),
     );
   }
 
@@ -64,9 +59,7 @@ class _TopicsScreenState extends ConsumerState<TopicsScreen> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Topic deleted', textAlign: TextAlign.center),
-      ),
+      appDeleteSnackBar('Topic deleted'),
     );
   }
 
@@ -131,13 +124,7 @@ class _TopicsScreenState extends ConsumerState<TopicsScreen> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Topic successfully updated',
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Color(0xFF2F855A),
-      ),
+      appSuccessSnackBar('Topic successfully updated'),
     );
   }
 

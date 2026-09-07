@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/providers/import_study_seed_provider.dart';
+import 'package:frontend/widgets/app_snack_bar.dart';
 
 class ImportSeedScreen extends ConsumerStatefulWidget {
   const ImportSeedScreen({super.key});
@@ -28,7 +29,7 @@ class _ImportSeedScreenState extends ConsumerState<ImportSeedScreen> {
     if (jsonText.isEmpty) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Paste a JSON seed before importing.')),
+        appInfoSnackBar('Paste a JSON seed before importing.'),
       );
 
       return;
@@ -49,13 +50,7 @@ class _ImportSeedScreenState extends ConsumerState<ImportSeedScreen> {
 
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Seed imported successfully.',
-            textAlign: TextAlign.center,
-          ),
-          backgroundColor: Color(0xFF2F855A),
-        ),
+        appSuccessSnackBar('Seed imported successfully.'),
       );
     } on FormatException catch (error) {
       if (!mounted) {
@@ -64,7 +59,7 @@ class _ImportSeedScreenState extends ConsumerState<ImportSeedScreen> {
 
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error.message, textAlign: TextAlign.center)),
+        appErrorSnackBar(error.message),
       );
     } catch (_) {
       if (!mounted) {
@@ -73,9 +68,7 @@ class _ImportSeedScreenState extends ConsumerState<ImportSeedScreen> {
 
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not import seed.', textAlign: TextAlign.center),
-        ),
+        appErrorSnackBar('Could not import seed.'),
       );
     } finally {
       if (mounted) {

@@ -90,18 +90,20 @@ The Flutter frontend has been started as the mobile client for StudyFlow. See th
 Current frontend features:
 
 - Start screen before entering the main StudyFlow flow
+- Mode selection screen with Study Mode and placeholder Exam Mode entry points
 - View, create, edit, and delete subjects locally
 - View, create, edit, and delete topics locally
 - Open a topic in a dedicated topic detail screen
 - Switch between study notes and quiz area with a bottom navigation bar
 - View, create, edit, and delete study notes locally
-- Open a study note and read its content
+- Open a study note and read Markdown-rendered content
 - Create quizzes locally
 - View, create, edit, and delete quiz questions locally
 - View, create, edit, and delete answer options locally
 - Mark answer options as correct
 - Validate quiz readiness before starting
 - Play quizzes with visual answer feedback
+- Render quiz questions and answer options as Markdown
 - Show final quiz results with score, percentage, and retry option
 - Import structured study content from pasted JSON seed data
 - Reuse existing subjects and topics during JSON seed import to avoid duplicates
@@ -114,8 +116,8 @@ Current frontend features:
 - Application-level helpers for quiz validation, quiz play data loading, and JSON seed import
 - String-based frontend IDs prepared for local persistence and backend/API integration
 - Basic navigation between screens
-- Basic app theming with a custom color scheme
-- SnackBar feedback for local actions
+- Light and dark app themes with shared color configuration
+- Themed SnackBar feedback for local success, info, error, and delete actions
 - Reusable widgets for shared layout, list items, and empty states
 
 ### Frontend Structure
@@ -138,6 +140,9 @@ lib/models
 lib/providers
 -> Riverpod providers for repositories, stream-based list state, and application-level helpers
 
+lib/theme
+-> Shared light and dark Material theme configuration
+
 lib/repositories/contracts
 -> Repository contracts for frontend data access
 
@@ -151,14 +156,16 @@ lib/screens
 -> App screens for start, subjects, topics, topic details, study notes, quizzes, questions, answer options, note details, JSON seed import, and local creation flows
 
 lib/widgets
--> Reusable UI widgets such as shared screen layout, empty state messages, and study note list items
+-> Reusable UI widgets such as mode cards, button styles, SnackBars, empty state messages, and study note list items
 ```
 
 ### Frontend Flow
 
 ```text
 StartScreen
--> SubjectsScreen
+-> ModeSelectionScreen
+   -> Study Mode
+      -> SubjectsScreen
 -> TopicsScreen
 -> TopicDetailScreen
    -> StudyNotesScreen
@@ -193,6 +200,8 @@ The frontend has been migrated from screen-owned list state and direct screen-le
 Subjects, topics, study notes, quizzes, quiz questions, and answer options now use stream-based Riverpod providers backed by ToStore watchers. Their screens observe live provider state, while controllers focus on user actions such as create, edit, and delete.
 
 The quiz area supports a first usable local quiz flow. Users can create questions, add answer options, mark the correct answer, prevent multiple correct answers for the same question, edit quiz content, validate quiz readiness before starting, start a quiz, select answers, receive visual feedback for correct and incorrect answers, and view a final result screen.
+
+Study notes, quiz questions, and answer options can now be displayed with Markdown formatting. The UI also includes a mode selection screen before the study flow, a shared theme file for light and dark mode, reusable mode cards, shared button styling for form actions, and themed SnackBar helpers for consistent success, info, error, and delete feedback.
 
 The frontend now includes an initial JSON seed import flow. Users can paste structured JSON content into an import screen and create subjects, topics, study notes, quizzes, questions, and answer options locally. Existing subjects and topics are reused by normalized name comparison, so imports can add content to existing study areas without duplicating the main structure.
 
@@ -308,18 +317,20 @@ Das Flutter-Frontend wurde als mobiler Client fuer StudyFlow gestartet. Aktuelle
 Aktuelle Frontend-Funktionen:
 
 - Startbildschirm vor dem eigentlichen StudyFlow-Bereich
+- Modus-Auswahl mit Study Mode und vorbereitetem Exam Mode
 - Subjects lokal anzeigen, erstellen, bearbeiten und loeschen
 - Topics lokal anzeigen, erstellen, bearbeiten und loeschen
 - Ein Topic in einem eigenen Topic-Detail-Screen oeffnen
 - Zwischen Study Notes und Quiz-Bereich ueber eine Bottom Navigation wechseln
 - Study Notes lokal anzeigen, erstellen, bearbeiten und loeschen
-- Eine Study Note oeffnen und den Inhalt lesen
+- Eine Study Note oeffnen und Markdown-formatierten Inhalt lesen
 - Quizze lokal erstellen
 - Quizfragen lokal anzeigen, erstellen, bearbeiten und loeschen
 - Antwortoptionen lokal anzeigen, erstellen, bearbeiten und loeschen
 - Antwortoptionen als richtig markieren
 - Quiz vor dem Start validieren
 - Quizze mit richtig/falsch-Feedback spielen
+- Quizfragen und Antwortoptionen als Markdown anzeigen
 - Ergebnisbildschirm mit Punktzahl, Prozentanzeige und Wiederholen-Option anzeigen
 - Strukturierte Lerninhalte aus eingefuegten JSON-Seed-Daten importieren
 - Vorhandene Subjects und Topics beim JSON-Import wiederverwenden, um Duplikate zu vermeiden
@@ -332,8 +343,8 @@ Aktuelle Frontend-Funktionen:
 - Application-Level-Helfer fuer Quiz-Validierung, Quiz-Play-Daten und JSON-Seed-Import
 - String-basierte IDs fuer lokale Persistenz und spaetere Backend/API-Integration
 - Einfache Navigation zwischen Screens
-- Einfaches App-Theming mit eigenem Farbschema
-- SnackBar-Feedback fuer lokale Aktionen
+- Light- und Dark-Theme mit gemeinsamer Farbkonfiguration
+- Gestyltes SnackBar-Feedback fuer Success-, Info-, Error- und Delete-Aktionen
 - Wiederverwendbare Widgets fuer gemeinsames Layout, Listenelemente und Empty States
 
 ### Frontend-Struktur
@@ -356,6 +367,9 @@ lib/models
 lib/providers
 -> Riverpod-Provider fuer Repositories, stream-basierten Listen-State und Application-Level-Helfer
 
+lib/theme
+-> Gemeinsame Material-Theme-Konfiguration fuer Light Mode und Dark Mode
+
 lib/repositories/contracts
 -> Repository-Vertraege fuer den Datenzugriff im Frontend
 
@@ -369,14 +383,16 @@ lib/screens
 -> App-Screens fuer Start, Subjects, Topics, Topic Details, Study Notes, Quizzes, Questions, Answer Options, Note Details, JSON-Seed-Import und lokale Creation Flows
 
 lib/widgets
--> Wiederverwendbare UI-Widgets wie Empty-State-Meldungen und Study Note List Items
+-> Wiederverwendbare UI-Widgets wie Mode Cards, Button Styles, SnackBars, Empty-State-Meldungen und Study Note List Items
 ```
 
 ### Frontend Flow
 
 ```text
 StartScreen
--> SubjectsScreen
+-> ModeSelectionScreen
+   -> Study Mode
+      -> SubjectsScreen
 -> TopicsScreen
 -> TopicDetailScreen
    -> StudyNotesScreen
@@ -411,6 +427,8 @@ Das Frontend wurde fuer die wichtigsten lokalen Flows von Screen-eigenem Listen-
 Subjects, Topics, Study Notes, Quizze, Quiz Questions und Answer Options verwenden jetzt stream-basierte Riverpod-Provider mit ToStore-Watchern. Die Screens beobachten live den Provider-State, waehrend Controller sich auf Benutzeraktionen wie Create, Edit und Delete konzentrieren.
 
 Der Quiz-Bereich unterstuetzt jetzt einen ersten nutzbaren lokalen Quiz-Flow. Benutzer koennen Fragen erstellen, Antwortoptionen hinzufuegen, die richtige Antwort markieren, mehrere richtige Antworten pro Frage verhindern, Quiz-Inhalte bearbeiten, ein Quiz vor dem Start validieren, ein Quiz starten, Antworten auswaehlen, visuelles Feedback fuer richtige und falsche Antworten erhalten und einen Ergebnisbildschirm anzeigen.
+
+Study Notes, Quizfragen und Antwortoptionen koennen jetzt mit Markdown-Formatierung angezeigt werden. Die UI enthaelt ausserdem eine Modus-Auswahl vor dem Study Flow, eine gemeinsame Theme-Datei fuer Light Mode und Dark Mode, wiederverwendbare Mode Cards, gemeinsames Button-Styling fuer Formularaktionen und gestylte SnackBar-Helfer fuer konsistentes Success-, Info-, Error- und Delete-Feedback.
 
 Das Frontend enthaelt jetzt einen ersten JSON-Seed-Import-Flow. Benutzer koennen strukturierte JSON-Inhalte in einen Import-Screen einfuegen und lokal Subjects, Topics, Study Notes, Quizze, Questions und Answer Options erstellen. Vorhandene Subjects und Topics werden ueber normalisierte Namensvergleiche wiederverwendet, damit Imports neue Inhalte zu bestehenden Lernbereichen hinzufuegen koennen, ohne die Hauptstruktur zu duplizieren.
 

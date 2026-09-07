@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/widgets/app_button_styles.dart';
 
 class NewSubject extends StatefulWidget {
   const NewSubject({super.key, required this.onAddSubject});
@@ -57,6 +58,7 @@ class _NewSubjectState extends State<NewSubject> {
           Row(
             children: [
               FilledButton(
+                style: appPrimaryButtonStyle(context),
                 onPressed: _submitSubjectData,
                 child: Text('Save Subject'),
               ),

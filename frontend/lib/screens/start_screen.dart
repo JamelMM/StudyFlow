@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/main.dart';
+
+import 'package:frontend/screens/mode_selection_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
-
-import 'subject_screen.dart';
 
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
@@ -20,15 +19,24 @@ class _StartScreenState extends State<StartScreen> {
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const SubjectScreen()),
+        MaterialPageRoute(builder: (context) => const ModeSelectionScreen()),
       );
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final appBarTheme = Theme.of(context).appBarTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final logoBackgroundColor = isDarkMode
+        ? const Color(0xFF263A6B)
+        : colorScheme.primaryContainer;
+    final logoColor = isDarkMode
+        ? colorScheme.secondaryContainer
+        : appBarTheme.backgroundColor ?? colorScheme.onPrimaryContainer;
+
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -38,7 +46,7 @@ class _StartScreenState extends State<StartScreen> {
               style: GoogleFonts.inter(
                 fontSize: 48,
                 fontWeight: FontWeight.bold,
-                color: colorScheme.onPrimaryContainer,
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 80),
@@ -46,21 +54,21 @@ class _StartScreenState extends State<StartScreen> {
               width: 140,
               height: 140,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
+                color: logoBackgroundColor,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.auto_stories,
                 size: 126,
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                color: logoColor,
               ),
             ),
-            SizedBox(height: 100),
+            const SizedBox(height: 100),
             Text(
               "Learn. Organize. Remember.",
               style: GoogleFonts.inter(
                 fontSize: 16,
-                color: colorScheme.onPrimaryContainer,
+                color: colorScheme.onSurface,
               ),
             ),
           ],

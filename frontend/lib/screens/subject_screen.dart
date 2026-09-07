@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:frontend/providers/subjects_stream_provider.dart';
 import 'package:frontend/screens/edit_subject.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
+import 'package:frontend/widgets/app_snack_bar.dart';
 import 'package:frontend/screens/topics_screen.dart';
 import 'package:frontend/models/subject.dart';
 import 'package:frontend/screens/new_subject.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/controllers/subjects_controller.dart';
-import 'package:frontend/screens/import_seed_screen.dart';
 
 class SubjectScreen extends ConsumerStatefulWidget {
   const SubjectScreen({super.key});
@@ -39,13 +39,7 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Subject successfully created',
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Color(0xFF2F855A),
-      ),
+      appSuccessSnackBar('Subject successfully created'),
     );
   }
 
@@ -58,9 +52,7 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Subject deleted', textAlign: TextAlign.center),
-      ),
+      appDeleteSnackBar('Subject deleted'),
     );
   }
 
@@ -125,13 +117,7 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Subject successfully updated',
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Color(0xFF2F855A),
-      ),
+      appSuccessSnackBar('Subject successfully updated'),
     );
   }
 
@@ -214,15 +200,6 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
       appBar: AppBar(
         title: const Text('StudyFlow'),
         centerTitle: true,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ImportSeedScreen()),
-            );
-          },
-          icon: const Icon(Icons.upload_file),
-        ),
         actions: [
           IconButton(onPressed: _openAddSubjectOverlay, icon: Icon(Icons.add)),
         ],

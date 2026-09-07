@@ -4,17 +4,18 @@ This folder contains the Flutter frontend for StudyFlow.
 
 The current frontend is a local-first prototype. It uses repository contracts with ToStore-backed local persistence and is not connected to the ASP.NET Core backend yet.
 
-The app has been migrated from screen-owned list state and direct screen-level dependency access to Riverpod providers and controllers for the main local-first study and quiz flows. Riverpod now handles the async access patterns for subjects, topics, study notes, quizzes, questions, answer options, quiz validation, quiz play data loading, and JSON seed import. Subjects, topics, study notes, quizzes, quiz questions, and answer options already use stream-based providers for automatic local UI updates.
+The app has been migrated from screen-owned list state and direct screen-level dependency access to Riverpod providers and controllers for the main local-first study and quiz flows. Riverpod now handles the async access patterns for subjects, topics, study notes, quizzes, questions, answer options, quiz validation, quiz play data loading, and JSON seed import. Subjects, topics, study notes, quizzes, quiz questions, and answer options already use stream-based providers for automatic local UI updates. The UI now includes a start screen, a mode selection screen, Markdown rendering for learning content, and light/dark theme support.
 
 ## Current Features
 
 - Start screen before entering the main StudyFlow flow
+- Mode selection screen with Study Mode and placeholder Exam Mode entry points
 - View, create, edit, and delete subjects locally
 - View, create, edit, and delete topics locally
 - Open topics in a dedicated topic detail screen
 - Switch between notes and quiz area with a bottom navigation bar
 - View, create, edit, and delete study notes locally
-- Open a study note and read its content
+- Open a study note and read Markdown-rendered content
 - Create quizzes locally
 - View, create, edit, and delete quiz questions locally
 - View, create, edit, and delete answer options locally
@@ -22,6 +23,7 @@ The app has been migrated from screen-owned list state and direct screen-level d
 - Validate quiz readiness before starting
 - Start a quiz and answer questions
 - Randomize quiz questions and answer options during quiz play
+- Render quiz questions and answer options as Markdown
 - Show visual feedback for correct and incorrect quiz answers
 - View final quiz results with score, percentage, and retry option
 - Import structured study content from pasted JSON seed data
@@ -35,9 +37,9 @@ The app has been migrated from screen-owned list state and direct screen-level d
 - Application-level helpers for quiz validation, quiz play data loading, and JSON seed import
 - String-based IDs prepared for ToStore and backend integration
 - Basic Material Design UI
-- Custom color scheme
-- Reusable list item and empty state widgets
-- SnackBar feedback for local actions
+- Custom light and dark color schemes
+- Reusable mode card, list item, form button, SnackBar, and empty state widgets
+- Themed SnackBar feedback for local success, info, error, and delete actions
 
 ## Screenshots
 
@@ -65,16 +67,19 @@ Screens shown when there is no local data yet.
 
 ```text
 StartScreen
--> SubjectsScreen
--> TopicsScreen
--> TopicDetailScreen
-   -> StudyNotesScreen
-      -> NoteScreen
-   -> QuizzesScreen
-      -> QuizQuestionsScreen
-         -> QuestionDetailScreen
-      -> QuizPlayScreen
-         -> QuizResultScreen
+-> ModeSelectionScreen
+   -> Study Mode
+      -> SubjectsScreen
+         -> TopicsScreen
+            -> TopicDetailScreen
+               -> StudyNotesScreen
+                  -> NoteScreen
+               -> QuizzesScreen
+                  -> QuizQuestionsScreen
+                     -> QuestionDetailScreen
+                  -> QuizPlayScreen
+                     -> QuizResultScreen
+   -> Exam Mode placeholder
 ```
 
 ## Project Structure
@@ -138,6 +143,7 @@ frontend/
 |   |-- repositories/
 |   |   `-- contracts/
 |   |-- screens/
+|   |-- theme/
 |   `-- widgets/
 |-- pubspec.yaml
 `-- README.md
@@ -152,6 +158,7 @@ frontend/
 - Repository pattern with local ToStore implementations
 - Riverpod for state management, dependency access, and controller-based screen logic
 - StreamProvider for automatic UI updates in migrated local lists
+- flutter_markdown for rendering study notes, quiz questions, and answer options
 - StatefulWidget and setState for purely local visual UI state
 - Flutter Navigator for screen navigation
 
@@ -187,11 +194,17 @@ The app now supports local create, edit, and delete flows for the main study ent
 
 The quiz area has a first usable local flow. Users can create quiz questions, add answer options, mark correct answers, prevent multiple correct answers for the same question, edit quiz content, validate quiz readiness before starting, play quizzes with randomized questions and answer options, receive visual feedback for correct and incorrect answers, and view a final result screen with score and percentage.
 
+Study notes, quiz questions, and answer options are rendered as Markdown when shown to the user. This keeps generated JSON seed content readable when it includes bullets, emphasis, short explanations, or simple structured text.
+
+The UI now has a dedicated mode selection screen after the start screen. Study Mode opens the current subject/topic/note/quiz flow, while Exam Mode is prepared as a future entry point. JSON seed import access has moved to this mode selection area instead of occupying the subject screen back/leading slot.
+
+Light and dark themes are configured in `lib/theme/app_theme.dart`. Shared UI helpers keep repeated styling consistent, including mode cards, primary form button styling, and success/info/error/delete SnackBars.
+
 The frontend now includes an initial JSON seed import flow. Users can paste structured JSON into a temporary import screen and create subjects, topics, study notes, quizzes, questions, and answer options locally. Existing subjects and topics are reused by normalized name comparison, so imports can add content to existing study areas without duplicating the main structure.
 
 The frontend models use string-based IDs to prepare the app for local persistence and later backend synchronization.
 
-The next major step is improving the JSON import UX, moving import access into a better navigation surface, and preparing import/export features for local study content.
+The next major step is improving the JSON import UX with file picker support, preparing export features for local study content, and deciding the first useful version of Exam Mode.
 
 ## Next Steps
 
@@ -200,6 +213,7 @@ The next major step is improving the JSON import UX, moving import access into a
 - Add an initial seed with public demo learning content
 - Improve JSON import with file picker support
 - Add JSON export for study content
+- Define and build the first Exam Mode flow
 - Prepare API service classes
 - Connect the Flutter frontend to the ASP.NET Core backend
 - Add synchronization between local data and backend data

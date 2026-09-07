@@ -4,6 +4,7 @@ import 'package:frontend/models/answer_option.dart';
 import 'package:frontend/models/question.dart';
 import 'package:frontend/screens/edit_answer_option.dart';
 import 'package:frontend/screens/new_answer_option.dart';
+import 'package:frontend/widgets/app_snack_bar.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/controllers/answer_options_controller.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -53,20 +54,14 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
     if (errorMessage != null) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage, textAlign: TextAlign.center)),
+        appErrorSnackBar(errorMessage),
       );
       return;
     }
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Answer successfully created',
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Color(0xFF2F855A),
-      ),
+      appSuccessSnackBar('Answer successfully created'),
     );
   }
 
@@ -83,9 +78,7 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Answer deleted', textAlign: TextAlign.center),
-      ),
+      appDeleteSnackBar('Answer deleted'),
     );
   }
 
@@ -158,20 +151,14 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
     if (errorMessage != null) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage, textAlign: TextAlign.center)),
+        appErrorSnackBar(errorMessage),
       );
       return;
     }
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Answer successfully updated',
-          textAlign: TextAlign.center,
-        ),
-        backgroundColor: Color(0xFF2F855A),
-      ),
+      appSuccessSnackBar('Answer successfully updated'),
     );
   }
 
@@ -180,6 +167,8 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
     final answerOptionsAsync = ref.watch(
       answerOptionsStreamProvider(widget.question.id),
     );
+    final appBarTheme = Theme.of(context).appBarTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     final mainContent = answerOptionsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -212,7 +201,7 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
                           : Icons.radio_button_unchecked,
                       color: answerOption.isCorrect
                           ? const Color(0xFF2F855A)
-                          : Theme.of(context).colorScheme.onPrimaryContainer,
+                          : colorScheme.onPrimaryContainer,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -255,7 +244,7 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
           style: GoogleFonts.inter(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            color: colorScheme.onPrimaryContainer,
           ),
         ),
         actions: [
@@ -271,11 +260,22 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Card(
-              color: const Color(0xFFFFF3B0),
+              color: appBarTheme.backgroundColor ?? colorScheme.primary,
               margin: const EdgeInsets.symmetric(horizontal: 16),
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: MarkdownBody(data: widget.question.markdownText),
+                child: MarkdownBody(
+                  data: widget.question.markdownText,
+                  styleSheet: MarkdownStyleSheet(
+                    p: GoogleFonts.sourceSans3(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      height: 1.35,
+                      color:
+                          appBarTheme.foregroundColor ?? colorScheme.onPrimary,
+                    ),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 30),
@@ -285,7 +285,7 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  color: colorScheme.onPrimaryContainer,
                 ),
               ),
             ),

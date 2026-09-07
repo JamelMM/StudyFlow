@@ -67,6 +67,8 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
   @override
   Widget build(BuildContext context) {
     final quizPlayDataAsync = ref.watch(quizPlayDataProvider(widget.quiz.id));
+    final appBarTheme = Theme.of(context).appBarTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     final mainContent = quizPlayDataAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -93,7 +95,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
               ),
               const SizedBox(height: 24),
               Card(
-                color: const Color(0xFFFFF3B0),
+                color: appBarTheme.backgroundColor ?? colorScheme.primary,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: MarkdownBody(
@@ -103,7 +105,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
                         height: 1.35,
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: appBarTheme.foregroundColor ?? colorScheme.onPrimary,
                       ),
                     ),
                   ),
@@ -130,6 +132,17 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                       cardColor = const Color(0xFFD1FAE5);
                     }
 
+                    final hasFeedbackColor =
+                        _hasAnswered && (isCorrect || isSelected);
+                    final answerTextColor = hasFeedbackColor
+                        ? Colors.black
+                        : colorScheme.onPrimaryContainer;
+                    final answerIconColor = _hasAnswered && isCorrect
+                        ? const Color(0xFF2F855A)
+                        : _hasAnswered && isSelected && !isCorrect
+                        ? const Color(0xFFB91C1C)
+                        : colorScheme.onPrimaryContainer;
+
                     return Card(
                       color: cardColor,
                       child: ListTile(
@@ -139,13 +152,18 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                               : isSelected
                               ? Icons.radio_button_checked
                               : Icons.radio_button_unchecked,
-                          color: _hasAnswered && isCorrect
-                              ? const Color(0xFF2F855A)
-                              : Theme.of(
-                                  context,
-                                ).colorScheme.onPrimaryContainer,
+                          color: answerIconColor,
                         ),
-                        title: MarkdownBody(data: answerOption.markdownText),
+                        title: MarkdownBody(
+                          data: answerOption.markdownText,
+                          styleSheet: MarkdownStyleSheet(
+                            p: TextStyle(
+                              color: answerTextColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
                         onTap: () {
                           _selectAnswer(answerOption);
                         },
@@ -156,6 +174,12 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
               ),
               if (_hasAnswered)
                 FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor:
+                        appBarTheme.backgroundColor ?? colorScheme.primary,
+                    foregroundColor:
+                        appBarTheme.foregroundColor ?? colorScheme.onPrimary,
+                  ),
                   onPressed: () {
                     _goToNextQuestion(quizPlayData);
                   },

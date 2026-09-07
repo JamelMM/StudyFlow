@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/subject.dart';
+import 'package:frontend/widgets/app_button_styles.dart';
 
 class EditSubject extends StatefulWidget {
   const EditSubject({
@@ -61,6 +62,7 @@ class _EditSubjectState extends State<EditSubject> {
           Row(
             children: [
               FilledButton(
+                style: appPrimaryButtonStyle(context),
                 onPressed: _submitSubjectData,
                 child: const Text('Save'),
               ),

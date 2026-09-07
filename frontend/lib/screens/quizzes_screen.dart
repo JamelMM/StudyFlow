@@ -6,6 +6,7 @@ import 'package:frontend/controllers/quizzes_controller.dart';
 import 'package:frontend/models/quiz.dart';
 import 'package:frontend/models/topic.dart';
 import 'package:frontend/providers/quizzes_stream_provider.dart';
+import 'package:frontend/widgets/app_snack_bar.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/screens/quiz_play_screen.dart';
@@ -35,10 +36,7 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
 
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Quiz successfully created', textAlign: TextAlign.center),
-        backgroundColor: Color(0xFF2F855A),
-      ),
+      appSuccessSnackBar('Quiz successfully created'),
     );
   }
 
@@ -54,7 +52,7 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
     if (errorMessage != null) {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage, textAlign: TextAlign.center)),
+        appErrorSnackBar(errorMessage),
       );
 
       return;
@@ -69,6 +67,17 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
   @override
   Widget build(BuildContext context) {
     final quizzesAsync = ref.watch(quizzesStreamProvider(widget.topic.id));
+    final appBarTheme = Theme.of(context).appBarTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    final quizContentColor = isDarkMode
+        ? const Color(0xFF344E41)
+        : colorScheme.secondaryContainer;
+
+    final quizCardColor = isDarkMode
+        ? const Color.fromARGB(255, 182, 204, 184)
+        : colorScheme.onSecondaryContainer;
 
     Widget mainContent = quizzesAsync.when(
       error: (error, stackTrace) =>
@@ -94,7 +103,7 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
                 width: double.infinity,
                 height: 360,
                 child: Card(
-                  color: const Color(0xFFFFF3B0),
+                  color: quizCardColor,
                   elevation: 6,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -104,7 +113,7 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.quiz, size: 80),
+                        Icon(Icons.quiz, size: 80, color: quizContentColor),
                         const SizedBox(height: 64),
                         Text(
                           quiz.name,
@@ -112,9 +121,7 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
                           style: GoogleFonts.inter(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onPrimaryContainer,
+                            color: quizContentColor,
                           ),
                         ),
                       ],
@@ -124,13 +131,26 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
               ),
               const SizedBox(height: 36),
               FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor:
+                      appBarTheme.backgroundColor ?? colorScheme.primary,
+                  foregroundColor:
+                      appBarTheme.foregroundColor ?? colorScheme.onPrimary,
+                ),
                 onPressed: () {
                   _startQuiz(quiz);
                 },
                 child: const Text('Start quiz'),
               ),
-              const SizedBox(height: 12),
-              OutlinedButton(
+              const SizedBox(height: 48),
+              FilledButton.tonalIcon(
+                style: FilledButton.styleFrom(
+                  elevation: 24,
+                  backgroundColor:
+                      appBarTheme.backgroundColor ?? colorScheme.primary,
+                  foregroundColor:
+                      appBarTheme.foregroundColor ?? colorScheme.onPrimary,
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -139,7 +159,9 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
                     ),
                   );
                 },
-                child: const Text('Manage questions'),
+
+                label: const Text('Manage questions'),
+                icon: const Icon(Icons.settings),
               ),
             ],
           ),

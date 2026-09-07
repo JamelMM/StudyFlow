@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/question.dart';
+import 'package:frontend/widgets/app_button_styles.dart';
 
 class EditQuestion extends StatefulWidget {
   const EditQuestion({
@@ -64,6 +65,7 @@ class _EditQuestionState extends State<EditQuestion> {
           Row(
             children: [
               FilledButton(
+                style: appPrimaryButtonStyle(context),
                 onPressed: _submitQuestionData,
                 child: const Text('Save'),
               ),

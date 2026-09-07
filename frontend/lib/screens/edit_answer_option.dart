@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/answer_option.dart';
+import 'package:frontend/widgets/app_button_styles.dart';
 
 class EditAnswerOption extends StatefulWidget {
   const EditAnswerOption({
@@ -84,6 +85,7 @@ class _EditAnswerOptionState extends State<EditAnswerOption> {
               ),
               const Spacer(),
               FilledButton(
+                style: appPrimaryButtonStyle(context),
                 onPressed: _submitAnswerOptionData,
                 child: const Text('Save'),
               ),

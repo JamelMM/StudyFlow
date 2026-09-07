@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/widgets/app_button_styles.dart';
 
 class NewQuestion extends StatefulWidget {
   const NewQuestion({super.key, required this.onAddQuestion});
@@ -71,6 +72,7 @@ class _NewQuestionState extends State<NewQuestion> {
               ),
               const SizedBox(width: 8),
               FilledButton(
+                style: appPrimaryButtonStyle(context),
                 onPressed: _submitQuestionData,
                 child: const Text('Save question'),
               ),
