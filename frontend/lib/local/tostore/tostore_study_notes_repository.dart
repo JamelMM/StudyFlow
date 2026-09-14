@@ -21,11 +21,11 @@ class ToStoreStudyNotesRepository implements StudyNotesRepository {
       'updatedAt': null,
     });
 
-    if (!result.isSuccess) {
+    if (result.hasErrors) {
       throw Exception('Could not create study note.');
     }
 
-    final generatedId = result.successKeys.first.toString();
+    final generatedId = result.firstPrimaryKey.toString();
 
     return StudyNote(
       id: generatedId,
@@ -84,7 +84,7 @@ class ToStoreStudyNotesRepository implements StudyNotesRepository {
         .delete(_tableName)
         .where('id', '=', id);
 
-    if (!result.isSuccess) {
+    if (result.hasErrors) {
       throw Exception('Could not delete study note.');
     }
   }
@@ -105,7 +105,7 @@ class ToStoreStudyNotesRepository implements StudyNotesRepository {
         })
         .where('id', '=', id);
 
-    if (!result.isSuccess) {
+    if (result.hasErrors) {
       throw Exception('Could not update study note.');
     }
   }

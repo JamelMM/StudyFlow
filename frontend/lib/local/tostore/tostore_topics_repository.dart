@@ -18,11 +18,11 @@ class ToStoreTopicsRepository implements TopicsRepository {
       'createdAt': createdAt.toIso8601String(),
     });
 
-    if (!result.isSuccess) {
+    if (result.hasErrors) {
       throw Exception('Could not create topic.');
     }
 
-    final generatedId = result.successKeys.first.toString();
+    final generatedId = result.firstPrimaryKey.toString();
 
     return Topic(
       id: generatedId,
@@ -71,7 +71,7 @@ class ToStoreTopicsRepository implements TopicsRepository {
         .delete(_tableName)
         .where('id', '=', id);
 
-    if (!result.isSuccess) {
+    if (result.hasErrors) {
       throw Exception('Could not delete topic.');
     }
   }
@@ -87,7 +87,7 @@ class ToStoreTopicsRepository implements TopicsRepository {
         })
         .where('id', '=', id);
 
-    if (!result.isSuccess) {
+    if (!result.hasErrors) {
       throw Exception('Could not update topic.');
     }
   }

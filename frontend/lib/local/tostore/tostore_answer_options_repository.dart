@@ -21,11 +21,11 @@ class ToStoreAnswerOptionsRepository implements AnswerOptionsRepository {
       'updatedAt': null,
     });
 
-    if (!result.isSuccess) {
+    if (result.hasErrors) {
       throw Exception('Could not create answer.');
     }
 
-    final generatedId = result.successKeys.first.toString();
+    final generatedId = result.firstPrimaryKey.toString();
 
     return AnswerOption(
       id: generatedId,
@@ -69,7 +69,7 @@ class ToStoreAnswerOptionsRepository implements AnswerOptionsRepository {
         .delete(_tableName)
         .where('id', '=', id);
 
-    if (!result.isSuccess) {
+    if (result.hasErrors) {
       throw Exception('Could not delete answer.');
     }
   }
@@ -90,7 +90,7 @@ class ToStoreAnswerOptionsRepository implements AnswerOptionsRepository {
         })
         .where('id', '=', id);
 
-    if (!result.isSuccess) {
+    if (result.hasErrors) {
       throw Exception('Could not update answer.');
     }
   }

@@ -40,11 +40,11 @@ class ToStoreSubjectsRepository implements SubjectsRepository {
       'createdAt': createdAt.toIso8601String(),
     });
 
-    if (!result.isSuccess) {
+    if (result.hasErrors) {
       throw Exception('Could not create subject.');
     }
 
-    final generatedId = result.successKeys.first.toString();
+    final generatedId = result.firstPrimaryKey.toString();
 
     return Subject(id: generatedId, name: name, createdAt: createdAt);
   }
@@ -55,7 +55,7 @@ class ToStoreSubjectsRepository implements SubjectsRepository {
         .delete(_tableName)
         .where('id', '=', id);
 
-    if (!result.isSuccess) {
+    if (result.hasErrors) {
       throw Exception('Could not delete subject.');
     }
   }
@@ -71,7 +71,7 @@ class ToStoreSubjectsRepository implements SubjectsRepository {
         })
         .where('id', '=', id);
 
-    if (!result.isSuccess) {
+    if (result.hasErrors) {
       throw Exception('Could not update subject.');
     }
   }

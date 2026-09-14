@@ -35,9 +35,9 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
     }
 
     ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      appSuccessSnackBar('Quiz successfully created'),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appSuccessSnackBar('Quiz successfully created'));
   }
 
   Future<void> _startQuiz(Quiz quiz) async {
@@ -51,9 +51,9 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
 
     if (errorMessage != null) {
       ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        appErrorSnackBar(errorMessage),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(appErrorSnackBar(errorMessage));
 
       return;
     }

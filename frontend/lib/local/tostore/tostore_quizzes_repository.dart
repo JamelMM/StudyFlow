@@ -16,11 +16,11 @@ class ToStoreQuizzesRepository implements QuizzesRepository {
       'updatedAt': null,
     });
 
-    if (!result.isSuccess) {
+    if (result.hasErrors) {
       throw Exception('Could not create Quiz.');
     }
 
-    final generatedId = result.successKeys.first.toString();
+    final generatedId = result.firstPrimaryKey.toString();
 
     return Quiz(
       id: generatedId,
@@ -88,7 +88,7 @@ class ToStoreQuizzesRepository implements QuizzesRepository {
         .delete(_tableName)
         .where('id', '=', id);
 
-    if (!result.isSuccess) {
+    if (result.hasErrors) {
       throw Exception('Could not delete the quiz.');
     }
   }

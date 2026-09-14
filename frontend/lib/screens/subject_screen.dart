@@ -38,9 +38,9 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
     }
 
     ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      appSuccessSnackBar('Subject successfully created'),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appSuccessSnackBar('Subject successfully created'));
   }
 
   Future<void> _removeSubject(Subject subject) async {
@@ -51,9 +51,9 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
     }
 
     ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      appDeleteSnackBar('Subject deleted'),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appDeleteSnackBar('Subject deleted'));
   }
 
   Future<bool> _confirmRemoveSubject(Subject subject) async {
@@ -116,9 +116,9 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
     }
 
     ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      appSuccessSnackBar('Subject successfully updated'),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appSuccessSnackBar('Subject successfully updated'));
   }
 
   @override

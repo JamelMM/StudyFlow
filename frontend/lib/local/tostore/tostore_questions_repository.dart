@@ -19,11 +19,11 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
       'updatedAt': null,
     });
 
-    if (!result.isSuccess) {
+    if (result.hasErrors) {
       throw Exception('Could not create Question.');
     }
 
-    final generatedId = result.successKeys.first.toString();
+    final generatedId = result.firstPrimaryKey.toString();
 
     return Question(
       id: generatedId,
@@ -60,7 +60,7 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
         .delete(_tableName)
         .where('id', '=', id);
 
-    if (!result.isSuccess) {
+    if (result.hasErrors) {
       throw Exception('Could not delete question.');
     }
   }
@@ -79,7 +79,7 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
         })
         .where('id', '=', id);
 
-    if (!result.isSuccess) {
+    if (result.hasErrors) {
       throw Exception('Could not update question.');
     }
   }
