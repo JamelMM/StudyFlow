@@ -30,6 +30,12 @@ class ImportStudySeed {
   final QuestionsRepository questionsRepository;
   final AnswerOptionsRepository answerOptionsRepository;
 
+  // ToStore generates IDs through an async pool. Large imports can exhaust it,
+  // so we give the pool time to refill between create operations.
+  Future<void> _waitForToStoreIdPool() async {
+    await Future.delayed(const Duration(milliseconds: 100));
+  }
+
   Future<Subject> _findOrCreateSubject(String name) async {
     final subjects = await subjectsRepository.getSubjects();
 
@@ -41,7 +47,10 @@ class ImportStudySeed {
       }
     }
 
-    return subjectsRepository.addSubject(name);
+    final createdSubject = await subjectsRepository.addSubject(name);
+    await _waitForToStoreIdPool();
+
+    return createdSubject;
   }
 
   Future<Topic> _findOrCreateTopic({
@@ -58,7 +67,13 @@ class ImportStudySeed {
       }
     }
 
-    return topicsRepository.addTopic(subjectId: subjectId, name: name);
+    final createdTopic = await topicsRepository.addTopic(
+      subjectId: subjectId,
+      name: name,
+    );
+    await _waitForToStoreIdPool();
+
+    return createdTopic;
   }
 
   Future<void> call(String jsonText) async {
@@ -85,6 +100,7 @@ class ImportStudySeed {
             name: seedNote.name,
             markdownText: seedNote.markdownText,
           );
+          await _waitForToStoreIdPool();
         }
 
         final seedQuiz = seedTopic.quiz;
@@ -97,12 +113,14 @@ class ImportStudySeed {
           topicId: topic.id,
           name: seedQuiz.name,
         );
+        await _waitForToStoreIdPool();
 
         for (final seedQuestion in seedQuiz.questions) {
           final question = await questionsRepository.addQuestion(
             quizId: quiz.id,
             markdownText: seedQuestion.markdownText,
           );
+          await _waitForToStoreIdPool();
 
           for (final seedAnswerOption in seedQuestion.answerOptions) {
             await answerOptionsRepository.addAnswerOption(
@@ -110,6 +128,7 @@ class ImportStudySeed {
               markdownText: seedAnswerOption.markdownText,
               isCorrect: seedAnswerOption.isCorrect,
             );
+            await _waitForToStoreIdPool();
           }
         }
       }
