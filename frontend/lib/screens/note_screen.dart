@@ -6,6 +6,7 @@ import 'package:frontend/widgets/app_snack_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/controllers/study_notes_controller.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:frontend/widgets/responsive_layout.dart';
 
 class NoteScreen extends ConsumerStatefulWidget {
   const NoteScreen({super.key, required this.note});
@@ -75,9 +76,11 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 20),
+      body: ResponsiveContent(
+        maxWidth: 900,
+        padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Center(
               child: Text(
@@ -90,10 +93,14 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
               ),
             ),
             const SizedBox(height: 30),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: MarkdownBody(data: _note.markdownText),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: MarkdownBody(data: _note.markdownText),
+                  ),
+                ),
               ),
             ),
           ],

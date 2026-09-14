@@ -9,6 +9,7 @@ import 'package:frontend/screens/new_subject.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/controllers/subjects_controller.dart';
+import 'package:frontend/widgets/responsive_layout.dart';
 
 class SubjectScreen extends ConsumerStatefulWidget {
   const SubjectScreen({super.key});
@@ -143,53 +144,73 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
           );
         }
 
-        return ListView.builder(
-          itemCount: subjects.length,
-          itemBuilder: (context, index) {
-            final subject = subjects[index];
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final columns = ResponsiveBreakpoints.gridColumns(
+              constraints.maxWidth,
+            );
 
-            return Card(
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TopicsScreen(subject: subject),
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.school),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text(subject.name)),
-                      PopupMenuButton<String>(
-                        onSelected: (value) async {
-                          if (value == 'edit') {
-                            _openEditSubjectOverlay(subject);
-                          }
+            return GridView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: subjects.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: columns,
+                mainAxisExtent: 88,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+              ),
+              itemBuilder: (context, index) {
+                final subject = subjects[index];
 
-                          if (value == 'delete') {
-                            final shouldRemove = await _confirmRemoveSubject(
-                              subject,
-                            );
+                return Card(
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TopicsScreen(subject: subject),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.school),
+                          const SizedBox(width: 12),
+                          Expanded(child: Text(subject.name)),
+                          PopupMenuButton<String>(
+                            onSelected: (value) async {
+                              if (value == 'edit') {
+                                _openEditSubjectOverlay(subject);
+                              }
 
-                            if (shouldRemove == true) {
-                              _removeSubject(subject);
-                            }
-                          }
-                        },
-                        itemBuilder: (context) => const [
-                          PopupMenuItem(value: 'edit', child: Text('Edit')),
-                          PopupMenuItem(value: 'delete', child: Text('Delete')),
+                              if (value == 'delete') {
+                                final shouldRemove =
+                                    await _confirmRemoveSubject(subject);
+
+                                if (shouldRemove == true) {
+                                  _removeSubject(subject);
+                                }
+                              }
+                            },
+                            itemBuilder: (context) => const [
+                              PopupMenuItem(
+                                value: 'edit',
+                                child: Text('Edit'),
+                              ),
+                              PopupMenuItem(
+                                value: 'delete',
+                                child: Text('Delete'),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             );
           },
         );
@@ -204,8 +225,9 @@ class _SubjectScreenState extends ConsumerState<SubjectScreen> {
           IconButton(onPressed: _openAddSubjectOverlay, icon: Icon(Icons.add)),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 20),
+      body: ResponsiveContent(
+        maxWidth: 1100,
+        padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

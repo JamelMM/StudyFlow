@@ -10,6 +10,7 @@ import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/controllers/study_notes_controller.dart';
 import 'package:frontend/screens/edit_study_note.dart';
+import 'package:frontend/widgets/responsive_layout.dart';
 
 class StudyNotesScreen extends ConsumerStatefulWidget {
   const StudyNotesScreen({
@@ -136,26 +137,41 @@ class _StudyNotesScreenState extends ConsumerState<StudyNotesScreen> {
           );
         }
 
-        return ListView.builder(
-          itemCount: studyNotes.length,
-          itemBuilder: (context, index) {
-            final note = studyNotes[index];
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final columns = ResponsiveBreakpoints.gridColumns(
+              constraints.maxWidth,
+            );
 
-            return StudyNoteListItem(
-              note: note,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => NoteScreen(note: note),
-                  ),
+            return GridView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: studyNotes.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: columns,
+                mainAxisExtent: 88,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+              ),
+              itemBuilder: (context, index) {
+                final note = studyNotes[index];
+
+                return StudyNoteListItem(
+                  note: note,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NoteScreen(note: note),
+                      ),
+                    );
+                  },
+                  onEdit: () {
+                    _openEditStudyNoteOverlay(note);
+                  },
+                  onDelete: () {
+                    _confirmRemoveStudyNote(note);
+                  },
                 );
-              },
-              onEdit: () {
-                _openEditStudyNoteOverlay(note);
-              },
-              onDelete: () {
-                _confirmRemoveStudyNote(note);
               },
             );
           },
@@ -163,8 +179,9 @@ class _StudyNotesScreenState extends ConsumerState<StudyNotesScreen> {
       },
     );
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
+    return ResponsiveContent(
+      maxWidth: 1100,
+      padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

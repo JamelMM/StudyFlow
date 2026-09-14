@@ -6,12 +6,13 @@ import 'package:frontend/controllers/quizzes_controller.dart';
 import 'package:frontend/models/quiz.dart';
 import 'package:frontend/models/topic.dart';
 import 'package:frontend/providers/quizzes_stream_provider.dart';
-import 'package:frontend/widgets/app_snack_bar.dart';
-import 'package:frontend/widgets/empty_state_message.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/providers/validate_quiz_can_start_provider.dart';
 import 'package:frontend/screens/quiz_play_screen.dart';
 import 'package:frontend/screens/quiz_questions_screen.dart';
-import 'package:frontend/providers/validate_quiz_can_start_provider.dart';
+import 'package:frontend/widgets/app_snack_bar.dart';
+import 'package:frontend/widgets/empty_state_message.dart';
+import 'package:frontend/widgets/responsive_layout.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class QuizzesScreen extends ConsumerStatefulWidget {
   const QuizzesScreen({super.key, required this.topic});
@@ -79,7 +80,7 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
         ? const Color.fromARGB(255, 182, 204, 184)
         : colorScheme.onSecondaryContainer;
 
-    Widget mainContent = quizzesAsync.when(
+    final mainContent = quizzesAsync.when(
       error: (error, stackTrace) =>
           const Center(child: Text('Could not load quiz.')),
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -94,83 +95,112 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
           );
         }
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(
-                width: double.infinity,
-                height: 360,
-                child: Card(
-                  color: quizCardColor,
-                  elevation: 6,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.quiz, size: 80, color: quizContentColor),
-                        const SizedBox(height: 64),
-                        Text(
-                          quiz.name,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: quizContentColor,
-                          ),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = ResponsiveBreakpoints.isTabletOrWider(
+              constraints.maxWidth,
+            );
+            final cardHeight = isWide ? 320.0 : 360.0;
+            final card = SizedBox(
+              width: double.infinity,
+              height: cardHeight,
+              child: Card(
+                color: quizCardColor,
+                elevation: 6,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.quiz, size: 80, color: quizContentColor),
+                      const SizedBox(height: 48),
+                      Text(
+                        quiz.name,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: quizContentColor,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(height: 36),
-              FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor:
-                      appBarTheme.backgroundColor ?? colorScheme.primary,
-                  foregroundColor:
-                      appBarTheme.foregroundColor ?? colorScheme.onPrimary,
+            );
+            final actions = Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor:
+                        appBarTheme.backgroundColor ?? colorScheme.primary,
+                    foregroundColor:
+                        appBarTheme.foregroundColor ?? colorScheme.onPrimary,
+                  ),
+                  onPressed: () {
+                    _startQuiz(quiz);
+                  },
+                  child: const Text('Start quiz'),
                 ),
-                onPressed: () {
-                  _startQuiz(quiz);
-                },
-                child: const Text('Start quiz'),
-              ),
-              const SizedBox(height: 48),
-              FilledButton.tonalIcon(
-                style: FilledButton.styleFrom(
-                  elevation: 24,
-                  backgroundColor:
-                      appBarTheme.backgroundColor ?? colorScheme.primary,
-                  foregroundColor:
-                      appBarTheme.foregroundColor ?? colorScheme.onPrimary,
+                const SizedBox(height: 24),
+                FilledButton.tonalIcon(
+                  style: FilledButton.styleFrom(
+                    elevation: 24,
+                    backgroundColor:
+                        appBarTheme.backgroundColor ?? colorScheme.primary,
+                    foregroundColor:
+                        appBarTheme.foregroundColor ?? colorScheme.onPrimary,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => QuizQuestionsScreen(quiz: quiz),
+                      ),
+                    );
+                  },
+                  label: const Text('Manage questions'),
+                  icon: const Icon(Icons.settings),
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QuizQuestionsScreen(quiz: quiz),
-                    ),
-                  );
-                },
+              ],
+            );
 
-                label: const Text('Manage questions'),
-                icon: const Icon(Icons.settings),
+            if (isWide) {
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(flex: 3, child: card),
+                  const SizedBox(width: 32),
+                  SizedBox(width: 280, child: actions),
+                ],
+              );
+            }
+
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  card,
+                  const SizedBox(height: 36),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: actions,
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
+    return ResponsiveContent(
+      maxWidth: 1100,
+      padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

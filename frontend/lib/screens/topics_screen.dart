@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/controllers/topics_controller.dart';
 import 'package:frontend/providers/topics_stream_provider.dart';
+import 'package:frontend/widgets/responsive_layout.dart';
 
 class TopicsScreen extends ConsumerStatefulWidget {
   const TopicsScreen({super.key, required this.subject});
@@ -147,52 +148,74 @@ class _TopicsScreenState extends ConsumerState<TopicsScreen> {
           );
         }
 
-        return ListView.builder(
-          itemCount: topics.length,
-          itemBuilder: (context, index) {
-            final topic = topics[index];
-            return Card(
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TopicDetailScreen(topic: topic),
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.topic),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text(topic.name)),
-                      PopupMenuButton<String>(
-                        onSelected: (value) async {
-                          if (value == 'edit') {
-                            _openEditTopicOverlay(topic);
-                          }
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final columns = ResponsiveBreakpoints.gridColumns(
+              constraints.maxWidth,
+            );
 
-                          if (value == 'delete') {
-                            final shouldRemove = await _confirmRemoveTopic(
-                              topic,
-                            );
+            return GridView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: topics.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: columns,
+                mainAxisExtent: 88,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+              ),
+              itemBuilder: (context, index) {
+                final topic = topics[index];
+                return Card(
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TopicDetailScreen(
+                            topic: topic,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.topic),
+                          const SizedBox(width: 12),
+                          Expanded(child: Text(topic.name)),
+                          PopupMenuButton<String>(
+                            onSelected: (value) async {
+                              if (value == 'edit') {
+                                _openEditTopicOverlay(topic);
+                              }
 
-                            if (shouldRemove == true) {
-                              _removeTopic(topic);
-                            }
-                          }
-                        },
-                        itemBuilder: (context) => const [
-                          PopupMenuItem(value: 'edit', child: Text('Edit')),
-                          PopupMenuItem(value: 'delete', child: Text('Delete')),
+                              if (value == 'delete') {
+                                final shouldRemove =
+                                    await _confirmRemoveTopic(topic);
+
+                                if (shouldRemove == true) {
+                                  _removeTopic(topic);
+                                }
+                              }
+                            },
+                            itemBuilder: (context) => const [
+                              PopupMenuItem(
+                                value: 'edit',
+                                child: Text('Edit'),
+                              ),
+                              PopupMenuItem(
+                                value: 'delete',
+                                child: Text('Delete'),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             );
           },
         );
@@ -209,8 +232,9 @@ class _TopicsScreenState extends ConsumerState<TopicsScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 20),
+      body: ResponsiveContent(
+        maxWidth: 1100,
+        padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

@@ -30,10 +30,40 @@ class ImportStudySeed {
   final QuestionsRepository questionsRepository;
   final AnswerOptionsRepository answerOptionsRepository;
 
+  static const _maxCreateAttempts = 8;
+
   // ToStore generates IDs through an async pool. Large imports can exhaust it,
-  // so we give the pool time to refill between create operations.
+  // so we give the pool time to refill between create operations and retry
+  // creates that fail while the next ID is still unavailable.
   Future<void> _waitForToStoreIdPool() async {
     await Future.delayed(const Duration(milliseconds: 100));
+  }
+
+  Future<T> _createWithRetry<T>(Future<T> Function() create) async {
+    Object? lastError;
+
+    for (var attempt = 1; attempt <= _maxCreateAttempts; attempt++) {
+      try {
+        final createdItem = await create();
+        await _waitForToStoreIdPool();
+
+        return createdItem;
+      } catch (error) {
+        lastError = error;
+
+        if (!_isToStoreCreateError(error) || attempt == _maxCreateAttempts) {
+          rethrow;
+        }
+
+        await Future.delayed(Duration(milliseconds: 120 * attempt));
+      }
+    }
+
+    throw lastError ?? Exception('Could not create item.');
+  }
+
+  bool _isToStoreCreateError(Object error) {
+    return error.toString().toLowerCase().contains('could not create');
   }
 
   Future<Subject> _findOrCreateSubject(String name) async {
@@ -47,10 +77,7 @@ class ImportStudySeed {
       }
     }
 
-    final createdSubject = await subjectsRepository.addSubject(name);
-    await _waitForToStoreIdPool();
-
-    return createdSubject;
+    return _createWithRetry(() => subjectsRepository.addSubject(name));
   }
 
   Future<Topic> _findOrCreateTopic({
@@ -67,13 +94,9 @@ class ImportStudySeed {
       }
     }
 
-    final createdTopic = await topicsRepository.addTopic(
-      subjectId: subjectId,
-      name: name,
+    return _createWithRetry(
+      () => topicsRepository.addTopic(subjectId: subjectId, name: name),
     );
-    await _waitForToStoreIdPool();
-
-    return createdTopic;
   }
 
   Future<void> call(String jsonText) async {
@@ -95,12 +118,13 @@ class ImportStudySeed {
         );
 
         for (final seedNote in seedTopic.studyNotes) {
-          await studyNotesRepository.addStudyNote(
-            topicId: topic.id,
-            name: seedNote.name,
-            markdownText: seedNote.markdownText,
+          await _createWithRetry(
+            () => studyNotesRepository.addStudyNote(
+              topicId: topic.id,
+              name: seedNote.name,
+              markdownText: seedNote.markdownText,
+            ),
           );
-          await _waitForToStoreIdPool();
         }
 
         final seedQuiz = seedTopic.quiz;
@@ -109,26 +133,26 @@ class ImportStudySeed {
           continue;
         }
 
-        final quiz = await quizzesRepository.addQuiz(
-          topicId: topic.id,
-          name: seedQuiz.name,
+        final quiz = await _createWithRetry(
+          () => quizzesRepository.addQuiz(topicId: topic.id, name: seedQuiz.name),
         );
-        await _waitForToStoreIdPool();
 
         for (final seedQuestion in seedQuiz.questions) {
-          final question = await questionsRepository.addQuestion(
-            quizId: quiz.id,
-            markdownText: seedQuestion.markdownText,
+          final question = await _createWithRetry(
+            () => questionsRepository.addQuestion(
+              quizId: quiz.id,
+              markdownText: seedQuestion.markdownText,
+            ),
           );
-          await _waitForToStoreIdPool();
 
           for (final seedAnswerOption in seedQuestion.answerOptions) {
-            await answerOptionsRepository.addAnswerOption(
-              questionId: question.id,
-              markdownText: seedAnswerOption.markdownText,
-              isCorrect: seedAnswerOption.isCorrect,
+            await _createWithRetry(
+              () => answerOptionsRepository.addAnswerOption(
+                questionId: question.id,
+                markdownText: seedAnswerOption.markdownText,
+                isCorrect: seedAnswerOption.isCorrect,
+              ),
             );
-            await _waitForToStoreIdPool();
           }
         }
       }
