@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/screens/subject_screen.dart';
 import 'package:frontend/widgets/mode_card.dart';
 import 'package:frontend/screens/import_seed_screen.dart';
+import 'package:frontend/screens/exam_sections_screen.dart';
 import 'package:frontend/widgets/responsive_layout.dart';
 
 class ModeSelectionScreen extends StatelessWidget {
@@ -77,7 +78,15 @@ class ModeSelectionScreen extends StatelessWidget {
                           icon: Icons.quiz,
                           title: 'Exam Mode',
                           subtitle: 'Simulate a full exam',
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const ExamSectionsScreen(),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
