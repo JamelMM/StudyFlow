@@ -12,6 +12,43 @@ const subjectSchema = TableSchema(
   ],
 );
 
+const examSectionSchema = TableSchema(
+  name: 'exam_sections',
+  primaryKeyConfig: PrimaryKeyConfig(
+    name: 'id',
+    type: PrimaryKeyType.timestampBased,
+  ),
+  fields: [
+    FieldSchema(name: 'name', type: DataType.text, nullable: false),
+    FieldSchema(name: 'createdAt', type: DataType.text, nullable: false),
+  ],
+);
+
+final examTipSchema = TableSchema(
+  name: 'exam_tips',
+  primaryKeyConfig: PrimaryKeyConfig(
+    name: 'id',
+    type: PrimaryKeyType.timestampBased,
+  ),
+  fields: [
+    FieldSchema(name: 'examSectionId', type: DataType.text, nullable: false),
+    FieldSchema(name: 'name', type: DataType.text, nullable: false),
+    FieldSchema(name: 'markdownText', type: DataType.text, nullable: false),
+    FieldSchema(name: 'createdAt', type: DataType.text, nullable: false),
+    FieldSchema(name: 'updatedAt', type: DataType.text, nullable: true),
+  ],
+  foreignKeys: [
+    ForeignKeySchema(
+      name: 'fk_exam_tips_section',
+      fields: ['examSectionId'],
+      referencedTable: 'exam_sections',
+      referencedFields: ['id'],
+      onDelete: ForeignKeyCascadeAction.cascade,
+      onUpdate: ForeignKeyCascadeAction.cascade,
+    ),
+  ],
+);
+
 final topicSchema = TableSchema(
   name: 'topics',
   primaryKeyConfig: PrimaryKeyConfig(
@@ -135,6 +172,8 @@ final answerOptionSchema = TableSchema(
 
 final studyFlowSchemas = [
   subjectSchema,
+  examSectionSchema,
+  examTipSchema,
   topicSchema,
   studyNoteSchema,
   quizSchema,
