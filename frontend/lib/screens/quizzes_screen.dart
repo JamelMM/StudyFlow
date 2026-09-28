@@ -78,7 +78,7 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
 
     final quizCardColor = isDarkMode
         ? const Color.fromARGB(255, 182, 204, 184)
-        : colorScheme.onSecondaryContainer;
+        : (appBarTheme.backgroundColor ?? colorScheme.primary);
 
     final mainContent = quizzesAsync.when(
       error: (error, stackTrace) =>
