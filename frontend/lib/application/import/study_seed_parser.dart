@@ -19,10 +19,15 @@ class StudySeedParser {
     return StudySeed(
       version: json['version'] as int,
       subjects: _parseSubjects(json['subjects']),
+      examSections: _parseExamSections(json['examSections']),
     );
   }
 
   List<SeedSubject> _parseSubjects(Object? value) {
+    if (value == null) {
+      return [];
+    }
+
     if (value is! List) {
       throw const FormatException('subjects must be a list.');
     }
@@ -35,6 +40,48 @@ class StudySeedParser {
       return SeedSubject(
         name: item['name'] as String,
         topics: _parseTopics(item['topics']),
+      );
+    }).toList();
+  }
+
+  List<SeedExamSection> _parseExamSections(Object? value) {
+    if (value == null) {
+      return [];
+    }
+
+    if (value is! List) {
+      throw const FormatException('examSections must be a list.');
+    }
+
+    return value.map((item) {
+      if (item is! Map<String, dynamic>) {
+        throw const FormatException('Each exam section must be an object.');
+      }
+
+      return SeedExamSection(
+        name: item['name'] as String,
+        tips: _parseExamTips(item['tips']),
+      );
+    }).toList();
+  }
+
+  List<SeedExamTip> _parseExamTips(Object? value) {
+    if (value == null) {
+      return [];
+    }
+
+    if (value is! List) {
+      throw const FormatException('tips must be a list.');
+    }
+
+    return value.map((item) {
+      if (item is! Map<String, dynamic>) {
+        throw const FormatException('Each exam tip must be an object.');
+      }
+
+      return SeedExamTip(
+        name: item['name'] as String,
+        markdownText: item['markdownText'] as String,
       );
     }).toList();
   }

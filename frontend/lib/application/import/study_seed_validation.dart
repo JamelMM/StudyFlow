@@ -8,8 +8,8 @@ class StudySeedValidation {
       return 'Unsupported seed version.';
     }
 
-    if (seed.subjects.isEmpty) {
-      return 'The seed must contain at least one subject.';
+    if (seed.subjects.isEmpty && seed.examSections.isEmpty) {
+      return 'The seed must contain subjects or exam sections.';
     }
 
     for (final subject in seed.subjects) {
@@ -17,6 +17,32 @@ class StudySeedValidation {
 
       if (subjectError != null) {
         return subjectError;
+      }
+    }
+
+    for (final examSection in seed.examSections) {
+      final examSectionError = _validateExamSection(examSection);
+
+      if (examSectionError != null) {
+        return examSectionError;
+      }
+    }
+
+    return null;
+  }
+
+  String? _validateExamSection(SeedExamSection examSection) {
+    if (examSection.name.trim().isEmpty) {
+      return 'Exam section name cannot be empty.';
+    }
+
+    for (final tip in examSection.tips) {
+      if (tip.name.trim().isEmpty) {
+        return 'Tip name cannot be empty in exam section "${examSection.name}".';
+      }
+
+      if (tip.markdownText.trim().isEmpty) {
+        return 'Tip "${tip.name}" cannot have empty markdown text.';
       }
     }
 

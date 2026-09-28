@@ -8,6 +8,8 @@ import 'package:frontend/providers/quizzes_repository_provider.dart';
 import 'package:frontend/providers/study_notes_repository_provider.dart';
 import 'package:frontend/providers/subjects_repository_provider.dart';
 import 'package:frontend/providers/topics_repository_provider.dart';
+import 'package:frontend/providers/exam_sections_repository_provider.dart';
+import 'package:frontend/providers/exam_tips_repository_provider.dart';
 
 final studySeedParserProvider = Provider<StudySeedParser>((ref) {
   return const StudySeedParser();
@@ -27,5 +29,7 @@ final importStudySeedProvider = Provider<ImportStudySeed>((ref) {
     quizzesRepository: ref.watch(quizzesRepositoryProvider),
     questionsRepository: ref.watch(questionsRepositoryProvider),
     answerOptionsRepository: ref.watch(answerOptionsRepositoryProvider),
+    examSectionsRepository: ref.watch(examSectionsRepositoryProvider),
+    examTipsRepository: ref.watch(examTipsRepositoryProvider),
   );
 });

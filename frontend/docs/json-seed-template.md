@@ -10,14 +10,17 @@ The JSON seed can create:
 - Quizzes
 - Questions
 - Answer options
+- Exam sections
+- Exam tips and recommendations
 
 StudyFlow reuses existing subjects and topics when their names match after normalization. This means that `WISO`, `Wiso`, and `wiso` are treated as the same subject.
 
 ## Rules
 
-- The root object must contain `version` and `subjects`.
+- The root object must contain `version`.
 - `version` must currently be `1`.
-- `subjects` must be a list.
+- `subjects` and `examSections` are optional lists.
+- At least one of those lists must contain data.
 - Each subject needs a non-empty `name`.
 - Each subject needs at least one topic.
 - Each topic needs a non-empty `name`.
@@ -27,6 +30,75 @@ StudyFlow reuses existing subjects and topics when their names match after norma
 - Each question needs at least one answer option.
 - Each question should have exactly one correct answer.
 - Do not provide IDs. StudyFlow creates IDs locally.
+
+## Exam Mode Template
+
+Use this structure to import exam sections and their tips. Existing exam
+sections are reused when their names match without regard to capitalization.
+
+```json
+{
+  "version": 1,
+  "examSections": [
+    {
+      "name": "AP1",
+      "tips": [
+        {
+          "name": "Time management",
+          "markdownText": "## Before starting\n\nRead all tasks and assign time to each section."
+        }
+      ]
+    }
+  ]
+}
+```
+
+Rules:
+
+- Each exam section needs a non-empty `name`.
+- `tips` can be empty or omitted.
+- Every tip needs `name` and `markdownText`.
+- `markdownText` supports the same Markdown formatting as study notes.
+- Reimporting a section reuses the section but creates the tips again.
+- Practice exams are not part of the seed format yet.
+
+## AI Prompt For Exam Mode JSON
+
+```text
+Convert the following exam preparation material into a valid StudyFlow JSON seed.
+
+Return only valid JSON. Do not include explanations outside the JSON.
+
+Use exactly this structure:
+
+{
+  "version": 1,
+  "examSections": [
+    {
+      "name": "Exam section name",
+      "tips": [
+        {
+          "name": "Short tip title",
+          "markdownText": "## Markdown heading\n\nConcise advice in Markdown."
+        }
+      ]
+    }
+  ]
+}
+
+Rules:
+- Do not create IDs.
+- Use version 1.
+- Use only these field names: version, examSections, name, tips, markdownText.
+- Make every tip atomic: one clear recommendation per tip.
+- Use useful Markdown headings and lists.
+- Put a blank line between a Markdown heading and its content.
+- Do not use trailing commas.
+
+Exam preparation material:
+
+[PASTE MATERIAL HERE]
+```
 
 ## Empty Template
 
@@ -322,8 +394,10 @@ External notes
 
 ## Current Limitations
 
-- The first import screen uses pasted JSON.
-- File picker support is planned later.
+- The import screen supports pasted JSON and JSON files.
 - Subjects and topics are reused by name.
+- Exam sections are reused by name.
 - Study notes, quizzes, questions, and answer options are currently imported as new content.
+- Exam tips are currently imported as new content.
+- Practice exams are not imported yet.
 - Import rollback is not implemented yet.

@@ -1,8 +1,27 @@
 class StudySeed {
-  const StudySeed({required this.version, required this.subjects});
+  const StudySeed({
+    required this.version,
+    required this.subjects,
+    required this.examSections,
+  });
 
   final int version;
   final List<SeedSubject> subjects;
+  final List<SeedExamSection> examSections;
+}
+
+class SeedExamSection {
+  const SeedExamSection({required this.name, required this.tips});
+
+  final String name;
+  final List<SeedExamTip> tips;
+}
+
+class SeedExamTip {
+  const SeedExamTip({required this.name, required this.markdownText});
+
+  final String name;
+  final String markdownText;
 }
 
 class SeedSubject {

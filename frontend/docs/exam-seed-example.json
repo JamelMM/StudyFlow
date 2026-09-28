@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "examSections": [
+    {
+      "name": "AP2",
+      "tips": [
+        {
+          "name": "Aufgaben zuerst ueberblicken",
+          "markdownText": "## Vor dem Start\n\n- Lies zuerst alle Aufgaben.\n- Markiere Schluesselwoerter.\n- Plane die verfuegbare Zeit."
+        },
+        {
+          "name": "Antworten kontrollieren",
+          "markdownText": "## Vor der Abgabe\n\nPruefe, ob jede Teilfrage beantwortet wurde und ob deine Begruendung zur Fragestellung passt."
+        }
+      ]
+    }
+  ]
+}

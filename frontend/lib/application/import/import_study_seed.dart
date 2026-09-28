@@ -6,6 +6,9 @@ import 'package:frontend/repositories/contracts/quizzes_repository.dart';
 import 'package:frontend/repositories/contracts/study_notes_repository.dart';
 import 'package:frontend/repositories/contracts/subjects_repository.dart';
 import 'package:frontend/repositories/contracts/topics_repository.dart';
+import 'package:frontend/repositories/contracts/exam_sections_repository.dart';
+import 'package:frontend/repositories/contracts/exam_tips_repository.dart';
+import 'package:frontend/models/exam_section.dart';
 import 'package:frontend/models/subject.dart';
 import 'package:frontend/models/topic.dart';
 
@@ -19,6 +22,8 @@ class ImportStudySeed {
     required this.quizzesRepository,
     required this.questionsRepository,
     required this.answerOptionsRepository,
+    required this.examSectionsRepository,
+    required this.examTipsRepository,
   });
 
   final StudySeedParser parser;
@@ -29,6 +34,8 @@ class ImportStudySeed {
   final QuizzesRepository quizzesRepository;
   final QuestionsRepository questionsRepository;
   final AnswerOptionsRepository answerOptionsRepository;
+  final ExamSectionsRepository examSectionsRepository;
+  final ExamTipsRepository examTipsRepository;
 
   static const _maxCreateAttempts = 8;
 
@@ -99,6 +106,19 @@ class ImportStudySeed {
     );
   }
 
+  Future<ExamSection> _findOrCreateExamSection(String name) async {
+    final examSections = await examSectionsRepository.getExamSections();
+    final normalizedName = name.trim().toLowerCase();
+
+    for (final examSection in examSections) {
+      if (examSection.name.trim().toLowerCase() == normalizedName) {
+        return examSection;
+      }
+    }
+
+    return _createWithRetry(() => examSectionsRepository.addExamSection(name));
+  }
+
   Future<void> call(String jsonText) async {
     final seed = parser.parse(jsonText);
 
@@ -155,6 +175,20 @@ class ImportStudySeed {
             );
           }
         }
+      }
+    }
+
+    for (final seedExamSection in seed.examSections) {
+      final examSection = await _findOrCreateExamSection(seedExamSection.name);
+
+      for (final seedTip in seedExamSection.tips) {
+        await _createWithRetry(
+          () => examTipsRepository.addExamTip(
+            examSectionId: examSection.id,
+            name: seedTip.name,
+            markdownText: seedTip.markdownText,
+          ),
+        );
       }
     }
   }
