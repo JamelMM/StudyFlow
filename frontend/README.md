@@ -4,12 +4,12 @@ This folder contains the Flutter frontend for StudyFlow.
 
 The current frontend is a local-first prototype. It uses repository contracts with ToStore-backed local persistence and is not connected to the ASP.NET Core backend yet.
 
-The app has been migrated from screen-owned list state and direct screen-level dependency access to Riverpod providers and controllers for the main local-first study and quiz flows. Riverpod now handles the async access patterns for subjects, topics, study notes, quizzes, questions, answer options, quiz validation, quiz play data loading, and JSON seed import. Subjects, topics, study notes, quizzes, quiz questions, and answer options already use stream-based providers for automatic local UI updates. The UI now includes a start screen, a mode selection screen, Markdown rendering for learning content, and light/dark theme support.
+The app uses Riverpod providers and controllers for its local-first study, quiz, and exam preparation flows. Riverpod handles asynchronous access to local entities, quiz validation, quiz play data loading, and JSON seed import. The UI includes Study Mode, the first functional Exam Mode screens, Markdown rendering, responsive layouts, and light/dark theme support.
 
 ## Current Features
 
 - Start screen before entering the main StudyFlow flow
-- Mode selection screen with Study Mode and placeholder Exam Mode entry points
+- Mode selection screen with functional Study Mode and Exam Mode entry points
 - View, create, edit, and delete subjects locally
 - View, create, edit, and delete topics locally
 - Open topics in a dedicated topic detail screen
@@ -26,9 +26,13 @@ The app has been migrated from screen-owned list state and direct screen-level d
 - Render quiz questions and answer options as Markdown
 - Show visual feedback for correct and incorrect quiz answers
 - View final quiz results with score, percentage, and retry option
-- Import structured study content from pasted JSON seed data
-- Reuse existing subjects and topics during JSON seed import to avoid duplicates
-- ToStore-backed local persistence for subjects, topics, study notes, quizzes, questions, and answer options
+- Create, edit, and delete exam sections such as AP1 or AP2
+- Open an exam section with Tips, Exams, and History tabs
+- Create, edit, delete, and read Markdown-formatted exam tips locally
+- Import structured content from pasted JSON or a selected `.json` file
+- Import subjects, topics, notes, quizzes, exam sections, and exam tips
+- Reuse existing subjects, topics, and exam sections during JSON seed import
+- ToStore-backed local persistence for Study Mode and the current Exam Mode entities
 - Cascade deletion support through ToStore relationships
 - Repository contracts for local-first data access
 - Riverpod migration for the main local-first study and quiz flows
@@ -79,7 +83,13 @@ StartScreen
                      -> QuestionDetailScreen
                   -> QuizPlayScreen
                      -> QuizResultScreen
-   -> Exam Mode placeholder
+   -> Exam Mode
+      -> ExamSectionsScreen
+         -> ExamSectionDetailScreen
+            -> ExamTipsScreen
+               -> ExamTipScreen
+            -> Practice Exams (planned)
+            -> History (planned)
 ```
 
 ## Project Structure
@@ -101,6 +111,8 @@ frontend/
 |   |       |-- quiz_play_data.dart
 |   |       `-- validate_quiz_can_start.dart
 |   |-- controllers/
+|   |   |-- exam_sections_controller.dart
+|   |   |-- exam_tips_controller.dart
 |   |   |-- subjects_controller.dart
 |   |   |-- topics_controller.dart
 |   |   |-- study_notes_controller.dart
@@ -111,6 +123,8 @@ frontend/
 |   |   `-- tostore/
 |   |       |-- studyflow_database.dart
 |   |       |-- studyflow_schemas.dart
+|   |       |-- tostore_exam_sections_repository.dart
+|   |       |-- tostore_exam_tips_repository.dart
 |   |       |-- tostore_subjects_repository.dart
 |   |       |-- tostore_topics_repository.dart
 |   |       |-- tostore_study_notes_repository.dart
@@ -118,6 +132,8 @@ frontend/
 |   |       |-- tostore_questions_repository.dart
 |   |       `-- tostore_answer_options_repository.dart
 |   |-- models/
+|   |   |-- exam_section.dart
+|   |   |-- exam_tip.dart
 |   |   |-- subject.dart
 |   |   |-- topic.dart
 |   |   |-- study_note.dart
@@ -127,6 +143,10 @@ frontend/
 |   |-- providers/
 |   |   |-- answer_options_repository_provider.dart
 |   |   |-- answer_options_stream_provider.dart
+|   |   |-- exam_sections_repository_provider.dart
+|   |   |-- exam_sections_stream_provider.dart
+|   |   |-- exam_tips_repository_provider.dart
+|   |   |-- exam_tips_stream_provider.dart
 |   |   |-- import_study_seed_provider.dart
 |   |   |-- load_quiz_play_data_provider.dart
 |   |   |-- questions_repository_provider.dart
@@ -159,6 +179,7 @@ frontend/
 - Riverpod for state management, dependency access, and controller-based screen logic
 - StreamProvider for automatic UI updates in migrated local lists
 - flutter_markdown for rendering study notes, quiz questions, and answer options
+- file_selector for importing JSON files through the platform file picker
 - StatefulWidget and setState for purely local visual UI state
 - Flutter Navigator for screen navigation
 
@@ -182,6 +203,19 @@ Run the app:
 flutter run
 ```
 
+## JSON Seed Import
+
+StudyFlow accepts pasted JSON and `.json` files. A seed can contain Study Mode
+content, Exam Mode sections, or both. Existing subjects, topics, and exam
+sections are reused when their normalized names match.
+
+- [JSON seed format](docs/json-seed-template.md)
+- [Exam Mode seed example](docs/exam-seed-example.json)
+
+Study notes, quizzes, questions, answer options, and exam tips are added as new
+content when a seed is imported again. Import rollback and Practice Exam import
+are not implemented yet.
+
 # Current Status
 
 The frontend is intentionally local-first at this stage.
@@ -196,25 +230,24 @@ The quiz area has a first usable local flow. Users can create quiz questions, ad
 
 Study notes, quiz questions, and answer options are rendered as Markdown when shown to the user. This keeps generated JSON seed content readable when it includes bullets, emphasis, short explanations, or simple structured text.
 
-The UI now has a dedicated mode selection screen after the start screen. Study Mode opens the current subject/topic/note/quiz flow, while Exam Mode is prepared as a future entry point. JSON seed import access has moved to this mode selection area instead of occupying the subject screen back/leading slot.
+The UI has a dedicated mode selection screen after the start screen. Study Mode opens the subject/topic/note/quiz flow. Exam Mode opens locally persisted exam sections and provides a section detail screen with Tips, Exams, and History destinations. Tips are functional and support Markdown; Practice Exams and History are placeholders for the next development stage. JSON seed import is available from the mode selection area.
 
 Light and dark themes are configured in `lib/theme/app_theme.dart`. Shared UI helpers keep repeated styling consistent, including mode cards, primary form button styling, and success/info/error/delete SnackBars.
 
-The frontend now includes an initial JSON seed import flow. Users can paste structured JSON into a temporary import screen and create subjects, topics, study notes, quizzes, questions, and answer options locally. Existing subjects and topics are reused by normalized name comparison, so imports can add content to existing study areas without duplicating the main structure.
+The JSON seed import flow accepts pasted JSON and `.json` files through the platform file selector. It can create Study Mode content as well as exam sections and exam tips. Existing subjects, topics, and exam sections are reused by normalized name comparison. The importer validates the seed and retries local creation operations to tolerate temporary ToStore ID-pool delays.
 
 The frontend models use string-based IDs to prepare the app for local persistence and later backend synchronization.
 
-The next major step is improving the JSON import UX with file picker support, preparing export features for local study content, and deciding the first useful version of Exam Mode.
+The next major work is completing Exam Mode with Practice Exams, answer explanations, persisted attempts, and a useful history view.
 
 ## Next Steps
 
-- Preserve list position when items are edited
-- Improve form validation
-- Add an initial seed with public demo learning content
-- Improve JSON import with file picker support
-- Add JSON export for study content
-- Define and build the first Exam Mode flow
-- Prepare API service classes
-- Connect the Flutter frontend to the ASP.NET Core backend
-- Add synchronization between local data and backend data
-- Refactor StudyNotesScreen into an internal StudyNotesView
+- Review and reorganize the growing codebase by feature
+- Centralize navigation before adding more Exam Mode screens
+- Add Practice Exam models, persistence, management, and simulation
+- Add a Markdown explanation to every Practice Exam answer
+- Persist exam attempts and show basic result history
+- Extend JSON seeds with Practice Exams and answer explanations
+- Add mixed Study Mode tests across all topics in a subject
+- Add an application icon and complete release testing
+- Add JSON export, backend integration, and synchronization after V1
