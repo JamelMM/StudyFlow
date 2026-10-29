@@ -1,8 +1,6 @@
 import 'package:frontend/repositories/contracts/answer_options_repository.dart';
 import 'package:frontend/repositories/contracts/questions_repository.dart';
 
-const maxQuestionsPerQuiz = 20;
-
 class ValidateQuizCanStart {
   const ValidateQuizCanStart({
     required this.questionsRepository,
@@ -17,10 +15,6 @@ class ValidateQuizCanStart {
 
     if (questions.isEmpty) {
       return 'Add at least one question before starting the quiz.';
-    }
-
-    if (questions.length > maxQuestionsPerQuiz) {
-      return 'A quiz can have up to $maxQuestionsPerQuiz questions.';
     }
 
     for (final question in questions) {
