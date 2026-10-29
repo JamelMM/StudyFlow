@@ -9,6 +9,7 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
   Future<Question> addQuestion({
     required String quizId,
     required String markdownText,
+    String? explanationMarkdown,
   }) async {
     final createdAt = DateTime.now();
 
@@ -16,6 +17,7 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
       'quizId': quizId,
       'markdownText': markdownText,
       'createdAt': createdAt.toIso8601String(),
+      'explanationMarkdown': explanationMarkdown,
       'updatedAt': null,
     });
 
@@ -30,6 +32,7 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
       quizId: quizId,
       markdownText: markdownText,
       createdAt: createdAt,
+      explanationMarkdown: explanationMarkdown,
     );
   }
 
@@ -50,6 +53,7 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
         updatedAt: updatedAtValue == null
             ? null
             : DateTime.parse(updatedAtValue.toString()),
+        explanationMarkdown: row['explanationMarkdown']?.toString(),
       );
     }).toList();
   }
@@ -69,12 +73,14 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
   Future<void> updateQuestion({
     required String id,
     required String markdownText,
+    String? explanationMarkdown,
   }) async {
     final updatedAt = DateTime.now();
 
     final result = await StudyFlowDatabase.db
         .update(_tableName, {
           'markdownText': markdownText,
+          'explanationMarkdown': explanationMarkdown,
           'updatedAt': updatedAt.toIso8601String(),
         })
         .where('id', '=', id);
@@ -93,6 +99,7 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
           quizId: row['quizId'].toString(),
           markdownText: row['markdownText'].toString(),
           createdAt: DateTime.parse(row['createdAt'].toString()),
+          explanationMarkdown: row['explanationMarkdown']?.toString(),
         );
       }).toList();
     });

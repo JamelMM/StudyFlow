@@ -8,6 +8,7 @@ import 'package:frontend/screens/quiz_result_screen.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:frontend/widgets/responsive_layout.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/widgets/question_explanation_card.dart';
 
 class QuizPlayScreen extends ConsumerStatefulWidget {
   const QuizPlayScreen({super.key, required this.quiz});
@@ -81,6 +82,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
         }
 
         final currentQuestion = quizPlayData.questions[_currentQuestionIndex];
+        final explanationMarkdown = currentQuestion.explanationMarkdown?.trim();
 
         final currentAnswerOptions =
             quizPlayData.answerOptionsByQuestionId[currentQuestion.id] ?? [];
@@ -213,6 +215,14 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                             ],
                           ),
                   ),
+                  if (_hasAnswered &&
+                      explanationMarkdown != null &&
+                      explanationMarkdown.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    QuestionExplanationCard(
+                      explanationMarkdown: explanationMarkdown,
+                    ),
+                  ],
                   if (_hasAnswered) ...[
                     const SizedBox(height: 12),
                     SafeArea(

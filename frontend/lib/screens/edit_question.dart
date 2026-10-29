@@ -10,7 +10,8 @@ class EditQuestion extends StatefulWidget {
   });
 
   final Question question;
-  final void Function(String markdownText) onUpdateQuestion;
+  final void Function(String markdownText, String? explanationMarkdown)
+  onUpdateQuestion;
 
   @override
   State<EditQuestion> createState() {
@@ -20,6 +21,7 @@ class EditQuestion extends StatefulWidget {
 
 class _EditQuestionState extends State<EditQuestion> {
   late final TextEditingController _markdownTextController;
+  late final TextEditingController _explanationMarkdownController;
 
   @override
   void initState() {
@@ -27,22 +29,30 @@ class _EditQuestionState extends State<EditQuestion> {
     _markdownTextController = TextEditingController(
       text: widget.question.markdownText,
     );
+    _explanationMarkdownController = TextEditingController(
+      text: widget.question.explanationMarkdown ?? '',
+    );
   }
 
   void _submitQuestionData() {
     final enteredMarkdownText = _markdownTextController.text.trim();
+    final enteredExplanation = _explanationMarkdownController.text.trim();
 
     if (enteredMarkdownText.isEmpty) {
       return;
     }
 
-    widget.onUpdateQuestion(enteredMarkdownText);
+    widget.onUpdateQuestion(
+      enteredMarkdownText,
+      enteredExplanation.isEmpty ? null : enteredExplanation,
+    );
     Navigator.pop(context);
   }
 
   @override
   void dispose() {
     _markdownTextController.dispose();
+    _explanationMarkdownController.dispose();
     super.dispose();
   }
 
@@ -60,6 +70,17 @@ class _EditQuestionState extends State<EditQuestion> {
             maxLength: 300,
             maxLines: 4,
             decoration: const InputDecoration(label: Text('Question')),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _explanationMarkdownController,
+            maxLength: 2000,
+            maxLines: 6,
+            decoration: const InputDecoration(
+              labelText: 'Explanation (optional)',
+              alignLabelWithHint: true,
+              border: OutlineInputBorder(),
+            ),
           ),
           const SizedBox(height: 16),
           Row(

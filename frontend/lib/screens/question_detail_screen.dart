@@ -10,6 +10,7 @@ import 'package:frontend/controllers/answer_options_controller.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/providers/answer_options_stream_provider.dart';
+import 'package:frontend/widgets/question_explanation_card.dart';
 
 class QuestionDetailScreen extends ConsumerStatefulWidget {
   const QuestionDetailScreen({super.key, required this.question});
@@ -53,16 +54,16 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
 
     if (errorMessage != null) {
       ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        appErrorSnackBar(errorMessage),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(appErrorSnackBar(errorMessage));
       return;
     }
 
     ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      appSuccessSnackBar('Answer successfully created'),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appSuccessSnackBar('Answer successfully created'));
   }
 
   Future<void> _removeAnswerOption(String id) async {
@@ -77,9 +78,9 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
     }
 
     ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      appDeleteSnackBar('Answer deleted'),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appDeleteSnackBar('Answer deleted'));
   }
 
   Future<bool> _confirmRemoveAnswerOption(AnswerOption answerOption) async {
@@ -150,16 +151,16 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
 
     if (errorMessage != null) {
       ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        appErrorSnackBar(errorMessage),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(appErrorSnackBar(errorMessage));
       return;
     }
 
     ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      appSuccessSnackBar('Answer successfully updated'),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appSuccessSnackBar('Answer successfully updated'));
   }
 
   @override
@@ -169,6 +170,7 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
     );
     final appBarTheme = Theme.of(context).appBarTheme;
     final colorScheme = Theme.of(context).colorScheme;
+    final explanationMarkdown = widget.question.explanationMarkdown?.trim();
 
     final mainContent = answerOptionsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -278,6 +280,14 @@ class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
                 ),
               ),
             ),
+            if (explanationMarkdown != null &&
+                explanationMarkdown.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              QuestionExplanationCard(
+                explanationMarkdown: explanationMarkdown,
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+              ),
+            ],
             const SizedBox(height: 30),
             Center(
               child: Text(

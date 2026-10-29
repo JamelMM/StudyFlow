@@ -4,7 +4,8 @@ import 'package:frontend/widgets/app_button_styles.dart';
 class NewQuestion extends StatefulWidget {
   const NewQuestion({super.key, required this.onAddQuestion});
 
-  final void Function(String markdownText) onAddQuestion;
+  final void Function(String markdownText, String? explanationMarkdown)
+  onAddQuestion;
 
   @override
   State<NewQuestion> createState() {
@@ -14,9 +15,11 @@ class NewQuestion extends StatefulWidget {
 
 class _NewQuestionState extends State<NewQuestion> {
   final _markdownTextController = TextEditingController();
+  final _explanationMarkdownController = TextEditingController();
 
   void _submitQuestionData() {
     final enteredText = _markdownTextController.text.trim();
+    final enteredExplanation = _explanationMarkdownController.text.trim();
 
     if (enteredText.isEmpty) {
       showDialog(
@@ -37,20 +40,26 @@ class _NewQuestionState extends State<NewQuestion> {
       return;
     }
 
-    widget.onAddQuestion(enteredText);
+    widget.onAddQuestion(
+      enteredText,
+      enteredExplanation.isEmpty ? null : enteredExplanation,
+    );
     Navigator.pop(context);
   }
 
   @override
   void dispose() {
     _markdownTextController.dispose();
+    _explanationMarkdownController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
+    final keyboardSpace = MediaQuery.viewInsetsOf(context).bottom;
+
+    return SingleChildScrollView(
+      padding: EdgeInsets.fromLTRB(16, 16, 16, keyboardSpace + 16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -58,7 +67,22 @@ class _NewQuestionState extends State<NewQuestion> {
             controller: _markdownTextController,
             maxLength: 300,
             maxLines: 4,
-            decoration: const InputDecoration(label: Text('Question')),
+            decoration: const InputDecoration(
+              labelText: 'Question',
+              alignLabelWithHint: true,
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 16),
+          TextField(
+            controller: _explanationMarkdownController,
+            maxLength: 2000,
+            maxLines: 6,
+            decoration: const InputDecoration(
+              labelText: 'Explanation (optional)',
+              alignLabelWithHint: true,
+              border: OutlineInputBorder(),
+            ),
           ),
           const SizedBox(height: 16),
           Row(

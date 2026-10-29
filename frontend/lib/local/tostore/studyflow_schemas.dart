@@ -132,6 +132,11 @@ final questionSchema = TableSchema(
     FieldSchema(name: 'markdownText', type: DataType.text, nullable: false),
     FieldSchema(name: 'createdAt', type: DataType.text, nullable: false),
     FieldSchema(name: 'updatedAt', type: DataType.text, nullable: true),
+    FieldSchema(
+      name: 'explanationMarkdown',
+      type: DataType.text,
+      nullable: true,
+    ),
   ],
   foreignKeys: [
     ForeignKeySchema(

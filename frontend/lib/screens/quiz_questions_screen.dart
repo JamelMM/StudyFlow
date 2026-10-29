@@ -24,19 +24,22 @@ class QuizQuestionsScreen extends ConsumerStatefulWidget {
 }
 
 class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
-  Future<void> _addQuestion(String markdownText) async {
+  Future<void> _addQuestion(
+    String markdownText,
+    String? explanationMarkdown,
+  ) async {
     await ref
         .read(questionsControllerProvider(widget.quiz.id))
-        .addQuestion(markdownText);
+        .addQuestion(markdownText, explanationMarkdown: explanationMarkdown);
 
     if (!mounted) {
       return;
     }
 
     ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      appSuccessSnackBar('Question successfully created'),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appSuccessSnackBar('Question successfully created'));
   }
 
   void _openAddQuestionOverlay() {
@@ -61,9 +64,9 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
     }
 
     ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      appDeleteSnackBar('Question deleted'),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appDeleteSnackBar('Question deleted'));
   }
 
   Future<bool> _confirmRemoveQuestion(Question question) async {
@@ -103,8 +106,12 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
       builder: (ctx) {
         return EditQuestion(
           question: question,
-          onUpdateQuestion: (markdownText) {
-            _updateQuestion(id: question.id, markdownText: markdownText);
+          onUpdateQuestion: (markdownText, explanationMarkdown) {
+            _updateQuestion(
+              id: question.id,
+              markdownText: markdownText,
+              explanationMarkdown: explanationMarkdown,
+            );
           },
         );
       },
@@ -114,19 +121,24 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
   Future<void> _updateQuestion({
     required String id,
     required String markdownText,
+    String? explanationMarkdown,
   }) async {
     await ref
         .read(questionsControllerProvider(widget.quiz.id))
-        .updateQuestion(id: id, markdownText: markdownText);
+        .updateQuestion(
+          id: id,
+          markdownText: markdownText,
+          explanationMarkdown: explanationMarkdown,
+        );
 
     if (!mounted) {
       return;
     }
 
     ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      appSuccessSnackBar('Question successfully updated'),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appSuccessSnackBar('Question successfully updated'));
   }
 
   @override

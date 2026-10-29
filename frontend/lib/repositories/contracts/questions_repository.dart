@@ -6,6 +6,7 @@ abstract class QuestionsRepository {
   Future<Question> addQuestion({
     required String quizId,
     required String markdownText,
+    String? explanationMarkdown,
   });
 
   Stream<List<Question>> watchQuestionsByQuizId(String quizId);
@@ -15,5 +16,6 @@ abstract class QuestionsRepository {
   Future<void> updateQuestion({
     required String id,
     required String markdownText,
+    String? explanationMarkdown,
   });
 }
