@@ -152,6 +152,7 @@ class StudySeedParser {
 
       return SeedQuestion(
         markdownText: item['markdownText'] as String,
+        explanationMarkdown: item['explanationMarkdown'] as String?,
         answerOptions: _parseAnswerOptions(item['answerOptions']),
       );
     }).toList();

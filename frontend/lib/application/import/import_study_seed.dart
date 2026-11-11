@@ -154,7 +154,8 @@ class ImportStudySeed {
         }
 
         final quiz = await _createWithRetry(
-          () => quizzesRepository.addQuiz(topicId: topic.id, name: seedQuiz.name),
+          () =>
+              quizzesRepository.addQuiz(topicId: topic.id, name: seedQuiz.name),
         );
 
         for (final seedQuestion in seedQuiz.questions) {
@@ -162,6 +163,7 @@ class ImportStudySeed {
             () => questionsRepository.addQuestion(
               quizId: quiz.id,
               markdownText: seedQuestion.markdownText,
+              explanationMarkdown: seedQuestion.explanationMarkdown,
             ),
           );
 

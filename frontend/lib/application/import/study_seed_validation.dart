@@ -128,6 +128,12 @@ class StudySeedValidation {
       return 'Question text cannot be empty in quiz "$quizName".';
     }
 
+    final explanationMarkdown = question.explanationMarkdown;
+
+    if (explanationMarkdown != null && explanationMarkdown.trim().isEmpty) {
+      return 'Question explanation cannot be empty in quiz "$quizName".';
+    }
+
     if (question.answerOptions.isEmpty) {
       return 'Every question in quiz "$quizName" needs at least one answer.';
     }

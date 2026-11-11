@@ -54,9 +54,14 @@ class SeedQuiz {
 }
 
 class SeedQuestion {
-  const SeedQuestion({required this.markdownText, required this.answerOptions});
+  const SeedQuestion({
+    required this.markdownText,
+    required this.answerOptions,
+    this.explanationMarkdown,
+  });
 
   final String markdownText;
+  final String? explanationMarkdown;
   final List<SeedAnswerOption> answerOptions;
 }
 
