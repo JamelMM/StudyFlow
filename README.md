@@ -34,7 +34,7 @@ StudyFlow/
 `-- README.md
 ```
 
-The backend is in progress and already exposes the first API endpoints. The Flutter frontend has also been started and currently provides a visual, navigable, local-first version of StudyFlow using repository contracts, Riverpod, stream-based providers, and ToStore-backed local persistence.
+The backend is in progress and already exposes the first API endpoints. The Flutter frontend currently provides a usable offline-first Study Mode and the first Exam Mode vertical slice using repository contracts, Riverpod, stream-based providers, and ToStore-backed local persistence. Practice Exam persistence is the current development focus.
 
 ---
 
@@ -104,12 +104,15 @@ Current frontend features:
 - Validate quiz readiness before starting
 - Play quizzes with visual answer feedback
 - Render quiz questions and answer options as Markdown
+- Store and display optional Markdown explanations after answering quiz questions
 - Show final quiz results with score, percentage, and retry option
+- Use quizzes without a fixed maximum question count
 - Create, edit, and delete exam sections such as AP1 or AP2
 - Create, edit, delete, and read Markdown-formatted exam tips
 - Navigate through Exam Mode tabs for tips, future practice exams, and future attempt history
 - Import structured content from pasted JSON or a selected `.json` file
 - Import exam sections and exam tips alongside Study Mode content
+- Import optional quiz question explanations while remaining compatible with older seeds
 - Reuse existing subjects, topics, and exam sections during JSON seed import
 - Local persistence with ToStore for Study Mode content, exam sections, and exam tips
 - Cascade deletion support through ToStore relationships
@@ -122,8 +125,10 @@ Current frontend features:
 - Basic navigation between screens
 - Light and dark app themes with shared color configuration
 - Responsive layouts for phone and tablet orientations
+- Custom StudyFlow launcher icon for Android, iOS, and Windows
 - Themed SnackBar feedback for local success, info, error, and delete actions
 - Reusable widgets for shared layout, list items, and empty states
+- Practice Exam models, ToStore schemas, repository contracts, and the first ToStore repository
 
 ### Frontend Structure
 
@@ -140,7 +145,7 @@ lib/controllers
 -> Riverpod controllers for user actions such as create, edit, and delete
 
 lib/models
--> Frontend data models such as Subject, Topic, StudyNote, Quiz, Question, AnswerOption, ExamSection, and ExamTip
+-> Frontend data models such as Subject, Topic, StudyNote, Quiz, Question, AnswerOption, ExamSection, ExamTip, PracticeExam, PracticeExamQuestion, and PracticeExamAnswerOption
 
 lib/providers
 -> Riverpod providers for repositories, stream-based list state, and application-level helpers
@@ -210,13 +215,13 @@ The frontend has been migrated from screen-owned list state and direct screen-le
 
 Subjects, topics, study notes, quizzes, quiz questions, and answer options now use stream-based Riverpod providers backed by ToStore watchers. Their screens observe live provider state, while controllers focus on user actions such as create, edit, and delete.
 
-The quiz area supports a first usable local quiz flow. Users can create questions, add answer options, mark the correct answer, prevent multiple correct answers for the same question, edit quiz content, validate quiz readiness before starting, start a quiz, select answers, receive visual feedback for correct and incorrect answers, and view a final result screen.
+The quiz area supports a usable local quiz flow. Users can create questions, add answer options, mark the correct answer, prevent multiple correct answers for the same question, edit quiz content, validate quiz readiness before starting, start quizzes of any length, select answers, receive visual feedback for correct and incorrect answers, read optional Markdown explanations, and view a final result screen.
 
 Study notes, quiz questions, and answer options can now be displayed with Markdown formatting. The UI also includes a mode selection screen before the study flow, a shared theme file for light and dark mode, reusable mode cards, shared button styling for form actions, and themed SnackBar helpers for consistent success, info, error, and delete feedback.
 
-The frontend JSON seed importer accepts pasted JSON and selected `.json` files. It creates Study Mode content plus Exam Mode sections and Markdown tips. Existing subjects, topics, and exam sections are reused by normalized name comparison, and local create operations are retried when ToStore temporarily needs time to refill its ID pool.
+The frontend JSON seed importer accepts pasted JSON and selected `.json` files. It creates Study Mode content, optional quiz explanations, Exam Mode sections, and Markdown tips. Existing subjects, topics, and exam sections are reused by normalized name comparison, and local create operations are retried when ToStore temporarily needs time to refill its ID pool. Import tests cover quiz questions both with and without explanations.
 
-Exam Mode now has its first functional vertical slice. Users can manage exam sections such as AP1 and AP2, open a section, and manage Markdown-formatted tips and recommendations. The Practice Exams and History tabs establish the next extension points but do not persist exams or attempts yet.
+Exam Mode now has its first functional vertical slice. Users can manage exam sections such as AP1 and AP2, open a section, and manage Markdown-formatted tips and recommendations. The Practice Exam foundation defines the domain models, relationships, cascade rules, repository contracts, and ToStore schemas. The top-level Practice Exam repository is implemented; question and answer repositories, management screens, simulation, and attempt history are still in development.
 
 Reusable empty states are shown when no local data is available. The frontend models use string-based IDs, which prepares the app for local persistence and later ASP.NET Core API integration.
 
@@ -344,12 +349,15 @@ Aktuelle Frontend-Funktionen:
 - Quiz vor dem Start validieren
 - Quizze mit richtig/falsch-Feedback spielen
 - Quizfragen und Antwortoptionen als Markdown anzeigen
+- Optionale Markdown-Erklaerungen nach der Beantwortung einer Quizfrage anzeigen
 - Ergebnisbildschirm mit Punktzahl, Prozentanzeige und Wiederholen-Option anzeigen
+- Quizze ohne feste maximale Fragenanzahl verwenden
 - Exam Sections wie AP1 oder AP2 lokal erstellen, bearbeiten und loeschen
 - Markdown-formatierte Exam Tips erstellen, lesen, bearbeiten und loeschen
 - Exam-Mode-Navigation fuer Tips sowie vorbereitete Bereiche fuer Practice Exams und Verlauf
 - Strukturierte Inhalte aus eingefuegtem JSON oder einer ausgewaehlten `.json`-Datei importieren
 - Exam Sections und Exam Tips zusammen mit Study-Mode-Inhalten importieren
+- Optionale Quiz-Erklaerungen importieren und dabei mit aelteren Seeds kompatibel bleiben
 - Vorhandene Subjects, Topics und Exam Sections beim JSON-Import wiederverwenden
 - Lokale ToStore-Persistenz fuer Study Mode, Exam Sections und Exam Tips
 - Cascade Delete ueber ToStore-Beziehungen
@@ -362,8 +370,10 @@ Aktuelle Frontend-Funktionen:
 - Einfache Navigation zwischen Screens
 - Light- und Dark-Theme mit gemeinsamer Farbkonfiguration
 - Responsive Layouts fuer Smartphone- und Tablet-Ausrichtungen
+- Eigenes StudyFlow-App-Icon fuer Android, iOS und Windows
 - Gestyltes SnackBar-Feedback fuer Success-, Info-, Error- und Delete-Aktionen
 - Wiederverwendbare Widgets fuer gemeinsames Layout, Listenelemente und Empty States
+- Practice-Exam-Modelle, ToStore-Schemas, Repository-Vertraege und das erste ToStore-Repository
 
 ### Frontend-Struktur
 
@@ -380,7 +390,7 @@ lib/controllers
 -> Riverpod-Controller fuer Benutzeraktionen wie Create, Edit und Delete
 
 lib/models
--> Frontend-Datenmodelle wie Subject, Topic, StudyNote, Quiz, Question, AnswerOption, ExamSection und ExamTip
+-> Frontend-Datenmodelle wie Subject, Topic, StudyNote, Quiz, Question, AnswerOption, ExamSection, ExamTip, PracticeExam, PracticeExamQuestion und PracticeExamAnswerOption
 
 lib/providers
 -> Riverpod-Provider fuer Repositories, stream-basierten Listen-State und Application-Level-Helfer
@@ -450,13 +460,13 @@ Das Frontend wurde fuer die wichtigsten lokalen Flows von Screen-eigenem Listen-
 
 Subjects, Topics, Study Notes, Quizze, Quiz Questions und Answer Options verwenden jetzt stream-basierte Riverpod-Provider mit ToStore-Watchern. Die Screens beobachten live den Provider-State, waehrend Controller sich auf Benutzeraktionen wie Create, Edit und Delete konzentrieren.
 
-Der Quiz-Bereich unterstuetzt jetzt einen ersten nutzbaren lokalen Quiz-Flow. Benutzer koennen Fragen erstellen, Antwortoptionen hinzufuegen, die richtige Antwort markieren, mehrere richtige Antworten pro Frage verhindern, Quiz-Inhalte bearbeiten, ein Quiz vor dem Start validieren, ein Quiz starten, Antworten auswaehlen, visuelles Feedback fuer richtige und falsche Antworten erhalten und einen Ergebnisbildschirm anzeigen.
+Der Quiz-Bereich unterstuetzt einen nutzbaren lokalen Quiz-Flow. Benutzer koennen Fragen erstellen, Antwortoptionen hinzufuegen, die richtige Antwort markieren, mehrere richtige Antworten pro Frage verhindern, Quiz-Inhalte bearbeiten, Quizze beliebiger Laenge starten, Antworten auswaehlen, visuelles Feedback erhalten, optionale Markdown-Erklaerungen lesen und einen Ergebnisbildschirm anzeigen.
 
 Study Notes, Quizfragen und Antwortoptionen koennen jetzt mit Markdown-Formatierung angezeigt werden. Die UI enthaelt ausserdem eine Modus-Auswahl vor dem Study Flow, eine gemeinsame Theme-Datei fuer Light Mode und Dark Mode, wiederverwendbare Mode Cards, gemeinsames Button-Styling fuer Formularaktionen und gestylte SnackBar-Helfer fuer konsistentes Success-, Info-, Error- und Delete-Feedback.
 
-Der JSON-Seed-Import akzeptiert eingefuegtes JSON und ausgewaehlte `.json`-Dateien. Neben Study-Mode-Inhalten koennen Exam Sections und Markdown-formatierte Exam Tips erstellt werden. Vorhandene Subjects, Topics und Exam Sections werden ueber normalisierte Namensvergleiche wiederverwendet. Erstellungsoperationen werden wiederholt, wenn der lokale ToStore-ID-Pool kurzzeitig noch nicht bereit ist.
+Der JSON-Seed-Import akzeptiert eingefuegtes JSON und ausgewaehlte `.json`-Dateien. Neben Study-Mode-Inhalten und optionalen Quiz-Erklaerungen koennen Exam Sections und Markdown-formatierte Exam Tips erstellt werden. Vorhandene Subjects, Topics und Exam Sections werden ueber normalisierte Namensvergleiche wiederverwendet. Erstellungsoperationen werden wiederholt, wenn der lokale ToStore-ID-Pool kurzzeitig noch nicht bereit ist. Import-Tests decken Quizfragen mit und ohne Erklaerung ab.
 
-Exam Mode besitzt jetzt einen ersten funktionalen Vertical Slice. Benutzer koennen Exam Sections wie AP1 und AP2 verwalten, eine Section oeffnen und Markdown-formatierte Tipps und Empfehlungen pflegen. Practice Exams und History sind als naechste Erweiterungspunkte vorbereitet, speichern aber noch keine Pruefungen oder Versuche.
+Exam Mode besitzt einen ersten funktionalen Vertical Slice. Benutzer koennen Exam Sections wie AP1 und AP2 verwalten, eine Section oeffnen und Markdown-formatierte Tipps und Empfehlungen pflegen. Als Grundlage fuer Practice Exams existieren bereits Domain-Modelle, Beziehungen, Cascade-Regeln, Repository-Vertraege und ToStore-Schemas. Das Repository fuer Practice Exams ist implementiert; Repositories fuer Fragen und Antworten, Verwaltungs-Screens, Simulation und Versuchshistorie sind noch in Entwicklung.
 
 Wiederverwendbare Empty States werden angezeigt, wenn keine lokalen Daten vorhanden sind. Die Frontend-Modelle verwenden String-basierte IDs. Dadurch wird die App auf lokale Persistenz und eine spaetere ASP.NET Core API-Anbindung vorbereitet.
 

@@ -2,9 +2,11 @@
 
 This folder contains the Flutter frontend for StudyFlow.
 
-The current frontend is a local-first prototype. It uses repository contracts with ToStore-backed local persistence and is not connected to the ASP.NET Core backend yet.
+The current frontend is an offline-first Flutter application under active development. It uses repository contracts with ToStore-backed local persistence and is not connected to the ASP.NET Core backend yet.
 
-The app uses Riverpod providers and controllers for its local-first study, quiz, and exam preparation flows. Riverpod handles asynchronous access to local entities, quiz validation, quiz play data loading, and JSON seed import. The UI includes Study Mode, the first functional Exam Mode screens, Markdown rendering, responsive layouts, and light/dark theme support.
+The app uses Riverpod providers and controllers for its local-first study, quiz, and exam preparation flows. Riverpod handles asynchronous access to local entities, quiz validation, quiz play data loading, and JSON seed import. The UI includes a usable Study Mode, the first functional Exam Mode screens, Markdown explanations, responsive layouts, light/dark themes, and a custom launcher icon.
+
+## English
 
 ## Current Features
 
@@ -25,12 +27,15 @@ The app uses Riverpod providers and controllers for its local-first study, quiz,
 - Randomize quiz questions and answer options during quiz play
 - Render quiz questions and answer options as Markdown
 - Show visual feedback for correct and incorrect quiz answers
+- Show optional Markdown explanations after answering quiz questions
 - View final quiz results with score, percentage, and retry option
+- Use quizzes without a fixed maximum question count
 - Create, edit, and delete exam sections such as AP1 or AP2
 - Open an exam section with Tips, Exams, and History tabs
 - Create, edit, delete, and read Markdown-formatted exam tips locally
 - Import structured content from pasted JSON or a selected `.json` file
 - Import subjects, topics, notes, quizzes, exam sections, and exam tips
+- Import optional quiz question explanations while remaining compatible with older seeds
 - Reuse existing subjects, topics, and exam sections during JSON seed import
 - ToStore-backed local persistence for Study Mode and the current Exam Mode entities
 - Cascade deletion support through ToStore relationships
@@ -42,8 +47,11 @@ The app uses Riverpod providers and controllers for its local-first study, quiz,
 - String-based IDs prepared for ToStore and backend integration
 - Basic Material Design UI
 - Custom light and dark color schemes
+- Responsive layouts for phones and tablets in portrait and landscape
+- Custom StudyFlow launcher icon for Android, iOS, and Windows
 - Reusable mode card, list item, form button, SnackBar, and empty state widgets
 - Themed SnackBar feedback for local success, info, error, and delete actions
+- Practice Exam models, relationships, repository contracts, ToStore schemas, and the first ToStore repository
 
 ## Screenshots
 
@@ -139,7 +147,10 @@ frontend/
 |   |   |-- study_note.dart
 |   |   |-- quiz.dart
 |   |   |-- question.dart
-|   |   `-- answer_option.dart
+|   |   |-- answer_option.dart
+|   |   |-- practice_exam.dart
+|   |   |-- practice_exam_question.dart
+|   |   `-- practice_exam_answer_option.dart
 |   |-- providers/
 |   |   |-- answer_options_repository_provider.dart
 |   |   |-- answer_options_stream_provider.dart
@@ -206,15 +217,17 @@ flutter run
 ## JSON Seed Import
 
 StudyFlow accepts pasted JSON and `.json` files. A seed can contain Study Mode
-content, Exam Mode sections, or both. Existing subjects, topics, and exam
-sections are reused when their normalized names match.
+content, optional quiz question explanations, Exam Mode sections, or a
+combination of them. Existing subjects, topics, and exam sections are reused
+when their normalized names match.
 
 - [JSON seed format](docs/json-seed-template.md)
 - [Exam Mode seed example](docs/exam-seed-example.json)
 
 Study notes, quizzes, questions, answer options, and exam tips are added as new
-content when a seed is imported again. Import rollback and Practice Exam import
-are not implemented yet.
+content when a seed is imported again. Import tests cover questions with and
+without explanations. Import rollback and Practice Exam import are not
+implemented yet.
 
 # Current Status
 
@@ -226,28 +239,100 @@ Subjects, topics, study notes, quizzes, questions, answer options, quiz validati
 
 The app now supports local create, edit, and delete flows for the main study entities: subjects, topics, study notes, quiz questions, and answer options. Larger deletion flows, such as subjects and topics, use confirmation dialogs because related data can be removed through ToStore cascade relationships.
 
-The quiz area has a first usable local flow. Users can create quiz questions, add answer options, mark correct answers, prevent multiple correct answers for the same question, edit quiz content, validate quiz readiness before starting, play quizzes with randomized questions and answer options, receive visual feedback for correct and incorrect answers, and view a final result screen with score and percentage.
+The quiz area has a usable local flow. Users can create quiz questions, add answer options, mark correct answers, prevent multiple correct answers for the same question, edit quiz content, validate quiz readiness before starting, play quizzes of any length with randomized questions and answer options, receive visual feedback, read optional Markdown explanations, and view a final result screen with score and percentage.
 
-Study notes, quiz questions, and answer options are rendered as Markdown when shown to the user. This keeps generated JSON seed content readable when it includes bullets, emphasis, short explanations, or simple structured text.
+Study notes, quiz questions, answer options, and question explanations are rendered as Markdown when shown to the user. This keeps generated JSON seed content readable when it includes bullets, emphasis, explanations, or simple structured text.
 
-The UI has a dedicated mode selection screen after the start screen. Study Mode opens the subject/topic/note/quiz flow. Exam Mode opens locally persisted exam sections and provides a section detail screen with Tips, Exams, and History destinations. Tips are functional and support Markdown; Practice Exams and History are placeholders for the next development stage. JSON seed import is available from the mode selection area.
+The UI has a dedicated mode selection screen after the start screen. Study Mode opens the subject/topic/note/quiz flow. Exam Mode opens locally persisted exam sections and provides a section detail screen with Tips, Exams, and History destinations. Tips are functional and support Markdown. The Practice Exam foundation now contains its models, relationships, repository contracts, ToStore schemas, and top-level ToStore repository. Question and answer repositories, screens, simulation, and History remain under development. JSON seed import is available from the mode selection area.
 
 Light and dark themes are configured in `lib/theme/app_theme.dart`. Shared UI helpers keep repeated styling consistent, including mode cards, primary form button styling, and success/info/error/delete SnackBars.
 
-The JSON seed import flow accepts pasted JSON and `.json` files through the platform file selector. It can create Study Mode content as well as exam sections and exam tips. Existing subjects, topics, and exam sections are reused by normalized name comparison. The importer validates the seed and retries local creation operations to tolerate temporary ToStore ID-pool delays.
+The JSON seed import flow accepts pasted JSON and `.json` files through the platform file selector. It can create Study Mode content, optional quiz explanations, exam sections, and exam tips. Existing subjects, topics, and exam sections are reused by normalized name comparison. The importer validates the seed and retries local creation operations to tolerate temporary ToStore ID-pool delays. Focused tests verify compatibility with questions both with and without explanations.
 
 The frontend models use string-based IDs to prepare the app for local persistence and later backend synchronization.
 
-The next major work is completing Exam Mode with Practice Exams, answer explanations, persisted attempts, and a useful history view.
+The next major work is completing the remaining Practice Exam repositories and management screens, simulation, persisted attempts, and a useful history view.
 
 ## Next Steps
 
-- Review and reorganize the growing codebase by feature
-- Centralize navigation before adding more Exam Mode screens
-- Add Practice Exam models, persistence, management, and simulation
-- Add a Markdown explanation to every Practice Exam answer
+- Implement the remaining ToStore repositories for Practice Exam questions and answers
+- Add providers, controllers, management screens, and validation
+- Add Practice Exam simulation with Markdown explanations
 - Persist exam attempts and show basic result history
 - Extend JSON seeds with Practice Exams and answer explanations
-- Add mixed Study Mode tests across all topics in a subject
-- Add an application icon and complete release testing
+- Add focused tests for Practice Exam persistence and validation
+- Complete release testing on phone and tablet
 - Add JSON export, backend integration, and synchronization after V1
+
+---
+
+## Deutsch
+
+### Aktuelle Funktionen
+
+- Offline-first Study Mode mit Subjects, Topics und Markdown Study Notes
+- Lokales Erstellen, Bearbeiten und Loeschen von Lerninhalten
+- Quizze mit beliebig vielen Fragen und zufaelliger Reihenfolge
+- Markdown fuer Fragen, Antwortoptionen und optionale Erklaerungen
+- Visuelles Feedback sowie Ergebnisanzeige mit Punktzahl und Prozentwert
+- Exam Sections fuer Bereiche wie AP1 und AP2
+- Lokal persistierte Exam Tips mit Markdown-Unterstuetzung
+- JSON-Import ueber Text oder Dateiauswahl
+- Import von Quiz-Erklaerungen mit Kompatibilitaet zu aelteren Seeds
+- ToStore-Persistenz mit Foreign Keys und Cascade Delete
+- Riverpod-Provider, StreamProvider und Controller fuer lokale Flows
+- Responsive Layouts fuer Smartphone und Tablet in Hoch- und Querformat
+- Gemeinsames Light Theme und Dark Theme
+- Eigenes StudyFlow-App-Icon fuer Android, iOS und Windows
+- Practice-Exam-Modelle, Repository-Vertraege, ToStore-Schemas und das erste ToStore-Repository
+
+### App-Ablauf
+
+```text
+StartScreen
+-> ModeSelectionScreen
+   -> Study Mode
+      -> Subjects -> Topics -> Notes oder Quiz
+   -> Exam Mode
+      -> Exam Sections
+         -> Tips (nutzbar)
+         -> Practice Exams (in Entwicklung)
+         -> History (geplant)
+```
+
+### Aktueller Stand
+
+Das Frontend funktioniert ohne Backend und speichert seine Daten lokal mit
+ToStore. Die Screens greifen ueber Repository-Vertraege auf Daten zu. Riverpod
+stellt Repositories, Live-Listen und Controller bereit, sodass die UI nicht
+direkt von der Persistenzimplementierung abhaengt.
+
+Study Mode ist bereits als nutzbarer Offline-Flow vorhanden. Quizfragen koennen
+optionale Markdown-Erklaerungen enthalten, die nach der Beantwortung angezeigt
+werden. Der JSON-Importer verarbeitet Fragen mit und ohne Erklaerung; gezielte
+Tests pruefen beide Varianten.
+
+Exam Mode unterstuetzt aktuell Exam Sections und Markdown Tips. Fuer Practice
+Exams existieren bereits `PracticeExam`, `PracticeExamQuestion` und
+`PracticeExamAnswerOption` sowie Beziehungen, Cascade-Regeln,
+Repository-Vertraege und ToStore-Schemas. Das ToStore-Repository fuer
+Practice Exams ist implementiert. Repositories fuer Fragen und Antworten, UI,
+Simulation und Versuchshistorie sind noch nicht als fertige Funktion verfuegbar.
+
+### Naechste Schritte
+
+- ToStore-Repositories fuer Practice-Exam-Fragen und -Antworten
+- Provider, Controller und CRUD-Screens
+- Validierung: mindestens vier Optionen und genau eine richtige Antwort
+- Exam-Simulation mit Erklaerungen und Ergebnisanzeige
+- Persistierte Versuche und History
+- Practice Exams im JSON-Import
+- Tests und Release-Pruefung auf Smartphone und Tablet
+
+### Lokal ausfuehren
+
+```powershell
+flutter pub get
+flutter analyze
+flutter run
+```
