@@ -31,9 +31,7 @@ class ToStorePracticeExamsRepository implements PracticeExamsRepository {
     final result = await StudyFlowDatabase.db.query(_tableName);
 
     return result.data
-        .where(
-          (row) => row['examSectionId'].toString() == examSectionId,
-        )
+        .where((row) => row['examSectionId'].toString() == examSectionId)
         .map(_mapRow)
         .toList();
   }
@@ -44,9 +42,7 @@ class ToStorePracticeExamsRepository implements PracticeExamsRepository {
   ) {
     return StudyFlowDatabase.db.query(_tableName).watch().map((rows) {
       return rows
-          .where(
-            (row) => row['examSectionId'].toString() == examSectionId,
-          )
+          .where((row) => row['examSectionId'].toString() == examSectionId)
           .map(_mapRow)
           .toList();
     });
