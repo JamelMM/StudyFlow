@@ -5,6 +5,9 @@ import 'package:frontend/models/exam_section.dart';
 import 'package:frontend/screens/exam_tip_form.dart';
 import 'package:frontend/screens/exam_tips_screen.dart';
 import 'package:frontend/widgets/app_snack_bar.dart';
+import 'package:frontend/controllers/practice_exams_controller.dart';
+import 'package:frontend/screens/practice_exam_form.dart';
+import 'package:frontend/screens/practice_exams_screen.dart';
 
 class ExamSectionDetailScreen extends ConsumerStatefulWidget {
   const ExamSectionDetailScreen({super.key, required this.examSection});
@@ -56,6 +59,46 @@ class _ExamSectionDetailScreenState
       ..showSnackBar(snackBar);
   }
 
+  void _openAddPracticeExamOverlay() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
+      builder: (context) => PracticeExamForm(onSubmit: _addPracticeExam),
+    );
+  }
+
+  Future<bool> _addPracticeExam(
+    String name,
+    int passingPercentage,
+    int? durationMinutes,
+  ) async {
+    try {
+      await ref
+          .read(practiceExamsControllerProvider(widget.examSection.id))
+          .addPracticeExam(
+            name: name,
+            passingPercentage: passingPercentage,
+            durationMinutes: durationMinutes,
+          );
+
+      if (!mounted) {
+        return false;
+      }
+
+      _showSnackBar(appSuccessSnackBar('Practice exam successfully created'));
+
+      return true;
+    } catch (_) {
+      if (mounted) {
+        _showSnackBar(appErrorSnackBar('Could not create practice exam.'));
+      }
+
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final pages = <Widget>[
@@ -63,10 +106,9 @@ class _ExamSectionDetailScreenState
         examSection: widget.examSection,
         onAddTipPressed: _openAddExamTipOverlay,
       ),
-      const _ExamAreaEmptyState(
-        icon: Icons.assignment_outlined,
-        title: 'No practice exams yet.',
-        message: 'Practice exams for this section will appear here.',
+      PracticeExamsScreen(
+        examSection: widget.examSection,
+        onAddExamPressed: _openAddPracticeExamOverlay,
       ),
       const _ExamAreaEmptyState(
         icon: Icons.history,
@@ -83,6 +125,12 @@ class _ExamSectionDetailScreenState
             IconButton(
               tooltip: 'Add tip',
               onPressed: _openAddExamTipOverlay,
+              icon: const Icon(Icons.add),
+            ),
+          if (_selectedPageIndex == 1)
+            IconButton(
+              tooltip: 'Add practice exam',
+              onPressed: _openAddPracticeExamOverlay,
               icon: const Icon(Icons.add),
             ),
         ],
@@ -104,10 +152,7 @@ class _ExamSectionDetailScreenState
             icon: Icon(Icons.assignment_outlined),
             label: 'Exams',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'History',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
         ],
       ),
     );
