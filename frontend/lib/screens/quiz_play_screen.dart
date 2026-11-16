@@ -95,7 +95,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
             final questionCard = Card(
               color: appBarTheme.backgroundColor ?? colorScheme.primary,
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 child: MarkdownBody(
                   data: currentQuestion.markdownText,
                   styleSheet: MarkdownStyleSheet(
@@ -111,6 +111,8 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
               ),
             );
             final answers = ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: currentAnswerOptions.length,
               itemBuilder: (context, index) {
                 final answerOption = currentAnswerOptions[index];
@@ -142,6 +144,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                 return Card(
                   color: cardColor,
                   child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                     leading: Icon(
                       _hasAnswered && isCorrect
                           ? Icons.check_circle
@@ -185,55 +188,97 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                     ),
                   )
                 : const SizedBox.shrink();
+            final hasExplanation =
+                explanationMarkdown != null && explanationMarkdown.isNotEmpty;
+            final feedbackSection = Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (hasExplanation) ...[
+                  QuestionExplanationCard(
+                    explanationMarkdown: explanationMarkdown,
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                SafeArea(
+                  top: false,
+                  left: false,
+                  right: false,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: nextButton,
+                  ),
+                ),
+              ],
+            );
 
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Question ${_currentQuestionIndex + 1} of ${quizPlayData.questions.length}',
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  Expanded(
-                    child: isWide
-                        ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(child: questionCard),
-                              const SizedBox(width: 24),
-                              Expanded(child: answers),
-                            ],
-                          )
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              questionCard,
-                              const SizedBox(height: 24),
-                              Expanded(child: answers),
-                            ],
+            if (MediaQuery.orientationOf(context) == Orientation.portrait) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            'Question ${_currentQuestionIndex + 1} of ${quizPlayData.questions.length}',
+                            textAlign: TextAlign.center,
                           ),
-                  ),
-                  if (_hasAnswered &&
-                      explanationMarkdown != null &&
-                      explanationMarkdown.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    QuestionExplanationCard(
-                      explanationMarkdown: explanationMarkdown,
-                    ),
-                  ],
-                  if (_hasAnswered) ...[
-                    const SizedBox(height: 12),
-                    SafeArea(
-                      top: false,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: nextButton,
+                          const SizedBox(height: 16),
+                          questionCard,
+                          const SizedBox(height: 16),
+                          answers,
+                        ],
                       ),
                     ),
+                    if (_hasAnswered)
+                      SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const SizedBox(height: 12),
+                            feedbackSection,
+                          ],
+                        ),
+                      ),
                   ],
-                ],
+                ),
+              );
+            }
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Question ${_currentQuestionIndex + 1} of ${quizPlayData.questions.length}',
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    if (isWide)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: questionCard),
+                          const SizedBox(width: 16),
+                          Expanded(child: answers),
+                        ],
+                      )
+                    else ...[
+                      questionCard,
+                      const SizedBox(height: 16),
+                      answers,
+                    ],
+                    if (_hasAnswered) ...[
+                      const SizedBox(height: 12),
+                      feedbackSection,
+                    ],
+                  ],
+                ),
               ),
             );
           },
@@ -243,7 +288,15 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.quiz.name)),
-      body: ResponsiveContent(maxWidth: 1100, child: mainContent),
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        child: ResponsiveContent(
+          maxWidth: 1100,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: mainContent,
+        ),
+      ),
     );
   }
 }

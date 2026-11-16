@@ -100,7 +100,12 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
             final isWide = ResponsiveBreakpoints.isTabletOrWider(
               constraints.maxWidth,
             );
-            final cardHeight = isWide ? 320.0 : 360.0;
+            final isCompactHeight = constraints.maxHeight < 360;
+            final cardHeight = isCompactHeight
+                ? constraints.maxHeight
+                : isWide
+                ? 320.0
+                : 360.0;
             final card = SizedBox(
               width: double.infinity,
               height: cardHeight,
@@ -111,17 +116,23 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(isCompactHeight ? 12 : 16),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.quiz, size: 80, color: quizContentColor),
-                      const SizedBox(height: 48),
+                      Icon(
+                        Icons.quiz,
+                        size: isCompactHeight ? 56 : 80,
+                        color: quizContentColor,
+                      ),
+                      SizedBox(height: isCompactHeight ? 16 : 48),
                       Text(
                         quiz.name,
                         textAlign: TextAlign.center,
+                        maxLines: isCompactHeight ? 3 : 4,
+                        overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.inter(
-                          fontSize: 20,
+                          fontSize: isCompactHeight ? 18 : 20,
                           fontWeight: FontWeight.bold,
                           color: quizContentColor,
                         ),
