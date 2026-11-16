@@ -37,42 +37,65 @@ class _StartScreenState extends State<StartScreen> {
         : appBarTheme.backgroundColor ?? colorScheme.onPrimaryContainer;
 
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'StudyFlow',
-              style: GoogleFonts.inter(
-                fontSize: 48,
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isCompact = constraints.maxHeight < 500;
+          final minimumHeight = constraints.maxHeight > 32
+              ? constraints.maxHeight - 32
+              : 0.0;
+          final minimumWidth = constraints.maxWidth > 32
+              ? constraints.maxWidth - 32
+              : 0.0;
+          final logoSize = isCompact ? 96.0 : 140.0;
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: minimumHeight,
+                minWidth: minimumWidth,
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'StudyFlow',
+                      style: GoogleFonts.inter(
+                        fontSize: isCompact ? 34 : 48,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                    SizedBox(height: isCompact ? 24 : 80),
+                    Container(
+                      width: logoSize,
+                      height: logoSize,
+                      decoration: BoxDecoration(
+                        color: logoBackgroundColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.auto_stories,
+                        size: isCompact ? 84 : 126,
+                        color: logoColor,
+                      ),
+                    ),
+                    SizedBox(height: isCompact ? 24 : 100),
+                    Text(
+                      'Learn. Organize. Remember.',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 16,
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 80),
-            Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                color: logoBackgroundColor,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.auto_stories,
-                size: 126,
-                color: logoColor,
-              ),
-            ),
-            const SizedBox(height: 100),
-            Text(
-              "Learn. Organize. Remember.",
-              style: GoogleFonts.inter(
-                fontSize: 16,
-                color: colorScheme.onSurface,
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
