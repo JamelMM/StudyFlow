@@ -5,6 +5,7 @@ import 'package:frontend/models/exam_section.dart';
 import 'package:frontend/models/practice_exam.dart';
 import 'package:frontend/providers/practice_exams_stream_provider.dart';
 import 'package:frontend/screens/practice_exam_form.dart';
+import 'package:frontend/screens/practice_exam_questions_screen.dart';
 import 'package:frontend/widgets/app_snack_bar.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/widgets/responsive_layout.dart';
@@ -169,9 +170,20 @@ class _PracticeExamsScreenState extends ConsumerState<PracticeExamsScreen> {
                     : '${practiceExam.durationMinutes} min';
 
                 return Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PracticeExamQuestionsScreen(
+                            practiceExam: practiceExam,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
                       children: [
                         const Icon(Icons.assignment_outlined),
                         const SizedBox(width: 12),
@@ -214,6 +226,7 @@ class _PracticeExamsScreenState extends ConsumerState<PracticeExamsScreen> {
                           ],
                         ),
                       ],
+                      ),
                     ),
                   ),
                 );
