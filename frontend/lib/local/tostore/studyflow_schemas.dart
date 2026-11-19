@@ -217,6 +217,7 @@ final practiceExamQuestionSchema = TableSchema(
   ),
   fields: [
     FieldSchema(name: 'practiceExamId', type: DataType.text, nullable: false),
+    FieldSchema(name: 'topicId', type: DataType.text, nullable: true),
     FieldSchema(name: 'markdownText', type: DataType.text, nullable: false),
     FieldSchema(name: 'createdAt', type: DataType.text, nullable: false),
     FieldSchema(name: 'updatedAt', type: DataType.text, nullable: true),
@@ -233,6 +234,14 @@ final practiceExamQuestionSchema = TableSchema(
       referencedTable: 'practice_exams',
       referencedFields: ['id'],
       onDelete: ForeignKeyCascadeAction.cascade,
+      onUpdate: ForeignKeyCascadeAction.cascade,
+    ),
+    ForeignKeySchema(
+      name: 'fk_practice_exam_questions_topic',
+      fields: ['topicId'],
+      referencedTable: 'topics',
+      referencedFields: ['id'],
+      onDelete: ForeignKeyCascadeAction.setNull,
       onUpdate: ForeignKeyCascadeAction.cascade,
     ),
   ],

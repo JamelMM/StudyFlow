@@ -28,11 +28,13 @@ class PracticeExamQuestionsController {
 
   Future<void> addQuestion({
     required String markdownText,
+    String? topicId,
     String? explanationMarkdown,
   }) async {
     await practiceExamQuestionsRepository.addQuestion(
       practiceExamId: practiceExamId,
       markdownText: markdownText,
+      topicId: topicId,
       explanationMarkdown: explanationMarkdown,
     );
   }
@@ -40,11 +42,13 @@ class PracticeExamQuestionsController {
   Future<void> updateQuestion({
     required String id,
     required String markdownText,
+    String? topicId,
     String? explanationMarkdown,
   }) async {
     await practiceExamQuestionsRepository.updateQuestion(
       id: id,
       markdownText: markdownText,
+      topicId: topicId,
       explanationMarkdown: explanationMarkdown,
     );
   }

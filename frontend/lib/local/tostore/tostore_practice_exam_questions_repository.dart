@@ -12,6 +12,7 @@ class ToStorePracticeExamQuestionsRepository
     return PracticeExamQuestion(
       id: row['id'].toString(),
       practiceExamId: row['practiceExamId'].toString(),
+      topicId: row['topicId']?.toString(),
       markdownText: row['markdownText'].toString(),
       explanationMarkdown: row['explanationMarkdown']?.toString(),
       createdAt: DateTime.parse(row['createdAt'].toString()),
@@ -49,12 +50,14 @@ class ToStorePracticeExamQuestionsRepository
   Future<PracticeExamQuestion> addQuestion({
     required String practiceExamId,
     required String markdownText,
+    String? topicId,
     String? explanationMarkdown,
   }) async {
     final createdAt = DateTime.now();
 
     final result = await StudyFlowDatabase.db.insert(_tableName, {
       'practiceExamId': practiceExamId,
+      'topicId': topicId,
       'markdownText': markdownText,
       'explanationMarkdown': explanationMarkdown,
       'createdAt': createdAt.toIso8601String(),
@@ -68,6 +71,7 @@ class ToStorePracticeExamQuestionsRepository
     return PracticeExamQuestion(
       id: result.firstPrimaryKey.toString(),
       practiceExamId: practiceExamId,
+      topicId: topicId,
       markdownText: markdownText,
       explanationMarkdown: explanationMarkdown,
       createdAt: createdAt,
@@ -78,10 +82,12 @@ class ToStorePracticeExamQuestionsRepository
   Future<void> updateQuestion({
     required String id,
     required String markdownText,
+    String? topicId,
     String? explanationMarkdown,
   }) async {
     final result = await StudyFlowDatabase.db
         .update(_tableName, {
+          'topicId': topicId,
           'markdownText': markdownText,
           'explanationMarkdown': explanationMarkdown,
           'updatedAt': DateTime.now().toIso8601String(),

@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/practice_exam_question.dart';
+import 'package:frontend/providers/practice_exam_topic_options_provider.dart';
 import 'package:frontend/widgets/app_button_styles.dart';
 
 class PracticeExamQuestionForm extends StatefulWidget {
   const PracticeExamQuestionForm({
     super.key,
     this.question,
+    required this.topicOptions,
     required this.onSubmit,
   });
 
   final PracticeExamQuestion? question;
-  final Future<bool> Function(String markdownText, String? explanationMarkdown)
+  final List<PracticeExamTopicOption> topicOptions;
+  final Future<bool> Function(
+    String markdownText,
+    String? explanationMarkdown,
+    String? topicId,
+  )
   onSubmit;
 
   @override
@@ -23,6 +30,7 @@ class _PracticeExamQuestionFormState extends State<PracticeExamQuestionForm> {
 
   late final TextEditingController _markdownTextController;
   late final TextEditingController _explanationMarkdownController;
+  String? _selectedTopicId;
 
   bool _isSaving = false;
 
@@ -36,6 +44,7 @@ class _PracticeExamQuestionFormState extends State<PracticeExamQuestionForm> {
     _explanationMarkdownController = TextEditingController(
       text: widget.question?.explanationMarkdown ?? '',
     );
+    _selectedTopicId = widget.question?.topicId;
   }
 
   @override
@@ -67,6 +76,7 @@ class _PracticeExamQuestionFormState extends State<PracticeExamQuestionForm> {
       final wasSaved = await widget.onSubmit(
         markdownText,
         explanationText.isEmpty ? null : explanationText,
+        _selectedTopicId,
       );
 
       if (mounted && wasSaved) {
@@ -112,6 +122,39 @@ class _PracticeExamQuestionFormState extends State<PracticeExamQuestionForm> {
 
                 return null;
               },
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              initialValue: _selectedTopicId ?? '',
+              isExpanded: true,
+              decoration: const InputDecoration(
+                labelText: 'Topic',
+                helperText: 'Optional',
+              ),
+              items: [
+                const DropdownMenuItem(
+                  value: '',
+                  child: Text('No topic'),
+                ),
+                ...widget.topicOptions.map(
+                  (option) => DropdownMenuItem(
+                    value: option.topicId,
+                    child: Text(
+                      option.label,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ],
+              onChanged: _isSaving
+                  ? null
+                  : (value) {
+                      setState(() {
+                        _selectedTopicId = value == null || value.isEmpty
+                            ? null
+                            : value;
+                      });
+                    },
             ),
             const SizedBox(height: 16),
             TextFormField(

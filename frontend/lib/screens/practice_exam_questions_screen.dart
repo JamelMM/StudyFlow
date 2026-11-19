@@ -5,6 +5,7 @@ import 'package:frontend/controllers/practice_exam_questions_controller.dart';
 import 'package:frontend/models/practice_exam.dart';
 import 'package:frontend/models/practice_exam_question.dart';
 import 'package:frontend/providers/practice_exam_questions_stream_provider.dart';
+import 'package:frontend/providers/practice_exam_topic_options_provider.dart';
 import 'package:frontend/screens/practice_exam_question_form.dart';
 import 'package:frontend/widgets/app_snack_bar.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
@@ -32,15 +33,32 @@ class _PracticeExamQuestionsScreenState
       ..showSnackBar(snackBar);
   }
 
-  void _openAddQuestionOverlay() {
-    _openQuestionOverlay();
+  Future<void> _openAddQuestionOverlay() async {
+    await _openQuestionOverlay();
   }
 
-  void _openEditQuestionOverlay(PracticeExamQuestion question) {
-    _openQuestionOverlay(question: question);
+  Future<void> _openEditQuestionOverlay(
+    PracticeExamQuestion question,
+  ) async {
+    await _openQuestionOverlay(question: question);
   }
 
-  void _openQuestionOverlay({PracticeExamQuestion? question}) {
+  Future<void> _openQuestionOverlay({PracticeExamQuestion? question}) async {
+    List<PracticeExamTopicOption> topicOptions;
+
+    try {
+      topicOptions = await ref.read(practiceExamTopicOptionsProvider.future);
+    } catch (_) {
+      if (mounted) {
+        _showSnackBar(appErrorSnackBar('Could not load topics.'));
+      }
+      return;
+    }
+
+    if (!mounted) {
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -48,11 +66,13 @@ class _PracticeExamQuestionsScreenState
       constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
       builder: (context) => PracticeExamQuestionForm(
         question: question,
-        onSubmit: (markdownText, explanationMarkdown) {
+        topicOptions: topicOptions,
+        onSubmit: (markdownText, explanationMarkdown, topicId) {
           if (question == null) {
             return _addQuestion(
               markdownText: markdownText,
               explanationMarkdown: explanationMarkdown,
+              topicId: topicId,
             );
           }
 
@@ -60,6 +80,7 @@ class _PracticeExamQuestionsScreenState
             question: question,
             markdownText: markdownText,
             explanationMarkdown: explanationMarkdown,
+            topicId: topicId,
           );
         },
       ),
@@ -69,6 +90,7 @@ class _PracticeExamQuestionsScreenState
   Future<bool> _addQuestion({
     required String markdownText,
     String? explanationMarkdown,
+    String? topicId,
   }) async {
     try {
       await ref
@@ -76,6 +98,7 @@ class _PracticeExamQuestionsScreenState
           .addQuestion(
             markdownText: markdownText,
             explanationMarkdown: explanationMarkdown,
+            topicId: topicId,
           );
 
       if (!mounted) {
@@ -97,6 +120,7 @@ class _PracticeExamQuestionsScreenState
     required PracticeExamQuestion question,
     required String markdownText,
     String? explanationMarkdown,
+    String? topicId,
   }) async {
     try {
       await ref
@@ -105,6 +129,7 @@ class _PracticeExamQuestionsScreenState
             id: question.id,
             markdownText: markdownText,
             explanationMarkdown: explanationMarkdown,
+            topicId: topicId,
           );
 
       if (!mounted) {
@@ -166,6 +191,11 @@ class _PracticeExamQuestionsScreenState
 
   @override
   Widget build(BuildContext context) {
+    final topicOptions = ref.watch(practiceExamTopicOptionsProvider).when(
+      data: (options) => options,
+      loading: () => const <PracticeExamTopicOption>[],
+      error: (error, stackTrace) => const <PracticeExamTopicOption>[],
+    );
     final questionsAsync = ref.watch(
       practiceExamQuestionsStreamProvider(widget.practiceExam.id),
     );
@@ -190,6 +220,10 @@ class _PracticeExamQuestionsScreenState
           itemCount: questions.length,
           itemBuilder: (context, index) {
             final question = questions[index];
+            final topicLabel = _findTopicLabel(
+              topicOptions,
+              question.topicId,
+            );
 
             return Card(
               child: Padding(
@@ -207,6 +241,23 @@ class _PracticeExamQuestionsScreenState
                           ),
                           const SizedBox(height: 8),
                           MarkdownBody(data: question.markdownText),
+                          if (topicLabel != null) ...[
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                const Icon(Icons.topic_outlined, size: 16),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    topicLabel,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                           if (question.explanationMarkdown != null) ...[
                             const SizedBox(height: 8),
                             Row(
@@ -281,5 +332,22 @@ class _PracticeExamQuestionsScreenState
         ),
       ),
     );
+  }
+
+  String? _findTopicLabel(
+    List<PracticeExamTopicOption> options,
+    String? topicId,
+  ) {
+    if (topicId == null) {
+      return null;
+    }
+
+    for (final option in options) {
+      if (option.topicId == topicId) {
+        return option.label;
+      }
+    }
+
+    return null;
   }
 }
