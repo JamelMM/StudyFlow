@@ -236,14 +236,6 @@ final practiceExamQuestionSchema = TableSchema(
       onDelete: ForeignKeyCascadeAction.cascade,
       onUpdate: ForeignKeyCascadeAction.cascade,
     ),
-    ForeignKeySchema(
-      name: 'fk_practice_exam_questions_topic',
-      fields: ['topicId'],
-      referencedTable: 'topics',
-      referencedFields: ['id'],
-      onDelete: ForeignKeyCascadeAction.setNull,
-      onUpdate: ForeignKeyCascadeAction.cascade,
-    ),
   ],
 );
 

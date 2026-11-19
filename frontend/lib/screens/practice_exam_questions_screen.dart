@@ -7,16 +7,14 @@ import 'package:frontend/models/practice_exam_question.dart';
 import 'package:frontend/providers/practice_exam_questions_stream_provider.dart';
 import 'package:frontend/providers/practice_exam_topic_options_provider.dart';
 import 'package:frontend/screens/practice_exam_question_form.dart';
+import 'package:frontend/screens/practice_exam_question_detail_screen.dart';
 import 'package:frontend/widgets/app_snack_bar.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/widgets/responsive_layout.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class PracticeExamQuestionsScreen extends ConsumerStatefulWidget {
-  const PracticeExamQuestionsScreen({
-    super.key,
-    required this.practiceExam,
-  });
+  const PracticeExamQuestionsScreen({super.key, required this.practiceExam});
 
   final PracticeExam practiceExam;
 
@@ -37,9 +35,7 @@ class _PracticeExamQuestionsScreenState
     await _openQuestionOverlay();
   }
 
-  Future<void> _openEditQuestionOverlay(
-    PracticeExamQuestion question,
-  ) async {
+  Future<void> _openEditQuestionOverlay(PracticeExamQuestion question) async {
     await _openQuestionOverlay(question: question);
   }
 
@@ -147,9 +143,7 @@ class _PracticeExamQuestionsScreenState
     }
   }
 
-  Future<void> _confirmRemoveQuestion(
-    PracticeExamQuestion question,
-  ) async {
+  Future<void> _confirmRemoveQuestion(PracticeExamQuestion question) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -191,11 +185,13 @@ class _PracticeExamQuestionsScreenState
 
   @override
   Widget build(BuildContext context) {
-    final topicOptions = ref.watch(practiceExamTopicOptionsProvider).when(
-      data: (options) => options,
-      loading: () => const <PracticeExamTopicOption>[],
-      error: (error, stackTrace) => const <PracticeExamTopicOption>[],
-    );
+    final topicOptions = ref
+        .watch(practiceExamTopicOptionsProvider)
+        .when(
+          data: (options) => options,
+          loading: () => const <PracticeExamTopicOption>[],
+          error: (error, stackTrace) => const <PracticeExamTopicOption>[],
+        );
     final questionsAsync = ref.watch(
       practiceExamQuestionsStreamProvider(widget.practiceExam.id),
     );
@@ -220,80 +216,92 @@ class _PracticeExamQuestionsScreenState
           itemCount: questions.length,
           itemBuilder: (context, index) {
             final question = questions[index];
-            final topicLabel = _findTopicLabel(
-              topicOptions,
-              question.topicId,
-            );
+            final topicLabel = _findTopicLabel(topicOptions, question.topicId);
 
             return Card(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Question ${index + 1}',
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                          const SizedBox(height: 8),
-                          MarkdownBody(data: question.markdownText),
-                          if (topicLabel != null) ...[
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          PracticeExamQuestionDetailScreen(question: question),
+                    ),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Question ${index + 1}',
+                              style: Theme.of(context).textTheme.labelMedium,
+                            ),
                             const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                const Icon(Icons.topic_outlined, size: 16),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    topicLabel,
+                            MarkdownBody(data: question.markdownText),
+                            if (topicLabel != null) ...[
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  const Icon(Icons.topic_outlined, size: 16),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      topicLabel,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                            if (question.explanationMarkdown != null) ...[
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.lightbulb_outline,
+                                    size: 16,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Explanation added',
                                     style: Theme.of(
                                       context,
                                     ).textTheme.bodySmall,
                                   ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
+                            ],
                           ],
-                          if (question.explanationMarkdown != null) ...[
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.lightbulb_outline,
-                                  size: 16,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'Explanation added',
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
-                          ],
+                        ),
+                      ),
+                      PopupMenuButton<String>(
+                        onSelected: (value) {
+                          if (value == 'edit') {
+                            _openEditQuestionOverlay(question);
+                          }
+
+                          if (value == 'delete') {
+                            _confirmRemoveQuestion(question);
+                          }
+                        },
+                        itemBuilder: (context) => const [
+                          PopupMenuItem(value: 'edit', child: Text('Edit')),
+                          PopupMenuItem(value: 'delete', child: Text('Delete')),
                         ],
                       ),
-                    ),
-                    PopupMenuButton<String>(
-                      onSelected: (value) {
-                        if (value == 'edit') {
-                          _openEditQuestionOverlay(question);
-                        }
-
-                        if (value == 'delete') {
-                          _confirmRemoveQuestion(question);
-                        }
-                      },
-                      itemBuilder: (context) => const [
-                        PopupMenuItem(value: 'edit', child: Text('Edit')),
-                        PopupMenuItem(value: 'delete', child: Text('Delete')),
-                      ],
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );
