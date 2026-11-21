@@ -4,7 +4,9 @@ import 'package:frontend/controllers/practice_exams_controller.dart';
 import 'package:frontend/models/exam_section.dart';
 import 'package:frontend/models/practice_exam.dart';
 import 'package:frontend/providers/practice_exams_stream_provider.dart';
+import 'package:frontend/providers/validate_practice_exam_can_start_provider.dart';
 import 'package:frontend/screens/practice_exam_form.dart';
+import 'package:frontend/screens/practice_exam_play_screen.dart';
 import 'package:frontend/screens/practice_exam_questions_screen.dart';
 import 'package:frontend/widgets/app_snack_bar.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
@@ -27,6 +29,36 @@ class PracticeExamsScreen extends ConsumerStatefulWidget {
 }
 
 class _PracticeExamsScreenState extends ConsumerState<PracticeExamsScreen> {
+  Future<void> _startPracticeExam(PracticeExam practiceExam) async {
+    try {
+      final validatePracticeExamCanStart = ref.read(
+        validatePracticeExamCanStartProvider,
+      );
+      final errorMessage = await validatePracticeExamCanStart(practiceExam.id);
+
+      if (!mounted) {
+        return;
+      }
+
+      if (errorMessage != null) {
+        _showSnackBar(appErrorSnackBar(errorMessage));
+        return;
+      }
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              PracticeExamPlayScreen(practiceExam: practiceExam),
+        ),
+      );
+    } catch (_) {
+      if (mounted) {
+        _showSnackBar(appErrorSnackBar('Could not start the practice exam.'));
+      }
+    }
+  }
+
   void _openEditOverlay(PracticeExam practiceExam) {
     showModalBottomSheet(
       context: context,
@@ -184,48 +216,53 @@ class _PracticeExamsScreenState extends ConsumerState<PracticeExamsScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Row(
-                      children: [
-                        const Icon(Icons.assignment_outlined),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                practiceExam.name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                'Passing: '
-                                '${practiceExam.passingPercentage}%'
-                                ' | $durationText',
-                                style: Theme.of(context).textTheme.bodySmall,
+                        children: [
+                          const Icon(Icons.assignment_outlined),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  practiceExam.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  'Passing: '
+                                  '${practiceExam.passingPercentage}%'
+                                  ' | $durationText',
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            tooltip: 'Start practice exam',
+                            onPressed: () => _startPracticeExam(practiceExam),
+                            icon: const Icon(Icons.play_arrow),
+                          ),
+                          PopupMenuButton<String>(
+                            onSelected: (value) {
+                              if (value == 'edit') {
+                                _openEditOverlay(practiceExam);
+                              }
+
+                              if (value == 'delete') {
+                                _confirmRemovePracticeExam(practiceExam);
+                              }
+                            },
+                            itemBuilder: (context) => const [
+                              PopupMenuItem(value: 'edit', child: Text('Edit')),
+                              PopupMenuItem(
+                                value: 'delete',
+                                child: Text('Delete'),
                               ),
                             ],
                           ),
-                        ),
-                        PopupMenuButton<String>(
-                          onSelected: (value) {
-                            if (value == 'edit') {
-                              _openEditOverlay(practiceExam);
-                            }
-
-                            if (value == 'delete') {
-                              _confirmRemovePracticeExam(practiceExam);
-                            }
-                          },
-                          itemBuilder: (context) => const [
-                            PopupMenuItem(value: 'edit', child: Text('Edit')),
-                            PopupMenuItem(
-                              value: 'delete',
-                              child: Text('Delete'),
-                            ),
-                          ],
-                        ),
-                      ],
+                        ],
                       ),
                     ),
                   ),
