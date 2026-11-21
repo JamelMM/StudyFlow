@@ -23,22 +23,33 @@ class QuizPlayScreen extends ConsumerStatefulWidget {
 
 class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
   int _currentQuestionIndex = 0;
-  String? _selectedAnswerOptionId;
-  bool _hasAnswered = false;
+  final Map<String, String> _selectedAnswerOptionIdsByQuestionId = {};
   int _correctAnswersCount = 0;
 
-  void _selectAnswer(AnswerOption answerOption) {
-    if (_hasAnswered) {
+  void _selectAnswer({
+    required String questionId,
+    required AnswerOption answerOption,
+  }) {
+    if (_selectedAnswerOptionIdsByQuestionId.containsKey(questionId)) {
       return;
     }
 
     setState(() {
-      _selectedAnswerOptionId = answerOption.id;
-      _hasAnswered = true;
+      _selectedAnswerOptionIdsByQuestionId[questionId] = answerOption.id;
 
       if (answerOption.isCorrect) {
         _correctAnswersCount++;
       }
+    });
+  }
+
+  void _goToPreviousQuestion() {
+    if (_currentQuestionIndex == 0) {
+      return;
+    }
+
+    setState(() {
+      _currentQuestionIndex--;
     });
   }
 
@@ -61,8 +72,6 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
 
     setState(() {
       _currentQuestionIndex = nextQuestionIndex;
-      _selectedAnswerOptionId = null;
-      _hasAnswered = false;
     });
   }
 
@@ -83,6 +92,9 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
 
         final currentQuestion = quizPlayData.questions[_currentQuestionIndex];
         final explanationMarkdown = currentQuestion.explanationMarkdown?.trim();
+        final selectedAnswerOptionId =
+            _selectedAnswerOptionIdsByQuestionId[currentQuestion.id];
+        final hasAnswered = selectedAnswerOptionId != null;
 
         final currentAnswerOptions =
             quizPlayData.answerOptionsByQuestionId[currentQuestion.id] ?? [];
@@ -95,7 +107,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
             final questionCard = Card(
               color: appBarTheme.backgroundColor ?? colorScheme.primary,
               child: Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 child: MarkdownBody(
                   data: currentQuestion.markdownText,
                   styleSheet: MarkdownStyleSheet(
@@ -111,39 +123,42 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
               ),
             );
             final answers = ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: currentAnswerOptions.length,
               itemBuilder: (context, index) {
                 final answerOption = currentAnswerOptions[index];
 
-                final isSelected = _selectedAnswerOptionId == answerOption.id;
+                final isSelected = selectedAnswerOptionId == answerOption.id;
                 final isCorrect = answerOption.isCorrect;
 
                 Color? cardColor;
 
-                if (_hasAnswered && isSelected && isCorrect) {
+                if (hasAnswered && isSelected && isCorrect) {
                   cardColor = const Color(0xFFD1FAE5);
-                } else if (_hasAnswered && isSelected && !isCorrect) {
+                } else if (hasAnswered && isSelected && !isCorrect) {
                   cardColor = const Color(0xFFFEE2E2);
-                } else if (_hasAnswered && isCorrect) {
+                } else if (hasAnswered && isCorrect) {
                   cardColor = const Color(0xFFD1FAE5);
                 }
 
                 final hasFeedbackColor =
-                    _hasAnswered && (isCorrect || isSelected);
+                    hasAnswered && (isCorrect || isSelected);
                 final answerTextColor = hasFeedbackColor
                     ? Colors.black
                     : colorScheme.onPrimaryContainer;
-                final answerIconColor = _hasAnswered && isCorrect
+                final answerIconColor = hasAnswered && isCorrect
                     ? const Color(0xFF2F855A)
-                    : _hasAnswered && isSelected && !isCorrect
+                    : hasAnswered && isSelected && !isCorrect
                     ? const Color(0xFFB91C1C)
                     : colorScheme.onPrimaryContainer;
 
                 return Card(
                   color: cardColor,
                   child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                     leading: Icon(
-                      _hasAnswered && isCorrect
+                      hasAnswered && isCorrect
                           ? Icons.check_circle
                           : isSelected
                           ? Icons.radio_button_checked
@@ -161,79 +176,137 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                       ),
                     ),
                     onTap: () {
-                      _selectAnswer(answerOption);
+                      _selectAnswer(
+                        questionId: currentQuestion.id,
+                        answerOption: answerOption,
+                      );
                     },
                   ),
                 );
               },
             );
-            final nextButton = _hasAnswered
-                ? FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor:
-                          appBarTheme.backgroundColor ?? colorScheme.primary,
-                      foregroundColor:
-                          appBarTheme.foregroundColor ?? colorScheme.onPrimary,
-                    ),
-                    onPressed: () {
-                      _goToNextQuestion(quizPlayData);
-                    },
-                    child: Text(
-                      _currentQuestionIndex == quizPlayData.questions.length - 1
-                          ? 'Finish quiz'
-                          : 'Next question',
-                    ),
-                  )
-                : const SizedBox.shrink();
-
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Question ${_currentQuestionIndex + 1} of ${quizPlayData.questions.length}',
-                    textAlign: TextAlign.center,
+            final nextButton = FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor:
+                    appBarTheme.backgroundColor ?? colorScheme.primary,
+                foregroundColor:
+                    appBarTheme.foregroundColor ?? colorScheme.onPrimary,
+              ),
+              onPressed: hasAnswered
+                  ? () => _goToNextQuestion(quizPlayData)
+                  : null,
+              child: Text(
+                _currentQuestionIndex == quizPlayData.questions.length - 1
+                    ? 'Finish quiz'
+                    : 'Next question',
+              ),
+            );
+            final hasExplanation =
+                explanationMarkdown != null && explanationMarkdown.isNotEmpty;
+            final explanationSection = Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (hasAnswered && hasExplanation) ...[
+                  QuestionExplanationCard(
+                    explanationMarkdown: explanationMarkdown,
                   ),
-                  const SizedBox(height: 24),
-                  Expanded(
-                    child: isWide
-                        ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(child: questionCard),
-                              const SizedBox(width: 24),
-                              Expanded(child: answers),
-                            ],
-                          )
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              questionCard,
-                              const SizedBox(height: 24),
-                              Expanded(child: answers),
-                            ],
-                          ),
-                  ),
-                  if (_hasAnswered &&
-                      explanationMarkdown != null &&
-                      explanationMarkdown.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    QuestionExplanationCard(
-                      explanationMarkdown: explanationMarkdown,
+                  const SizedBox(height: 12),
+                ],
+              ],
+            );
+            final navigationButtons = SafeArea(
+              top: false,
+              left: false,
+              right: false,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _currentQuestionIndex == 0
+                            ? null
+                            : _goToPreviousQuestion,
+                        icon: const Icon(Icons.arrow_back),
+                        label: const Text('Previous'),
+                      ),
                     ),
+                    const SizedBox(width: 12),
+                    Expanded(child: nextButton),
                   ],
-                  if (_hasAnswered) ...[
-                    const SizedBox(height: 12),
-                    SafeArea(
-                      top: false,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: nextButton,
+                ),
+              ),
+            );
+
+            if (MediaQuery.orientationOf(context) == Orientation.portrait) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            'Question ${_currentQuestionIndex + 1} of ${quizPlayData.questions.length}',
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          questionCard,
+                          const SizedBox(height: 16),
+                          answers,
+                        ],
+                      ),
+                    ),
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const SizedBox(height: 12),
+                          explanationSection,
+                          navigationButtons,
+                        ],
                       ),
                     ),
                   ],
-                ],
+                ),
+              );
+            }
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Question ${_currentQuestionIndex + 1} of ${quizPlayData.questions.length}',
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    if (isWide)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: questionCard),
+                          const SizedBox(width: 16),
+                          Expanded(child: answers),
+                        ],
+                      )
+                    else ...[
+                      questionCard,
+                      const SizedBox(height: 16),
+                      answers,
+                    ],
+                    if (hasAnswered) ...[
+                      const SizedBox(height: 12),
+                      explanationSection,
+                    ],
+                    navigationButtons,
+                  ],
+                ),
               ),
             );
           },
@@ -243,7 +316,15 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.quiz.name)),
-      body: ResponsiveContent(maxWidth: 1100, child: mainContent),
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        child: ResponsiveContent(
+          maxWidth: 1100,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: mainContent,
+        ),
+      ),
     );
   }
 }

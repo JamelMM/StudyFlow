@@ -12,43 +12,6 @@ const subjectSchema = TableSchema(
   ],
 );
 
-const examSectionSchema = TableSchema(
-  name: 'exam_sections',
-  primaryKeyConfig: PrimaryKeyConfig(
-    name: 'id',
-    type: PrimaryKeyType.timestampBased,
-  ),
-  fields: [
-    FieldSchema(name: 'name', type: DataType.text, nullable: false),
-    FieldSchema(name: 'createdAt', type: DataType.text, nullable: false),
-  ],
-);
-
-final examTipSchema = TableSchema(
-  name: 'exam_tips',
-  primaryKeyConfig: PrimaryKeyConfig(
-    name: 'id',
-    type: PrimaryKeyType.timestampBased,
-  ),
-  fields: [
-    FieldSchema(name: 'examSectionId', type: DataType.text, nullable: false),
-    FieldSchema(name: 'name', type: DataType.text, nullable: false),
-    FieldSchema(name: 'markdownText', type: DataType.text, nullable: false),
-    FieldSchema(name: 'createdAt', type: DataType.text, nullable: false),
-    FieldSchema(name: 'updatedAt', type: DataType.text, nullable: true),
-  ],
-  foreignKeys: [
-    ForeignKeySchema(
-      name: 'fk_exam_tips_section',
-      fields: ['examSectionId'],
-      referencedTable: 'exam_sections',
-      referencedFields: ['id'],
-      onDelete: ForeignKeyCascadeAction.cascade,
-      onUpdate: ForeignKeyCascadeAction.cascade,
-    ),
-  ],
-);
-
 final topicSchema = TableSchema(
   name: 'topics',
   primaryKeyConfig: PrimaryKeyConfig(
@@ -175,13 +138,146 @@ final answerOptionSchema = TableSchema(
   ],
 );
 
+const examSectionSchema = TableSchema(
+  name: 'exam_sections',
+  primaryKeyConfig: PrimaryKeyConfig(
+    name: 'id',
+    type: PrimaryKeyType.timestampBased,
+  ),
+  fields: [
+    FieldSchema(name: 'name', type: DataType.text, nullable: false),
+    FieldSchema(name: 'createdAt', type: DataType.text, nullable: false),
+  ],
+);
+
+final examTipSchema = TableSchema(
+  name: 'exam_tips',
+  primaryKeyConfig: PrimaryKeyConfig(
+    name: 'id',
+    type: PrimaryKeyType.timestampBased,
+  ),
+  fields: [
+    FieldSchema(name: 'examSectionId', type: DataType.text, nullable: false),
+    FieldSchema(name: 'name', type: DataType.text, nullable: false),
+    FieldSchema(name: 'markdownText', type: DataType.text, nullable: false),
+    FieldSchema(name: 'createdAt', type: DataType.text, nullable: false),
+    FieldSchema(name: 'updatedAt', type: DataType.text, nullable: true),
+  ],
+  foreignKeys: [
+    ForeignKeySchema(
+      name: 'fk_exam_tips_section',
+      fields: ['examSectionId'],
+      referencedTable: 'exam_sections',
+      referencedFields: ['id'],
+      onDelete: ForeignKeyCascadeAction.cascade,
+      onUpdate: ForeignKeyCascadeAction.cascade,
+    ),
+  ],
+);
+
+final practiceExamSchema = TableSchema(
+  name: 'practice_exams',
+  primaryKeyConfig: PrimaryKeyConfig(
+    name: 'id',
+    type: PrimaryKeyType.timestampBased,
+  ),
+  fields: [
+    FieldSchema(name: 'examSectionId', type: DataType.text, nullable: false),
+    FieldSchema(name: 'name', type: DataType.text, nullable: false),
+    FieldSchema(
+      name: 'passingPercentage',
+      type: DataType.integer,
+      nullable: false,
+    ),
+    FieldSchema(name: 'createdAt', type: DataType.text, nullable: false),
+    FieldSchema(
+      name: 'durationMinutes',
+      type: DataType.integer,
+      nullable: true,
+    ),
+    FieldSchema(name: 'updatedAt', type: DataType.text, nullable: true),
+  ],
+  foreignKeys: [
+    ForeignKeySchema(
+      name: 'fk_practice_exams_exam_section',
+      fields: ['examSectionId'],
+      referencedTable: 'exam_sections',
+      referencedFields: ['id'],
+      onDelete: ForeignKeyCascadeAction.cascade,
+      onUpdate: ForeignKeyCascadeAction.cascade,
+    ),
+  ],
+);
+
+final practiceExamQuestionSchema = TableSchema(
+  name: 'practice_exam_questions',
+  primaryKeyConfig: PrimaryKeyConfig(
+    name: 'id',
+    type: PrimaryKeyType.timestampBased,
+  ),
+  fields: [
+    FieldSchema(name: 'practiceExamId', type: DataType.text, nullable: false),
+    FieldSchema(name: 'topicId', type: DataType.text, nullable: true),
+    FieldSchema(name: 'markdownText', type: DataType.text, nullable: false),
+    FieldSchema(name: 'createdAt', type: DataType.text, nullable: false),
+    FieldSchema(name: 'updatedAt', type: DataType.text, nullable: true),
+    FieldSchema(
+      name: 'explanationMarkdown',
+      type: DataType.text,
+      nullable: true,
+    ),
+  ],
+  foreignKeys: [
+    ForeignKeySchema(
+      name: 'fk_practice_exam_questions_exam',
+      fields: ['practiceExamId'],
+      referencedTable: 'practice_exams',
+      referencedFields: ['id'],
+      onDelete: ForeignKeyCascadeAction.cascade,
+      onUpdate: ForeignKeyCascadeAction.cascade,
+    ),
+  ],
+);
+
+final practiceExamAnswerOptionSchema = TableSchema(
+  name: 'practice_exam_answer_options',
+  primaryKeyConfig: PrimaryKeyConfig(
+    name: 'id',
+    type: PrimaryKeyType.timestampBased,
+  ),
+  fields: [
+    FieldSchema(
+      name: 'practiceExamQuestionId',
+      type: DataType.text,
+      nullable: false,
+    ),
+    FieldSchema(name: 'markdownText', type: DataType.text, nullable: false),
+    FieldSchema(name: 'createdAt', type: DataType.text, nullable: false),
+    FieldSchema(name: 'updatedAt', type: DataType.text, nullable: true),
+    FieldSchema(name: 'isCorrect', type: DataType.boolean, nullable: false),
+  ],
+  foreignKeys: [
+    ForeignKeySchema(
+      name: 'fk_practice_exam_answer_options_question',
+      fields: ['practiceExamQuestionId'],
+      referencedTable: 'practice_exam_questions',
+      referencedFields: ['id'],
+      onDelete: ForeignKeyCascadeAction.cascade,
+      onUpdate: ForeignKeyCascadeAction.cascade,
+    ),
+  ],
+);
+
 final studyFlowSchemas = [
   subjectSchema,
-  examSectionSchema,
-  examTipSchema,
   topicSchema,
   studyNoteSchema,
   quizSchema,
   questionSchema,
   answerOptionSchema,
+  examSectionSchema,
+  examTipSchema,
+  practiceExamSchema,
+  practiceExamQuestionSchema,
+  practiceExamAnswerOptionSchema,
 ];
