@@ -5,7 +5,8 @@ import 'package:frontend/application/practice_exam/practice_exam_play_data.dart'
 import 'package:frontend/models/practice_exam.dart';
 import 'package:frontend/models/practice_exam_answer_option.dart';
 import 'package:frontend/providers/load_practice_exam_play_data_provider.dart';
-import 'package:frontend/widgets/app_button_styles.dart';
+import 'package:frontend/screens/practice_exam_result_screen.dart';
+import 'package:frontend/widgets/question_explanation_card.dart';
 import 'package:frontend/widgets/responsive_layout.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -28,6 +29,10 @@ class _PracticeExamPlayScreenState
     required String questionId,
     required String answerOptionId,
   }) {
+    if (_selectedAnswerOptionIdsByQuestionId.containsKey(questionId)) {
+      return;
+    }
+
     setState(() {
       _selectedAnswerOptionIdsByQuestionId[questionId] = answerOptionId;
     });
@@ -43,12 +48,12 @@ class _PracticeExamPlayScreenState
     });
   }
 
-  Future<void> _goToNextQuestion(PracticeExamPlayData playData) async {
+  void _goToNextQuestion(PracticeExamPlayData playData) {
     final isLastQuestion =
         _currentQuestionIndex == playData.questions.length - 1;
 
     if (isLastQuestion) {
-      await _finishExam(playData);
+      _finishExam(playData);
       return;
     }
 
@@ -57,7 +62,7 @@ class _PracticeExamPlayScreenState
     });
   }
 
-  Future<void> _finishExam(PracticeExamPlayData playData) async {
+  void _finishExam(PracticeExamPlayData playData) {
     var correctAnswersCount = 0;
 
     for (final question in playData.questions) {
@@ -77,27 +82,14 @@ class _PracticeExamPlayScreenState
     }
 
     final totalQuestions = playData.questions.length;
-    final percentage = ((correctAnswersCount / totalQuestions) * 100).round();
-    final hasPassed = percentage >= widget.practiceExam.passingPercentage;
-
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(hasPassed ? 'Practice exam passed' : 'Practice exam ended'),
-        content: Text(
-          '$correctAnswersCount of $totalQuestions correct ($percentage%).',
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PracticeExamResultScreen(
+          practiceExam: widget.practiceExam,
+          correctAnswersCount: correctAnswersCount,
+          totalQuestions: totalQuestions,
         ),
-        actions: [
-          FilledButton(
-            style: appPrimaryButtonStyle(context),
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              Navigator.pop(context);
-            },
-            child: const Text('Close'),
-          ),
-        ],
       ),
     );
   }
@@ -129,6 +121,8 @@ class _PracticeExamPlayScreenState
         playData.answerOptionsByQuestionId[currentQuestion.id] ?? const [];
     final selectedAnswerOptionId =
         _selectedAnswerOptionIdsByQuestionId[currentQuestion.id];
+    final hasAnswered = selectedAnswerOptionId != null;
+    final explanationMarkdown = currentQuestion.explanationMarkdown?.trim();
 
     return ResponsiveContent(
       maxWidth: 1100,
@@ -144,12 +138,36 @@ class _PracticeExamPlayScreenState
           final answers = _AnswerOptionsList(
             answerOptions: answerOptions,
             selectedAnswerOptionId: selectedAnswerOptionId,
+            hasAnswered: hasAnswered,
             onSelected: (answerOptionId) {
               _selectAnswer(
                 questionId: currentQuestion.id,
                 answerOptionId: answerOptionId,
               );
             },
+          );
+          final hasExplanation =
+              hasAnswered &&
+              explanationMarkdown != null &&
+              explanationMarkdown.isNotEmpty;
+          final questionAndAnswers = Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (useSideBySideLayout)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: questionCard),
+                    const SizedBox(width: 16),
+                    Expanded(child: answers),
+                  ],
+                )
+              else ...[
+                questionCard,
+                const SizedBox(height: 12),
+                answers,
+              ],
+            ],
           );
 
           return Column(
@@ -163,34 +181,25 @@ class _PracticeExamPlayScreenState
               ),
               const SizedBox(height: 12),
               Expanded(
-                child: useSideBySideLayout
-                    ? Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(child: questionCard),
-                          const SizedBox(width: 16),
-                          Expanded(child: answers),
-                        ],
-                      )
-                    : ListView(
-                        children: [
-                          questionCard,
-                          const SizedBox(height: 12),
-                          ...answerOptions.map(
-                            (answerOption) => _AnswerOptionCard(
-                              answerOption: answerOption,
-                              isSelected:
-                                  selectedAnswerOptionId == answerOption.id,
-                              onTap: () {
-                                _selectAnswer(
-                                  questionId: currentQuestion.id,
-                                  answerOptionId: answerOption.id,
-                                );
-                              },
+                child: CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(child: questionAndAnswers),
+                    if (hasExplanation)
+                      SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const SizedBox(height: 12),
+                            QuestionExplanationCard(
+                              explanationMarkdown: explanationMarkdown,
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                  ],
+                ),
               ),
               const SizedBox(height: 12),
               SafeArea(
@@ -209,10 +218,17 @@ class _PracticeExamPlayScreenState
                     const SizedBox(width: 12),
                     Expanded(
                       child: FilledButton.icon(
-                        style: appPrimaryButtonStyle(context),
-                        onPressed: selectedAnswerOptionId == null
-                            ? null
-                            : () => _goToNextQuestion(playData),
+                        style: FilledButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).appBarTheme.backgroundColor ??
+                              Theme.of(context).colorScheme.primary,
+                          foregroundColor:
+                              Theme.of(context).appBarTheme.foregroundColor ??
+                              Theme.of(context).colorScheme.onPrimary,
+                        ),
+                        onPressed: hasAnswered
+                            ? () => _goToNextQuestion(playData)
+                            : null,
                         icon: Icon(
                           _currentQuestionIndex == playData.questions.length - 1
                               ? Icons.flag_outlined
@@ -270,16 +286,20 @@ class _AnswerOptionsList extends StatelessWidget {
   const _AnswerOptionsList({
     required this.answerOptions,
     required this.selectedAnswerOptionId,
+    required this.hasAnswered,
     required this.onSelected,
   });
 
   final List<PracticeExamAnswerOption> answerOptions;
   final String? selectedAnswerOptionId;
+  final bool hasAnswered;
   final ValueChanged<String> onSelected;
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.zero,
       itemCount: answerOptions.length,
       itemBuilder: (context, index) {
@@ -288,6 +308,7 @@ class _AnswerOptionsList extends StatelessWidget {
         return _AnswerOptionCard(
           answerOption: answerOption,
           isSelected: selectedAnswerOptionId == answerOption.id,
+          hasAnswered: hasAnswered,
           onTap: () => onSelected(answerOption.id),
         );
       },
@@ -299,33 +320,66 @@ class _AnswerOptionCard extends StatelessWidget {
   const _AnswerOptionCard({
     required this.answerOption,
     required this.isSelected,
+    required this.hasAnswered,
     required this.onTap,
   });
 
   final PracticeExamAnswerOption answerOption;
   final bool isSelected;
+  final bool hasAnswered;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isCorrect = answerOption.isCorrect;
+    Color? cardColor;
+
+    if (hasAnswered && isCorrect) {
+      cardColor = const Color(0xFFD1FAE5);
+    } else if (hasAnswered && isSelected) {
+      cardColor = const Color(0xFFFEE2E2);
+    }
+
+    final hasFeedbackColor = hasAnswered && (isCorrect || isSelected);
+    final textColor = hasFeedbackColor
+        ? Colors.black
+        : colorScheme.onPrimaryContainer;
+    final iconColor = hasAnswered && isCorrect
+        ? const Color(0xFF2F855A)
+        : hasAnswered && isSelected
+        ? const Color(0xFFB91C1C)
+        : colorScheme.onPrimaryContainer;
 
     return Card(
-      color: isSelected ? colorScheme.secondaryContainer : null,
+      color: cardColor,
       child: InkWell(
-        onTap: onTap,
+        onTap: hasAnswered ? null : onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           child: Row(
             children: [
               Icon(
-                isSelected
+                hasAnswered && isCorrect
+                    ? Icons.check_circle
+                    : isSelected
                     ? Icons.radio_button_checked
                     : Icons.radio_button_unchecked,
-                color: colorScheme.onPrimaryContainer,
+                color: iconColor,
               ),
               const SizedBox(width: 12),
-              Expanded(child: MarkdownBody(data: answerOption.markdownText)),
+              Expanded(
+                child: MarkdownBody(
+                  data: answerOption.markdownText,
+                  styleSheet: MarkdownStyleSheet(
+                    p: TextStyle(
+                      color: textColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
