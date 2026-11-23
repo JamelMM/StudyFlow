@@ -21,13 +21,15 @@ class QuestionsController {
   final QuestionsRepository questionsRepository;
   final String quizId;
 
-  Future<void> addQuestion(
-    String markdownText, {
+  Future<void> addQuestion({
+    required String markdownText,
+    required String subtopicId,
     String? explanationMarkdown,
   }) async {
     await questionsRepository.addQuestion(
       markdownText: markdownText,
       quizId: quizId,
+      subtopicId: subtopicId,
       explanationMarkdown: explanationMarkdown,
     );
   }
@@ -38,11 +40,13 @@ class QuestionsController {
 
   Future<void> updateQuestion({
     required String id,
+    required String subtopicId,
     required String markdownText,
     String? explanationMarkdown,
   }) async {
     await questionsRepository.updateQuestion(
       id: id,
+      subtopicId: subtopicId,
       markdownText: markdownText,
       explanationMarkdown: explanationMarkdown,
     );

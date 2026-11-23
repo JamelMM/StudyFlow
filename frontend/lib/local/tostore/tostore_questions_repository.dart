@@ -5,9 +5,26 @@ import 'package:frontend/repositories/contracts/questions_repository.dart';
 class ToStoreQuestionsRepository implements QuestionsRepository {
   static const _tableName = 'questions';
 
+  Question _mapRow(Map<String, dynamic> row) {
+    final updatedAt = row['updatedAt'];
+
+    return Question(
+      id: row['id'].toString(),
+      quizId: row['quizId'].toString(),
+      subtopicId: row['subtopicId'].toString(),
+      markdownText: row['markdownText'].toString(),
+      explanationMarkdown: row['explanationMarkdown']?.toString(),
+      createdAt: DateTime.parse(row['createdAt'].toString()),
+      updatedAt: updatedAt == null
+          ? null
+          : DateTime.parse(updatedAt.toString()),
+    );
+  }
+
   @override
   Future<Question> addQuestion({
     required String quizId,
+    required String subtopicId,
     required String markdownText,
     String? explanationMarkdown,
   }) async {
@@ -15,6 +32,7 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
 
     final result = await StudyFlowDatabase.db.insert(_tableName, {
       'quizId': quizId,
+      'subtopicId': subtopicId,
       'markdownText': markdownText,
       'createdAt': createdAt.toIso8601String(),
       'explanationMarkdown': explanationMarkdown,
@@ -30,6 +48,7 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
     return Question(
       id: generatedId,
       quizId: quizId,
+      subtopicId: subtopicId,
       markdownText: markdownText,
       createdAt: createdAt,
       explanationMarkdown: explanationMarkdown,
@@ -40,22 +59,10 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
   Future<List<Question>> getQuestionsByQuizId(String quizId) async {
     final result = await StudyFlowDatabase.db.query(_tableName);
 
-    return result.data.where((row) => row['quizId'].toString() == quizId).map((
-      row,
-    ) {
-      final updatedAtValue = row['updatedAt'];
-
-      return Question(
-        id: row['id'].toString(),
-        quizId: row['quizId'].toString(),
-        markdownText: row['markdownText'].toString(),
-        createdAt: DateTime.parse(row['createdAt'].toString()),
-        updatedAt: updatedAtValue == null
-            ? null
-            : DateTime.parse(updatedAtValue.toString()),
-        explanationMarkdown: row['explanationMarkdown']?.toString(),
-      );
-    }).toList();
+    return result.data
+        .where((row) => row['quizId'].toString() == quizId)
+        .map(_mapRow)
+        .toList();
   }
 
   @override
@@ -72,6 +79,7 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
   @override
   Future<void> updateQuestion({
     required String id,
+    required String subtopicId,
     required String markdownText,
     String? explanationMarkdown,
   }) async {
@@ -79,6 +87,7 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
 
     final result = await StudyFlowDatabase.db
         .update(_tableName, {
+          'subtopicId': subtopicId,
           'markdownText': markdownText,
           'explanationMarkdown': explanationMarkdown,
           'updatedAt': updatedAt.toIso8601String(),
@@ -93,15 +102,10 @@ class ToStoreQuestionsRepository implements QuestionsRepository {
   @override
   Stream<List<Question>> watchQuestionsByQuizId(String quizId) {
     return StudyFlowDatabase.db.query(_tableName).watch().map((rows) {
-      return rows.where((row) => row['quizId'].toString() == quizId).map((row) {
-        return Question(
-          id: row['id'].toString(),
-          quizId: row['quizId'].toString(),
-          markdownText: row['markdownText'].toString(),
-          createdAt: DateTime.parse(row['createdAt'].toString()),
-          explanationMarkdown: row['explanationMarkdown']?.toString(),
-        );
-      }).toList();
+      return rows
+          .where((row) => row['quizId'].toString() == quizId)
+          .map(_mapRow)
+          .toList();
     });
   }
 }

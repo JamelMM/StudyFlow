@@ -87,7 +87,7 @@ class ToStoreTopicsRepository implements TopicsRepository {
         })
         .where('id', '=', id);
 
-    if (!result.hasErrors) {
+    if (result.hasErrors) {
       throw Exception('Could not update topic.');
     }
   }

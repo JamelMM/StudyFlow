@@ -71,14 +71,14 @@ void main() {
       await controller.addQuestion(
         markdownText: '**Which answer is correct?**',
         explanationMarkdown: 'Because **B** is correct.',
-        topicId: 'topic-1',
+        subtopicId: 'subtopic-1',
       );
 
       final question = repository.items.single;
       expect(question.practiceExamId, 'exam-1');
       expect(question.markdownText, '**Which answer is correct?**');
       expect(question.explanationMarkdown, 'Because **B** is correct.');
-      expect(question.topicId, 'topic-1');
+      expect(question.subtopicId, 'subtopic-1');
     });
 
     test('updates and removes a question', () async {
@@ -96,7 +96,7 @@ void main() {
         id: question.id,
         markdownText: 'Updated question',
         explanationMarkdown: 'Updated explanation',
-        topicId: 'topic-2',
+        subtopicId: 'subtopic-2',
       );
 
       expect(repository.items.single.markdownText, 'Updated question');
@@ -104,7 +104,7 @@ void main() {
         repository.items.single.explanationMarkdown,
         'Updated explanation',
       );
-      expect(repository.items.single.topicId, 'topic-2');
+      expect(repository.items.single.subtopicId, 'subtopic-2');
 
       await controller.removeQuestion(question.id);
 
@@ -292,13 +292,13 @@ class _MemoryPracticeExamQuestionsRepository
   Future<PracticeExamQuestion> addQuestion({
     required String practiceExamId,
     required String markdownText,
-    String? topicId,
+    String? subtopicId,
     String? explanationMarkdown,
   }) async {
     final question = PracticeExamQuestion(
       id: 'question-${items.length + 1}',
       practiceExamId: practiceExamId,
-      topicId: topicId,
+      subtopicId: subtopicId,
       markdownText: markdownText,
       explanationMarkdown: explanationMarkdown,
       createdAt: DateTime(2026),
@@ -311,7 +311,9 @@ class _MemoryPracticeExamQuestionsRepository
   Future<List<PracticeExamQuestion>> getQuestionsByPracticeExamId(
     String practiceExamId,
   ) async {
-    return items.where((item) => item.practiceExamId == practiceExamId).toList();
+    return items
+        .where((item) => item.practiceExamId == practiceExamId)
+        .toList();
   }
 
   @override
@@ -323,7 +325,7 @@ class _MemoryPracticeExamQuestionsRepository
   Future<void> updateQuestion({
     required String id,
     required String markdownText,
-    String? topicId,
+    String? subtopicId,
     String? explanationMarkdown,
   }) async {
     final index = items.indexWhere((item) => item.id == id);
@@ -331,7 +333,7 @@ class _MemoryPracticeExamQuestionsRepository
     items[index] = PracticeExamQuestion(
       id: current.id,
       practiceExamId: current.practiceExamId,
-      topicId: topicId,
+      subtopicId: subtopicId,
       markdownText: markdownText,
       explanationMarkdown: explanationMarkdown,
       createdAt: current.createdAt,
@@ -375,10 +377,7 @@ class _MemoryPracticeExamAnswerOptionsRepository
     String practiceExamQuestionId,
   ) async {
     return items
-        .where(
-          (item) =>
-              item.practiceExamQuestionId == practiceExamQuestionId,
-        )
+        .where((item) => item.practiceExamQuestionId == practiceExamQuestionId)
         .toList();
   }
 
@@ -412,8 +411,7 @@ class _MemoryPracticeExamAnswerOptionsRepository
     return Stream.value(
       items
           .where(
-            (item) =>
-                item.practiceExamQuestionId == practiceExamQuestionId,
+            (item) => item.practiceExamQuestionId == practiceExamQuestionId,
           )
           .toList(),
     );

@@ -2,6 +2,7 @@ class Question {
   const Question({
     required this.id,
     required this.quizId,
+    required this.subtopicId,
     required this.markdownText,
     required this.createdAt,
     this.explanationMarkdown,
@@ -10,6 +11,7 @@ class Question {
 
   final String id;
   final String quizId;
+  final String subtopicId;
   final String markdownText;
   final String? explanationMarkdown;
   final DateTime createdAt;

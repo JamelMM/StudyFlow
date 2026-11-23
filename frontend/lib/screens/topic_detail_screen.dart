@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:frontend/controllers/study_notes_controller.dart';
+import 'package:frontend/controllers/subtopics_controller.dart';
 import 'package:frontend/models/topic.dart';
-import 'package:frontend/screens/new_study_note.dart';
+import 'package:frontend/screens/new_subtopic.dart';
 import 'package:frontend/screens/quizzes_screen.dart';
-import 'package:frontend/screens/study_notes_screen.dart';
+import 'package:frontend/screens/subtopics_screen.dart';
 import 'package:frontend/widgets/app_snack_bar.dart';
 
 class TopicDetailScreen extends ConsumerStatefulWidget {
@@ -25,37 +25,37 @@ class _TopicDetailScreenState extends ConsumerState<TopicDetailScreen> {
     });
   }
 
-  void _openAddStudyNoteOverlay() {
+  void _openAddSubtopicOverlay() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
-      builder: (ctx) => NewStudyNote(onAddNote: _addStudyNote),
+      builder: (ctx) => NewSubtopic(onAddSubtopic: _addSubtopic),
     );
   }
 
-  Future<void> _addStudyNote(String title, String markdownText) async {
+  Future<void> _addSubtopic(String name) async {
     await ref
-        .read(studyNotesControllerProvider(widget.topic.id))
-        .addStudyNote(name: title, markdownText: markdownText);
+        .read(subtopicsControllerProvider(widget.topic.id))
+        .addSubtopic(name: name);
 
     if (!mounted) {
       return;
     }
 
     ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      appSuccessSnackBar('Note successfully created'),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appSuccessSnackBar('Subtopic successfully created'));
   }
 
   @override
   Widget build(BuildContext context) {
     final pages = <Widget>[
-      StudyNotesScreen(
+      SubtopicsScreen(
         topic: widget.topic,
-        onAddStudyNotePressed: _openAddStudyNoteOverlay,
+        onAddSubtopicPressed: _openAddSubtopicOverlay,
       ),
       QuizzesScreen(topic: widget.topic),
     ];
@@ -66,7 +66,8 @@ class _TopicDetailScreenState extends ConsumerState<TopicDetailScreen> {
         actions: [
           if (_selectedPageIndex == 0)
             IconButton(
-              onPressed: _openAddStudyNoteOverlay,
+              tooltip: 'Add subtopic',
+              onPressed: _openAddSubtopicOverlay,
               icon: const Icon(Icons.add),
             ),
         ],
@@ -76,7 +77,10 @@ class _TopicDetailScreenState extends ConsumerState<TopicDetailScreen> {
         currentIndex: _selectedPageIndex,
         onTap: _onSelectedPage,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.notes), label: 'Notes'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_tree_outlined),
+            label: 'Subtopics',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.quiz), label: 'Quiz'),
         ],
       ),

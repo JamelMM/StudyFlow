@@ -39,7 +39,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
 
   Future<void> _updateStudyNote(String name, String markdownText) async {
     await ref
-        .read(studyNotesControllerProvider(_note.topicId))
+        .read(studyNotesControllerProvider(_note.subtopicId))
         .updateStudyNote(id: _note.id, name: name, markdownText: markdownText);
 
     if (!mounted) {
@@ -50,7 +50,7 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
       // local copy
       _note = StudyNote(
         id: _note.id,
-        topicId: _note.topicId,
+        subtopicId: _note.subtopicId,
         name: name,
         markdownText: markdownText,
         createdAt: _note.createdAt,
@@ -59,9 +59,9 @@ class _NoteScreenState extends ConsumerState<NoteScreen> {
     });
 
     ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      appSuccessSnackBar('Note successfully updated'),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appSuccessSnackBar('Note successfully updated'));
   }
 
   @override

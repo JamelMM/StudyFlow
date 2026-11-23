@@ -1,81 +1,58 @@
 # StudyFlow Frontend
 
-This folder contains the Flutter frontend for StudyFlow.
-
-The current frontend is an offline-first Flutter application under active development. It uses repository contracts with ToStore-backed local persistence and is not connected to the ASP.NET Core backend yet.
-
-The app uses Riverpod providers and controllers for its local-first study, quiz, and exam preparation flows. Riverpod handles asynchronous access to local entities, quiz validation, quiz play data loading, and JSON seed import. The UI includes a usable Study Mode, the first functional Exam Mode screens, Markdown explanations, responsive layouts, light/dark themes, and a custom launcher icon.
+The StudyFlow frontend is an offline-first Flutter application for organizing
+learning material, running focused quizzes, and practising short exams. It uses
+ToStore for local persistence and is intentionally independent from the ASP.NET
+Core backend during V1 development.
 
 ## English
 
-## Current Features
+### Current Features
 
-- Start screen before entering the main StudyFlow flow
-- Mode selection screen with functional Study Mode and Exam Mode entry points
-- View, create, edit, and delete subjects locally
-- View, create, edit, and delete topics locally
-- Open topics in a dedicated topic detail screen
-- Switch between notes and quiz area with a bottom navigation bar
-- View, create, edit, and delete study notes locally
-- Open a study note and read Markdown-rendered content
-- Create quizzes locally
-- View, create, edit, and delete quiz questions locally
-- View, create, edit, and delete answer options locally
-- Mark answer options as correct
-- Validate quiz readiness before starting
-- Start a quiz and answer questions
-- Randomize quiz questions and answer options during quiz play
-- Render quiz questions and answer options as Markdown
-- Show visual feedback for correct and incorrect quiz answers
-- Show optional Markdown explanations after answering quiz questions
-- View final quiz results with score, percentage, and retry option
-- Use quizzes without a fixed maximum question count
-- Create, edit, and delete exam sections such as AP1 or AP2
-- Open an exam section with Tips, Exams, and History tabs
-- Create, edit, delete, and read Markdown-formatted exam tips locally
-- Import structured content from pasted JSON or a selected `.json` file
-- Import subjects, topics, notes, quizzes, exam sections, and exam tips
-- Import optional quiz question explanations while remaining compatible with older seeds
-- Reuse existing subjects, topics, and exam sections during JSON seed import
-- ToStore-backed local persistence for Study Mode and the current Exam Mode entities
-- Cascade deletion support through ToStore relationships
-- Repository contracts for local-first data access
-- Riverpod migration for the main local-first study and quiz flows
-- Stream-based Riverpod providers for automatic UI updates in migrated local lists
-- Riverpod controllers for create/edit/delete actions
-- Application-level helpers for quiz validation, quiz play data loading, and JSON seed import
-- String-based IDs prepared for ToStore and backend integration
-- Basic Material Design UI
-- Custom light and dark color schemes
-- Responsive layouts for phones and tablets in portrait and landscape
-- Custom StudyFlow launcher icon for Android, iOS, and Windows
-- Reusable mode card, list item, form button, SnackBar, and empty state widgets
-- Themed SnackBar feedback for local success, info, error, and delete actions
-- Practice Exam models, relationships, repository contracts, ToStore schemas, and the first ToStore repository
+#### Study Mode
 
-## Screenshots
+- Create, edit, and delete Subjects, Topics, and Subtopics
+- Organize Markdown Study Notes inside Subtopics
+- Create one question bank / Quiz for each Topic
+- Classify every quiz question with a Subtopic
+- Select one, several, or all Subtopics before starting a quiz
+- Create and edit Markdown questions, answers, and explanations
+- Enforce a single correct answer per question
+- Randomize questions and answer options during quiz play
+- Show immediate correct/incorrect feedback and explanations
+- Navigate through quizzes and view final score and percentage
+- Retry a quiz with the same Subtopic selection
+- Use quizzes without a fixed question limit
 
-Current work-in-progress Flutter UI using local-first ToStore persistence.
+#### Exam Mode
 
-<p>
-  <img src="docs/screenshots/start-screen.png" alt="Start screen" width="220">
-  <img src="docs/screenshots/subjects-screen.png" alt="Subjects screen" width="220">
-  <img src="docs/screenshots/topics-screen.png" alt="Topics screen" width="220">
-  <img src="docs/screenshots/study-notes-screen.png" alt="Study notes screen" width="220">
-  <img src="docs/screenshots/note-detail-screen.png" alt="Note detail screen" width="220">
-</p>
+- Create, edit, and delete Exam Sections such as AP1 and AP2
+- Create and read Markdown Exam Tips
+- Create, edit, and delete Practice Exams
+- Configure passing percentage and optional duration
+- Create and edit Practice Exam questions and explanations
+- Optionally associate exam questions with a Subtopic
+- Create, edit, and delete answer options
+- Require at least four options and exactly one correct answer
+- Run complete Practice Exam simulations offline
+- Move backwards and forwards while preserving selected answers
+- Show immediate feedback, explanations, final score, and percentage
 
-## Empty States
+Attempt persistence and history are the next Exam Mode milestones.
 
-Screens shown when there is no local data yet.
+#### Shared Application Features
 
-<p>
-  <img src="docs/screenshots/subjects-empty-screen.png" width="180" />
-  <img src="docs/screenshots/topics-empty-screen.png" width="180" />
-  <img src="docs/screenshots/study-notes-empty-screen.png" width="180" />
-</p>
+- Offline ToStore persistence with foreign keys and cascade rules
+- Riverpod repository, stream, controller, and use-case providers
+- Repository contracts separating UI and persistence
+- JSON import from pasted text or a selected `.json` file
+- Responsive layouts for phone and tablet orientations
+- Light and dark themes
+- Markdown rendering
+- Custom Android, iOS, and Windows launcher icon
+- Shared buttons, empty states, SnackBars, and responsive layout widgets
 
-## App Flow
+### App Flow
 
 ```text
 StartScreen
@@ -84,185 +61,195 @@ StartScreen
       -> SubjectsScreen
          -> TopicsScreen
             -> TopicDetailScreen
-               -> StudyNotesScreen
-                  -> NoteScreen
+               -> SubtopicsScreen
+                  -> SubtopicDetailScreen
+                     -> StudyNotesScreen
+                        -> NoteScreen
                -> QuizzesScreen
-                  -> QuizQuestionsScreen
-                     -> QuestionDetailScreen
+                  -> Subtopic selection
                   -> QuizPlayScreen
                      -> QuizResultScreen
+                  -> QuizQuestionsScreen
+                     -> QuestionDetailScreen
    -> Exam Mode
       -> ExamSectionsScreen
          -> ExamSectionDetailScreen
-            -> ExamTipsScreen
-               -> ExamTipScreen
-            -> Practice Exams (planned)
+            -> Exam Tips
+            -> Practice Exams
+               -> Question and answer management
+               -> PracticeExamPlayScreen
+                  -> PracticeExamResultScreen
             -> History (planned)
 ```
 
-## Project Structure
+### Data Model
+
+```text
+Subject 1 --- * Topic
+Topic   1 --- * Subtopic
+Subtopic 1 -- * StudyNote
+
+Topic 1 ----- 0..1 Quiz
+Quiz 1 ------ * Question
+Subtopic 1 -- * Question
+Question 1 -- * AnswerOption
+
+ExamSection 1 --- * ExamTip
+ExamSection 1 --- * PracticeExam
+PracticeExam 1 -- * PracticeExamQuestion
+PracticeExamQuestion 1 -- * PracticeExamAnswerOption
+Subtopic 0..1 --- * PracticeExamQuestion
+```
+
+Deleting a Subtopic deletes its Study Notes and regular quiz questions. A
+Practice Exam question is preserved and its optional Subtopic reference is set
+to `null`.
+
+### Project Structure
 
 ```text
 frontend/
 |-- docs/
 |   |-- architecture/
-|   `-- screenshots/
+|   |-- screenshots/
+|   `-- study-seed-subtopics-example.json
 |-- lib/
-|   |-- application/
-|   |   |-- import/
-|   |   |   |-- import_study_seed.dart
-|   |   |   |-- study_seed.dart
-|   |   |   |-- study_seed_parser.dart
-|   |   |   `-- study_seed_validation.dart
-|   |   `-- quiz/
-|   |       |-- load_quiz_play_data.dart
-|   |       |-- quiz_play_data.dart
-|   |       `-- validate_quiz_can_start.dart
-|   |-- controllers/
-|   |   |-- exam_sections_controller.dart
-|   |   |-- exam_tips_controller.dart
-|   |   |-- subjects_controller.dart
-|   |   |-- topics_controller.dart
-|   |   |-- study_notes_controller.dart
-|   |   |-- quizzes_controller.dart
-|   |   |-- questions_controller.dart
-|   |   `-- answer_options_controller.dart
-|   |-- local/
-|   |   `-- tostore/
-|   |       |-- studyflow_database.dart
-|   |       |-- studyflow_schemas.dart
-|   |       |-- tostore_exam_sections_repository.dart
-|   |       |-- tostore_exam_tips_repository.dart
-|   |       |-- tostore_subjects_repository.dart
-|   |       |-- tostore_topics_repository.dart
-|   |       |-- tostore_study_notes_repository.dart
-|   |       |-- tostore_quizzes_repository.dart
-|   |       |-- tostore_questions_repository.dart
-|   |       `-- tostore_answer_options_repository.dart
-|   |-- models/
-|   |   |-- exam_section.dart
-|   |   |-- exam_tip.dart
-|   |   |-- subject.dart
-|   |   |-- topic.dart
-|   |   |-- study_note.dart
-|   |   |-- quiz.dart
-|   |   |-- question.dart
-|   |   |-- answer_option.dart
-|   |   |-- practice_exam.dart
-|   |   |-- practice_exam_question.dart
-|   |   `-- practice_exam_answer_option.dart
-|   |-- providers/
-|   |   |-- answer_options_repository_provider.dart
-|   |   |-- answer_options_stream_provider.dart
-|   |   |-- exam_sections_repository_provider.dart
-|   |   |-- exam_sections_stream_provider.dart
-|   |   |-- exam_tips_repository_provider.dart
-|   |   |-- exam_tips_stream_provider.dart
-|   |   |-- import_study_seed_provider.dart
-|   |   |-- load_quiz_play_data_provider.dart
-|   |   |-- questions_repository_provider.dart
-|   |   |-- questions_stream_provider.dart
-|   |   |-- quizzes_repository_provider.dart
-|   |   |-- quizzes_stream_provider.dart
-|   |   |-- study_notes_repository_provider.dart
-|   |   |-- study_notes_stream_provider.dart
-|   |   |-- subjects_repository_provider.dart
-|   |   |-- subjects_stream_provider.dart
-|   |   |-- topics_repository_provider.dart
-|   |   |-- topics_stream_provider.dart
-|   |   `-- validate_quiz_can_start_provider.dart
-|   |-- repositories/
-|   |   `-- contracts/
-|   |-- screens/
-|   |-- theme/
-|   `-- widgets/
+|   |-- application/             Use cases, validation, play data, imports
+|   |-- controllers/             Create, edit, and delete orchestration
+|   |-- local/tostore/           Database setup, schemas, repositories
+|   |-- models/                  Frontend domain models
+|   |-- providers/               Riverpod dependencies and streams
+|   |-- repositories/contracts/  Persistence abstractions
+|   |-- screens/                 Study Mode and Exam Mode UI
+|   |-- theme/                   Light and dark Material themes
+|   `-- widgets/                 Reusable UI components
+|-- test/
 |-- pubspec.yaml
 `-- README.md
 ```
 
-## Tech Stack
+The main data flow is:
 
-- Dart
-- Flutter
-- Material Design
-- ToStore for local persistence
-- Repository pattern with local ToStore implementations
-- Riverpod for state management, dependency access, and controller-based screen logic
-- StreamProvider for automatic UI updates in migrated local lists
-- flutter_markdown for rendering study notes, quiz questions, and answer options
-- file_selector for importing JSON files through the platform file picker
-- StatefulWidget and setState for purely local visual UI state
-- Flutter Navigator for screen navigation
-
-## Run Locally
-
-Install dependencies:
-
-```powershell
-flutter pub get
+```text
+Screen
+-> Riverpod Controller / Application Use Case
+-> Repository Contract
+-> ToStore Repository
+-> Local Database
 ```
 
-Analyze the project:
+### JSON Seed Import
+
+The importer currently supports:
+
+- Subjects, Topics, and Subtopics
+- Markdown Study Notes inside Subtopics
+- One Topic Quiz with questions classified by Subtopic
+- Answer options and optional Markdown explanations
+- Exam Sections and Markdown Exam Tips
+
+Canonical example:
+
+- [Subtopic seed example](docs/study-seed-subtopics-example.json)
+
+A new-format Topic looks like this:
+
+```json
+{
+  "name": "Programmiergrundlagen",
+  "subtopics": [
+    {
+      "name": "Objektorientierte Programmierung",
+      "studyNotes": []
+    }
+  ],
+  "quiz": {
+    "name": "Programmiergrundlagen Quiz",
+    "questions": [
+      {
+        "subtopic": "Objektorientierte Programmierung",
+        "markdownText": "What does encapsulation protect?",
+        "explanationMarkdown": "It protects the internal object state.",
+        "answerOptions": [
+          {
+            "markdownText": "The internal state",
+            "isCorrect": true
+          },
+          {
+            "markdownText": "The package manager",
+            "isCorrect": false
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Legacy Topics containing `studyNotes` directly remain valid. Their notes are
+placed in an automatically created `General` Subtopic. With multiple Subtopics,
+every question must name an existing Subtopic from the same Topic.
+
+Practice Exams, attempts, and flashcards are not part of the importer yet.
+Reimporting the same seed can duplicate child content. Large imports also do not
+show detailed progress yet and should not be interrupted.
+
+### Local Database Version
+
+The Subtopic schema uses `studyflow_v2`. This clean database version was
+introduced because ToStore cannot safely add required Subtopic foreign keys to
+already populated pre-V1 tables. Existing old database files are not deleted,
+but their content is not read by V2 and must be imported through a converted
+seed.
+
+### Verification
 
 ```powershell
 flutter analyze
+flutter test
 ```
 
-Run the app:
+The current suite has 26 passing tests. It covers:
+
+- Old and new JSON seed formats
+- Optional question explanations
+- Unknown Subtopic rejection
+- Practice Exam data loading and validation
+- Practice Exam controllers
+- Subtopic selection behaviour
+
+### Run and Build
 
 ```powershell
+flutter pub get
 flutter run
 ```
 
-## JSON Seed Import
+Generate the Android release APK:
 
-StudyFlow accepts pasted JSON and `.json` files. A seed can contain Study Mode
-content, optional quiz question explanations, Exam Mode sections, or a
-combination of them. Existing subjects, topics, and exam sections are reused
-when their normalized names match.
+```powershell
+flutter build apk --release
+```
 
-- [JSON seed format](docs/json-seed-template.md)
-- [Exam Mode seed example](docs/exam-seed-example.json)
+Output:
 
-Study notes, quizzes, questions, answer options, and exam tips are added as new
-content when a seed is imported again. Import tests cover questions with and
-without explanations. Import rollback and Practice Exam import are not
-implemented yet.
+```text
+build/app/outputs/flutter-apk/app-release.apk
+```
 
-# Current Status
+The current application version is `1.0.0+1`.
 
-The frontend is intentionally local-first at this stage.
+### Next V1 Steps
 
-Screens access data through repository contracts, and the active implementations use ToStore for local persistence. Subjects, topics, study notes, quizzes, questions, and answer options are stored locally.
-
-Subjects, topics, study notes, quizzes, questions, answer options, quiz validation, and quiz play data loading have been migrated to Riverpod-based providers, controllers, and application-level helpers. Subjects, topics, study notes, quizzes, quiz questions, and answer options now use stream-based providers backed by ToStore watchers, so their lists update automatically when local data changes. Controllers delegate persistence operations to the ToStore-backed repositories, while screens observe provider state and forward user actions to controllers instead of loading and storing entity lists manually.
-
-The app now supports local create, edit, and delete flows for the main study entities: subjects, topics, study notes, quiz questions, and answer options. Larger deletion flows, such as subjects and topics, use confirmation dialogs because related data can be removed through ToStore cascade relationships.
-
-The quiz area has a usable local flow. Users can create quiz questions, add answer options, mark correct answers, prevent multiple correct answers for the same question, edit quiz content, validate quiz readiness before starting, play quizzes of any length with randomized questions and answer options, receive visual feedback, read optional Markdown explanations, and view a final result screen with score and percentage.
-
-Study notes, quiz questions, answer options, and question explanations are rendered as Markdown when shown to the user. This keeps generated JSON seed content readable when it includes bullets, emphasis, explanations, or simple structured text.
-
-The UI has a dedicated mode selection screen after the start screen. Study Mode opens the subject/topic/note/quiz flow. Exam Mode opens locally persisted exam sections and provides a section detail screen with Tips, Exams, and History destinations. Tips are functional and support Markdown. The Practice Exam foundation now contains its models, relationships, repository contracts, ToStore schemas, and top-level ToStore repository. Question and answer repositories, screens, simulation, and History remain under development. JSON seed import is available from the mode selection area.
-
-Light and dark themes are configured in `lib/theme/app_theme.dart`. Shared UI helpers keep repeated styling consistent, including mode cards, primary form button styling, and success/info/error/delete SnackBars.
-
-The JSON seed import flow accepts pasted JSON and `.json` files through the platform file selector. It can create Study Mode content, optional quiz explanations, exam sections, and exam tips. Existing subjects, topics, and exam sections are reused by normalized name comparison. The importer validates the seed and retries local creation operations to tolerate temporary ToStore ID-pool delays. Focused tests verify compatibility with questions both with and without explanations.
-
-The frontend models use string-based IDs to prepare the app for local persistence and later backend synchronization.
-
-The next major work is completing the remaining Practice Exam repositories and management screens, simulation, persisted attempts, and a useful history view.
-
-## Next Steps
-
-- Implement the remaining ToStore repositories for Practice Exam questions and answers
-- Add providers, controllers, management screens, and validation
-- Add Practice Exam simulation with Markdown explanations
-- Persist exam attempts and show basic result history
-- Extend JSON seeds with Practice Exams and answer explanations
-- Add focused tests for Practice Exam persistence and validation
-- Complete release testing on phone and tablet
-- Add JSON export, backend integration, and synchronization after V1
+- Add `ExamAttempt` and `ExamAttemptAnswer`
+- Persist completed Practice Exams and selected answers
+- Add attempt list and detail screens
+- Calculate basic accuracy by Subtopic and Topic
+- Recommend relevant notes and filtered Topic Quizzes after mistakes
+- Add flashcards with Again, Hard, Good, and Easy
+- Import Practice Exams and flashcards from JSON
+- Add import progress, duplicate protection, and recoverable errors
+- Finish Android phone and tablet release QA
 
 ---
 
@@ -270,21 +257,46 @@ The next major work is completing the remaining Practice Exam repositories and m
 
 ### Aktuelle Funktionen
 
-- Offline-first Study Mode mit Subjects, Topics und Markdown Study Notes
-- Lokales Erstellen, Bearbeiten und Loeschen von Lerninhalten
-- Quizze mit beliebig vielen Fragen und zufaelliger Reihenfolge
-- Markdown fuer Fragen, Antwortoptionen und optionale Erklaerungen
-- Visuelles Feedback sowie Ergebnisanzeige mit Punktzahl und Prozentwert
-- Exam Sections fuer Bereiche wie AP1 und AP2
-- Lokal persistierte Exam Tips mit Markdown-Unterstuetzung
+#### Study Mode
+
+- Subjects, Topics und Subtopics erstellen, bearbeiten und loeschen
+- Markdown Study Notes innerhalb von Subtopics organisieren
+- Einen gemeinsamen Fragenbestand pro Topic verwalten
+- Jede Quizfrage einem Subtopic zuordnen
+- Vor dem Quiz ein, mehrere oder alle Subtopics auswaehlen
+- Fragen, Antworten und Erklaerungen als Markdown verwalten
+- Genau eine richtige Antwort pro Frage sicherstellen
+- Fragen und Antwortoptionen zufaellig anordnen
+- Direktes Richtig/Falsch-Feedback und Erklaerungen anzeigen
+- Ergebnis mit Punktzahl und Prozentwert anzeigen
+- Quiz mit derselben Subtopic-Auswahl wiederholen
+- Quizze ohne feste maximale Fragenanzahl verwenden
+
+#### Exam Mode
+
+- Exam Sections wie AP1 und AP2 verwalten
+- Markdown Exam Tips verwalten
+- Practice Exams erstellen, bearbeiten und loeschen
+- Bestehensgrenze und optionale Dauer konfigurieren
+- Fragen, Erklaerungen und Antwortoptionen verwalten
+- Exam-Fragen optional einem Subtopic zuordnen
+- Mindestens vier Optionen und genau eine richtige Antwort validieren
+- Practice Exams vollstaendig offline durchfuehren
+- Mit erhaltenen Antworten vor- und zuruecknavigieren
+- Direktes Feedback, Erklaerungen und Endergebnis anzeigen
+
+Die Persistenz von Versuchen und der Verlauf sind die naechsten Meilensteine.
+
+#### Gemeinsame Funktionen
+
+- Lokale ToStore-Persistenz mit Foreign Keys und Cascade-Regeln
+- Riverpod-Provider, Streams, Controller und Use Cases
+- Repository-Vertraege zwischen UI und Persistenz
 - JSON-Import ueber Text oder Dateiauswahl
-- Import von Quiz-Erklaerungen mit Kompatibilitaet zu aelteren Seeds
-- ToStore-Persistenz mit Foreign Keys und Cascade Delete
-- Riverpod-Provider, StreamProvider und Controller fuer lokale Flows
-- Responsive Layouts fuer Smartphone und Tablet in Hoch- und Querformat
-- Gemeinsames Light Theme und Dark Theme
-- Eigenes StudyFlow-App-Icon fuer Android, iOS und Windows
-- Practice-Exam-Modelle, Repository-Vertraege, ToStore-Schemas und das erste ToStore-Repository
+- Responsive Layouts fuer Smartphone und Tablet
+- Light Mode und Dark Mode
+- Markdown-Darstellung
+- Eigenes App-Icon
 
 ### App-Ablauf
 
@@ -292,47 +304,70 @@ The next major work is completing the remaining Practice Exam repositories and m
 StartScreen
 -> ModeSelectionScreen
    -> Study Mode
-      -> Subjects -> Topics -> Notes oder Quiz
+      -> Subjects -> Topics -> Subtopics -> Study Notes
+      -> Topic Quiz -> Subtopic-Auswahl -> Quiz -> Ergebnis
    -> Exam Mode
       -> Exam Sections
-         -> Tips (nutzbar)
-         -> Practice Exams (in Entwicklung)
+         -> Tips
+         -> Practice Exams -> Simulation -> Ergebnis
          -> History (geplant)
 ```
 
-### Aktueller Stand
+### JSON-Import
 
-Das Frontend funktioniert ohne Backend und speichert seine Daten lokal mit
-ToStore. Die Screens greifen ueber Repository-Vertraege auf Daten zu. Riverpod
-stellt Repositories, Live-Listen und Controller bereit, sodass die UI nicht
-direkt von der Persistenzimplementierung abhaengt.
+Das neue Format verwendet die Hierarchie:
 
-Study Mode ist bereits als nutzbarer Offline-Flow vorhanden. Quizfragen koennen
-optionale Markdown-Erklaerungen enthalten, die nach der Beantwortung angezeigt
-werden. Der JSON-Importer verarbeitet Fragen mit und ohne Erklaerung; gezielte
-Tests pruefen beide Varianten.
+```text
+Subject -> Topic -> Subtopic -> Study Note
+```
 
-Exam Mode unterstuetzt aktuell Exam Sections und Markdown Tips. Fuer Practice
-Exams existieren bereits `PracticeExam`, `PracticeExamQuestion` und
-`PracticeExamAnswerOption` sowie Beziehungen, Cascade-Regeln,
-Repository-Vertraege und ToStore-Schemas. Das ToStore-Repository fuer
-Practice Exams ist implementiert. Repositories fuer Fragen und Antworten, UI,
-Simulation und Versuchshistorie sind noch nicht als fertige Funktion verfuegbar.
+Das Topic besitzt weiterhin das Quiz. Jede Quizfrage verweist ueber `subtopic`
+auf den exakten Namen eines Subtopics im selben Topic. Das verbindliche Beispiel
+befindet sich unter:
 
-### Naechste Schritte
+- [Subtopic-Seed-Beispiel](docs/study-seed-subtopics-example.json)
 
-- ToStore-Repositories fuer Practice-Exam-Fragen und -Antworten
-- Provider, Controller und CRUD-Screens
-- Validierung: mindestens vier Optionen und genau eine richtige Antwort
-- Exam-Simulation mit Erklaerungen und Ergebnisanzeige
-- Persistierte Versuche und History
-- Practice Exams im JSON-Import
-- Tests und Release-Pruefung auf Smartphone und Tablet
+Alte Topics mit direkten `studyNotes` bleiben kompatibel. Ihre Notizen werden
+beim Import einem automatisch erzeugten Subtopic `General` zugeordnet.
 
-### Lokal ausfuehren
+Practice Exams, Versuche und Karteikarten werden noch nicht importiert. Ein
+erneuter Import kann untergeordnete Inhalte duplizieren. Grosse Imports zeigen
+noch keinen detaillierten Fortschritt und sollten nicht unterbrochen werden.
+
+### Lokale Datenbank
+
+Das aktuelle Schema verwendet `studyflow_v2`. Die neue lokale Datenbank startet
+leer, weil erforderliche Subtopic-Fremdschluessel nicht sicher in bereits
+gefuellte Pre-V1-Tabellen eingefuegt werden konnten. Alte Datenbankdateien werden
+nicht geloescht; ihre Inhalte muessen ueber einen konvertierten Seed erneut
+importiert werden.
+
+### Pruefung, Start und Build
 
 ```powershell
 flutter pub get
 flutter analyze
+flutter test
 flutter run
 ```
+
+Android-Release-APK erstellen:
+
+```powershell
+flutter build apk --release
+```
+
+Die aktuelle Testsuite umfasst 26 erfolgreiche Tests. Die App-Version ist
+`1.0.0+1`.
+
+### Naechste V1-Schritte
+
+- ExamAttempt und ExamAttemptAnswer einfuehren
+- Practice-Exam-Versuche und Antworten persistieren
+- Verlaufs- und Detailansicht erstellen
+- Accuracy nach Subtopic und Topic berechnen
+- Nach Fehlern passende Notizen und gefilterte Quizzes empfehlen
+- Karteikarten mit Again, Hard, Good und Easy implementieren
+- Practice Exams und Karteikarten per JSON importieren
+- Import-Fortschritt und Duplikatschutz hinzufuegen
+- Release-QA auf Smartphone und Tablet abschliessen

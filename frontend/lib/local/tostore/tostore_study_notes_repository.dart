@@ -5,16 +5,31 @@ import 'package:frontend/repositories/contracts/study_notes_repository.dart';
 class ToStoreStudyNotesRepository implements StudyNotesRepository {
   static const _tableName = 'study_notes';
 
+  StudyNote _mapRow(Map<String, dynamic> row) {
+    final updatedAt = row['updatedAt'];
+
+    return StudyNote(
+      id: row['id'].toString(),
+      subtopicId: row['subtopicId'].toString(),
+      name: row['name'].toString(),
+      markdownText: row['markdownText'].toString(),
+      createdAt: DateTime.parse(row['createdAt'].toString()),
+      updatedAt: updatedAt == null
+          ? null
+          : DateTime.parse(updatedAt.toString()),
+    );
+  }
+
   @override
   Future<StudyNote> addStudyNote({
-    required String topicId,
+    required String subtopicId,
     required String name,
     required String markdownText,
   }) async {
     final createdAt = DateTime.now();
 
     final result = await StudyFlowDatabase.db.insert(_tableName, {
-      'topicId': topicId,
+      'subtopicId': subtopicId,
       'name': name,
       'markdownText': markdownText,
       'createdAt': createdAt.toIso8601String(),
@@ -29,7 +44,7 @@ class ToStoreStudyNotesRepository implements StudyNotesRepository {
 
     return StudyNote(
       id: generatedId,
-      topicId: topicId,
+      subtopicId: subtopicId,
       name: name,
       markdownText: markdownText,
       createdAt: createdAt,
@@ -37,44 +52,22 @@ class ToStoreStudyNotesRepository implements StudyNotesRepository {
   }
 
   @override
-  Future<List<StudyNote>> getStudyNotesByTopicId(String topicId) async {
+  Future<List<StudyNote>> getStudyNotesBySubtopicId(String subtopicId) async {
     final result = await StudyFlowDatabase.db.query(_tableName);
 
-    return result.data.where((row) => row['topicId'].toString() == topicId).map(
-      (row) {
-        final updatedAtValue = row['updatedAt'];
-
-        return StudyNote(
-          id: row['id'].toString(),
-          topicId: row['topicId'].toString(),
-          name: row['name'].toString(),
-          markdownText: row['markdownText'].toString(),
-          createdAt: DateTime.parse(row['createdAt'].toString()),
-          updatedAt: updatedAtValue == null
-              ? null
-              : DateTime.parse(updatedAtValue.toString()),
-        );
-      },
-    ).toList();
+    return result.data
+        .where((row) => row['subtopicId'].toString() == subtopicId)
+        .map(_mapRow)
+        .toList();
   }
 
   @override
-  Stream<List<StudyNote>> watchStudyNotesByTopicId(String topicId) {
+  Stream<List<StudyNote>> watchStudyNotesBySubtopicId(String subtopicId) {
     return StudyFlowDatabase.db.query(_tableName).watch().map((rows) {
-      return rows.where((row) => row['topicId'].toString() == topicId).map((
-        row,
-      ) {
-        return StudyNote(
-          id: row['id'].toString(),
-          topicId: row['topicId'].toString(),
-          name: row['name'].toString(),
-          markdownText: row['markdownText'].toString(),
-          createdAt: DateTime.parse(row['createdAt'].toString()),
-          updatedAt: row['updatedAt'] == null
-              ? null
-              : DateTime.parse(row['updatedAt'].toString()),
-        );
-      }).toList();
+      return rows
+          .where((row) => row['subtopicId'].toString() == subtopicId)
+          .map(_mapRow)
+          .toList();
     });
   }
 
@@ -94,12 +87,14 @@ class ToStoreStudyNotesRepository implements StudyNotesRepository {
     required String id,
     required String name,
     required String markdownText,
+    required String subtopicId,
   }) async {
     final updatedAt = DateTime.now();
 
     final result = await StudyFlowDatabase.db
         .update(_tableName, {
           'name': name,
+          'subtopicId': subtopicId,
           'markdownText': markdownText,
           'updatedAt': updatedAt.toIso8601String(),
         })

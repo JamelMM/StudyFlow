@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/practice_exam_question.dart';
-import 'package:frontend/providers/practice_exam_topic_options_provider.dart';
+import 'package:frontend/providers/practice_exam_subtopic_options_provider.dart';
 import 'package:frontend/widgets/app_button_styles.dart';
 
 class PracticeExamQuestionForm extends StatefulWidget {
   const PracticeExamQuestionForm({
     super.key,
     this.question,
-    required this.topicOptions,
+    required this.subtopicOptions,
     required this.onSubmit,
   });
 
   final PracticeExamQuestion? question;
-  final List<PracticeExamTopicOption> topicOptions;
+  final List<PracticeExamSubtopicOption> subtopicOptions;
   final Future<bool> Function(
     String markdownText,
     String? explanationMarkdown,
-    String? topicId,
+    String? subtopicId,
   )
   onSubmit;
 
@@ -30,7 +30,7 @@ class _PracticeExamQuestionFormState extends State<PracticeExamQuestionForm> {
 
   late final TextEditingController _markdownTextController;
   late final TextEditingController _explanationMarkdownController;
-  String? _selectedTopicId;
+  String? _selectedSubtopicId;
 
   bool _isSaving = false;
 
@@ -44,7 +44,7 @@ class _PracticeExamQuestionFormState extends State<PracticeExamQuestionForm> {
     _explanationMarkdownController = TextEditingController(
       text: widget.question?.explanationMarkdown ?? '',
     );
-    _selectedTopicId = widget.question?.topicId;
+    _selectedSubtopicId = widget.question?.subtopicId;
   }
 
   @override
@@ -76,7 +76,7 @@ class _PracticeExamQuestionFormState extends State<PracticeExamQuestionForm> {
       final wasSaved = await widget.onSubmit(
         markdownText,
         explanationText.isEmpty ? null : explanationText,
-        _selectedTopicId,
+        _selectedSubtopicId,
       );
 
       if (mounted && wasSaved) {
@@ -125,24 +125,18 @@ class _PracticeExamQuestionFormState extends State<PracticeExamQuestionForm> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              initialValue: _selectedTopicId ?? '',
+              initialValue: _selectedSubtopicId ?? '',
               isExpanded: true,
               decoration: const InputDecoration(
-                labelText: 'Topic',
+                labelText: 'Subtopic',
                 helperText: 'Optional',
               ),
               items: [
-                const DropdownMenuItem(
-                  value: '',
-                  child: Text('No topic'),
-                ),
-                ...widget.topicOptions.map(
+                const DropdownMenuItem(value: '', child: Text('No subtopic')),
+                ...widget.subtopicOptions.map(
                   (option) => DropdownMenuItem(
-                    value: option.topicId,
-                    child: Text(
-                      option.label,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    value: option.subtopicId,
+                    child: Text(option.label, overflow: TextOverflow.ellipsis),
                   ),
                 ),
               ],
@@ -150,7 +144,7 @@ class _PracticeExamQuestionFormState extends State<PracticeExamQuestionForm> {
                   ? null
                   : (value) {
                       setState(() {
-                        _selectedTopicId = value == null || value.isEmpty
+                        _selectedSubtopicId = value == null || value.isEmpty
                             ? null
                             : value;
                       });

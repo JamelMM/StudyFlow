@@ -6,9 +6,11 @@ import 'package:frontend/controllers/quizzes_controller.dart';
 import 'package:frontend/models/quiz.dart';
 import 'package:frontend/models/topic.dart';
 import 'package:frontend/providers/quizzes_stream_provider.dart';
+import 'package:frontend/providers/subtopics_stream_provider.dart';
 import 'package:frontend/providers/validate_quiz_can_start_provider.dart';
 import 'package:frontend/screens/quiz_play_screen.dart';
 import 'package:frontend/screens/quiz_questions_screen.dart';
+import 'package:frontend/screens/quiz_subtopic_selection_sheet.dart';
 import 'package:frontend/widgets/app_snack_bar.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/widgets/responsive_layout.dart';
@@ -42,9 +44,39 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
   }
 
   Future<void> _startQuiz(Quiz quiz) async {
+    final subtopics = await ref.read(
+      subtopicsStreamProvider(widget.topic.id).future,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    if (subtopics.isEmpty) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(appErrorSnackBar('Create a subtopic first.'));
+      return;
+    }
+
+    final selectedSubtopicIds = await showModalBottomSheet<Set<String>>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
+      builder: (context) => QuizSubtopicSelectionSheet(subtopics: subtopics),
+    );
+
+    if (!mounted || selectedSubtopicIds == null) {
+      return;
+    }
+
     final validateQuizCanStart = ref.read(validateQuizCanStartProvider);
 
-    final errorMessage = await validateQuizCanStart(quiz.id);
+    final errorMessage = await validateQuizCanStart(
+      quiz.id,
+      selectedSubtopicIds: selectedSubtopicIds,
+    );
 
     if (!mounted) {
       return;
@@ -61,7 +93,12 @@ class _QuizzesScreenState extends ConsumerState<QuizzesScreen> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => QuizPlayScreen(quiz: quiz)),
+      MaterialPageRoute(
+        builder: (context) => QuizPlayScreen(
+          quiz: quiz,
+          selectedSubtopicIds: selectedSubtopicIds,
+        ),
+      ),
     );
   }
 

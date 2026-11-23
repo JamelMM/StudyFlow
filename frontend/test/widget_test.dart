@@ -1,30 +1,47 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:frontend/screens/subject_screen.dart';
+import 'package:frontend/models/subtopic.dart';
+import 'package:frontend/screens/quiz_subtopic_selection_sheet.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(SubjectScreen());
+  testWidgets('subtopic selection requires at least one selection', (
+    tester,
+  ) async {
+    final subtopics = [
+      Subtopic(
+        id: 'subtopic-1',
+        topicId: 'topic-1',
+        name: 'OOP',
+        createdAt: DateTime(2026),
+      ),
+      Subtopic(
+        id: 'subtopic-2',
+        topicId: 'topic-1',
+        name: 'Testing',
+        createdAt: DateTime(2026),
+      ),
+    ];
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(body: QuizSubtopicSelectionSheet(subtopics: subtopics)),
+      ),
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    expect(find.text('OOP'), findsOneWidget);
+    expect(find.text('Testing'), findsOneWidget);
+    expect(
+      tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+      isNotNull,
+    );
+
+    await tester.tap(find.text('Clear all'));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Select all'), findsOneWidget);
+    expect(
+      tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
+      isNull,
+    );
   });
 }

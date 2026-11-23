@@ -5,6 +5,7 @@ import 'package:tostore/tostore.dart';
 import 'studyflow_schemas.dart';
 
 class StudyFlowDatabase {
+  static const _databaseName = 'studyflow_v2';
   static ToStore? _db;
 
   static ToStore get db {
@@ -20,11 +21,11 @@ class StudyFlowDatabase {
   static Future<void> initialize() async {
     final documentDirectory = await getApplicationDocumentsDirectory();
 
-    final dbPath = p.join(documentDirectory.path, 'studyflow');
+    final dbPath = p.join(documentDirectory.path, _databaseName);
 
     _db = await ToStore.open(
       dbPath: dbPath,
-      dbName: 'studyflow',
+      dbName: _databaseName,
       schemas: studyFlowSchemas,
     );
   }

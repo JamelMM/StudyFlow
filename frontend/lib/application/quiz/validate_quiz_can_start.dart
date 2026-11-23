@@ -10,11 +10,23 @@ class ValidateQuizCanStart {
   final QuestionsRepository questionsRepository;
   final AnswerOptionsRepository answerOptionsRepository;
 
-  Future<String?> call(String quizId) async {
-    final questions = await questionsRepository.getQuestionsByQuizId(quizId);
+  Future<String?> call(
+    String quizId, {
+    Set<String>? selectedSubtopicIds,
+  }) async {
+    final allQuestions = await questionsRepository.getQuestionsByQuizId(quizId);
+    final questions = selectedSubtopicIds == null
+        ? allQuestions
+        : allQuestions
+              .where(
+                (question) => selectedSubtopicIds.contains(question.subtopicId),
+              )
+              .toList();
 
     if (questions.isEmpty) {
-      return 'Add at least one question before starting the quiz.';
+      return selectedSubtopicIds == null
+          ? 'Add at least one question before starting the quiz.'
+          : 'The selected subtopics do not contain any questions.';
     }
 
     for (final question in questions) {

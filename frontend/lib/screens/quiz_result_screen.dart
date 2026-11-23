@@ -9,11 +9,13 @@ class QuizResultScreen extends StatelessWidget {
     required this.quiz,
     required this.correctAnswersCount,
     required this.totalQuestions,
+    required this.selectedSubtopicIds,
   });
 
   final Quiz quiz;
   final int correctAnswersCount;
   final int totalQuestions;
+  final Set<String> selectedSubtopicIds;
 
   @override
   Widget build(BuildContext context) {
@@ -96,13 +98,17 @@ class QuizResultScreen extends StatelessWidget {
                         backgroundColor:
                             appBarTheme.backgroundColor ?? colorScheme.primary,
                         foregroundColor:
-                            appBarTheme.foregroundColor ?? colorScheme.onPrimary,
+                            appBarTheme.foregroundColor ??
+                            colorScheme.onPrimary,
                       ),
                       onPressed: () {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => QuizPlayScreen(quiz: quiz),
+                            builder: (context) => QuizPlayScreen(
+                              quiz: quiz,
+                              selectedSubtopicIds: selectedSubtopicIds,
+                            ),
                           ),
                         );
                       },

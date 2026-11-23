@@ -74,26 +74,44 @@ class StudySeedValidation {
       return 'Topic name cannot be empty in subject "$subjectName".';
     }
 
-    for (final note in topic.studyNotes) {
-      final noteError = _validateStudyNote(note, topic.name);
+    if (topic.subtopics.isEmpty) {
+      return 'Topic "${topic.name}" must contain at least one subtopic.';
+    }
 
-      if (noteError != null) {
-        return noteError;
+    final subtopicNames = <String>{};
+
+    for (final subtopic in topic.subtopics) {
+      if (subtopic.name.trim().isEmpty) {
+        return 'Subtopic name cannot be empty in topic "${topic.name}".';
+      }
+
+      final normalizedName = subtopic.name.trim().toLowerCase();
+
+      if (!subtopicNames.add(normalizedName)) {
+        return 'Subtopic "${subtopic.name}" is duplicated in topic "${topic.name}".';
+      }
+
+      for (final note in subtopic.studyNotes) {
+        final noteError = _validateStudyNote(note, subtopic.name);
+
+        if (noteError != null) {
+          return noteError;
+        }
       }
     }
 
     final quiz = topic.quiz;
 
     if (quiz != null) {
-      return _validateQuiz(quiz, topic.name);
+      return _validateQuiz(quiz, topic);
     }
 
     return null;
   }
 
-  String? _validateStudyNote(SeedStudyNote note, String topicName) {
+  String? _validateStudyNote(SeedStudyNote note, String subtopicName) {
     if (note.name.trim().isEmpty) {
-      return 'Study note name cannot be empty in topic "$topicName".';
+      return 'Study note name cannot be empty in subtopic "$subtopicName".';
     }
 
     if (note.markdownText.trim().isEmpty) {
@@ -103,9 +121,9 @@ class StudySeedValidation {
     return null;
   }
 
-  String? _validateQuiz(SeedQuiz quiz, String topicName) {
+  String? _validateQuiz(SeedQuiz quiz, SeedTopic topic) {
     if (quiz.name.trim().isEmpty) {
-      return 'Quiz name cannot be empty in topic "$topicName".';
+      return 'Quiz name cannot be empty in topic "${topic.name}".';
     }
 
     if (quiz.questions.isEmpty) {
@@ -113,11 +131,40 @@ class StudySeedValidation {
     }
 
     for (final question in quiz.questions) {
+      final subtopicError = _validateQuestionSubtopic(question, topic);
+
+      if (subtopicError != null) {
+        return subtopicError;
+      }
+
       final questionError = _validateQuestion(question, quiz.name);
 
       if (questionError != null) {
         return questionError;
       }
+    }
+
+    return null;
+  }
+
+  String? _validateQuestionSubtopic(SeedQuestion question, SeedTopic topic) {
+    final subtopicName = question.subtopicName?.trim();
+
+    if (subtopicName == null || subtopicName.isEmpty) {
+      if (topic.subtopics.length == 1) {
+        return null;
+      }
+
+      return 'Every question in topic "${topic.name}" must specify a subtopic.';
+    }
+
+    final exists = topic.subtopics.any(
+      (subtopic) =>
+          subtopic.name.trim().toLowerCase() == subtopicName.toLowerCase(),
+    );
+
+    if (!exists) {
+      return 'Question references unknown subtopic "$subtopicName" in topic "${topic.name}".';
     }
 
     return null;

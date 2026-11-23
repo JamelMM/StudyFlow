@@ -35,8 +35,8 @@ final topicSchema = TableSchema(
   ],
 );
 
-final studyNoteSchema = TableSchema(
-  name: 'study_notes',
+final subtopicSchema = TableSchema(
+  name: 'subtopics',
   primaryKeyConfig: PrimaryKeyConfig(
     name: 'id',
     type: PrimaryKeyType.timestampBased,
@@ -44,15 +44,39 @@ final studyNoteSchema = TableSchema(
   fields: [
     FieldSchema(name: 'topicId', type: DataType.text, nullable: false),
     FieldSchema(name: 'name', type: DataType.text, nullable: false),
+    FieldSchema(name: 'createdAt', type: DataType.text, nullable: false),
+    FieldSchema(name: 'updatedAt', type: DataType.text, nullable: true),
+  ],
+  foreignKeys: [
+    ForeignKeySchema(
+      name: 'fk_subtopics_topic',
+      fields: ['topicId'],
+      referencedTable: 'topics',
+      referencedFields: ['id'],
+      onDelete: ForeignKeyCascadeAction.cascade,
+      onUpdate: ForeignKeyCascadeAction.cascade,
+    ),
+  ],
+);
+
+final studyNoteSchema = TableSchema(
+  name: 'study_notes',
+  primaryKeyConfig: PrimaryKeyConfig(
+    name: 'id',
+    type: PrimaryKeyType.timestampBased,
+  ),
+  fields: [
+    FieldSchema(name: 'subtopicId', type: DataType.text, nullable: false),
+    FieldSchema(name: 'name', type: DataType.text, nullable: false),
     FieldSchema(name: 'markdownText', type: DataType.text, nullable: false),
     FieldSchema(name: 'createdAt', type: DataType.text, nullable: false),
     FieldSchema(name: 'updatedAt', type: DataType.text, nullable: true),
   ],
   foreignKeys: [
     ForeignKeySchema(
-      name: 'fk_study_notes_topic',
-      fields: ['topicId'],
-      referencedTable: 'topics',
+      name: 'fk_study_notes_subtopic',
+      fields: ['subtopicId'],
+      referencedTable: 'subtopics',
       referencedFields: ['id'],
       onDelete: ForeignKeyCascadeAction.cascade,
       onUpdate: ForeignKeyCascadeAction.cascade,
@@ -92,6 +116,7 @@ final questionSchema = TableSchema(
   ),
   fields: [
     FieldSchema(name: 'quizId', type: DataType.text, nullable: false),
+    FieldSchema(name: 'subtopicId', type: DataType.text, nullable: false),
     FieldSchema(name: 'markdownText', type: DataType.text, nullable: false),
     FieldSchema(name: 'createdAt', type: DataType.text, nullable: false),
     FieldSchema(name: 'updatedAt', type: DataType.text, nullable: true),
@@ -103,9 +128,17 @@ final questionSchema = TableSchema(
   ],
   foreignKeys: [
     ForeignKeySchema(
-      name: 'fk_question_quiz',
+      name: 'fk_questions_quiz',
       fields: ['quizId'],
       referencedTable: 'quizzes',
+      referencedFields: ['id'],
+      onDelete: ForeignKeyCascadeAction.cascade,
+      onUpdate: ForeignKeyCascadeAction.cascade,
+    ),
+    ForeignKeySchema(
+      name: 'fk_questions_subtopic',
+      fields: ['subtopicId'],
+      referencedTable: 'subtopics',
       referencedFields: ['id'],
       onDelete: ForeignKeyCascadeAction.cascade,
       onUpdate: ForeignKeyCascadeAction.cascade,
@@ -217,7 +250,7 @@ final practiceExamQuestionSchema = TableSchema(
   ),
   fields: [
     FieldSchema(name: 'practiceExamId', type: DataType.text, nullable: false),
-    FieldSchema(name: 'topicId', type: DataType.text, nullable: true),
+    FieldSchema(name: 'subtopicId', type: DataType.text, nullable: true),
     FieldSchema(name: 'markdownText', type: DataType.text, nullable: false),
     FieldSchema(name: 'createdAt', type: DataType.text, nullable: false),
     FieldSchema(name: 'updatedAt', type: DataType.text, nullable: true),
@@ -234,6 +267,14 @@ final practiceExamQuestionSchema = TableSchema(
       referencedTable: 'practice_exams',
       referencedFields: ['id'],
       onDelete: ForeignKeyCascadeAction.cascade,
+      onUpdate: ForeignKeyCascadeAction.cascade,
+    ),
+    ForeignKeySchema(
+      name: 'fk_practice_exam_questions_subtopic',
+      fields: ['subtopicId'],
+      referencedTable: 'subtopics',
+      referencedFields: ['id'],
+      onDelete: ForeignKeyCascadeAction.setNull,
       onUpdate: ForeignKeyCascadeAction.cascade,
     ),
   ],
@@ -271,6 +312,7 @@ final practiceExamAnswerOptionSchema = TableSchema(
 final studyFlowSchemas = [
   subjectSchema,
   topicSchema,
+  subtopicSchema,
   studyNoteSchema,
   quizSchema,
   questionSchema,

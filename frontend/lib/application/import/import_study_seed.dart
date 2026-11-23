@@ -11,6 +11,8 @@ import 'package:frontend/repositories/contracts/exam_tips_repository.dart';
 import 'package:frontend/models/exam_section.dart';
 import 'package:frontend/models/subject.dart';
 import 'package:frontend/models/topic.dart';
+import 'package:frontend/models/subtopic.dart';
+import 'package:frontend/repositories/contracts/subtopics_repository.dart';
 
 class ImportStudySeed {
   const ImportStudySeed({
@@ -18,6 +20,7 @@ class ImportStudySeed {
     required this.validation,
     required this.subjectsRepository,
     required this.topicsRepository,
+    required this.subtopicsRepository,
     required this.studyNotesRepository,
     required this.quizzesRepository,
     required this.questionsRepository,
@@ -30,6 +33,7 @@ class ImportStudySeed {
   final StudySeedValidation validation;
   final SubjectsRepository subjectsRepository;
   final TopicsRepository topicsRepository;
+  final SubtopicsRepository subtopicsRepository;
   final StudyNotesRepository studyNotesRepository;
   final QuizzesRepository quizzesRepository;
   final QuestionsRepository questionsRepository;
@@ -106,6 +110,24 @@ class ImportStudySeed {
     );
   }
 
+  Future<Subtopic> _findOrCreateSubtopic({
+    required String topicId,
+    required String name,
+  }) async {
+    final subtopics = await subtopicsRepository.getSubtopicsByTopicId(topicId);
+    final normalizedName = name.trim().toLowerCase();
+
+    for (final subtopic in subtopics) {
+      if (subtopic.name.trim().toLowerCase() == normalizedName) {
+        return subtopic;
+      }
+    }
+
+    return _createWithRetry(
+      () => subtopicsRepository.addSubtopic(topicId: topicId, name: name),
+    );
+  }
+
   Future<ExamSection> _findOrCreateExamSection(String name) async {
     final examSections = await examSectionsRepository.getExamSections();
     final normalizedName = name.trim().toLowerCase();
@@ -137,14 +159,24 @@ class ImportStudySeed {
           name: seedTopic.name,
         );
 
-        for (final seedNote in seedTopic.studyNotes) {
-          await _createWithRetry(
-            () => studyNotesRepository.addStudyNote(
-              topicId: topic.id,
-              name: seedNote.name,
-              markdownText: seedNote.markdownText,
-            ),
+        final subtopicsByName = <String, Subtopic>{};
+
+        for (final seedSubtopic in seedTopic.subtopics) {
+          final subtopic = await _findOrCreateSubtopic(
+            topicId: topic.id,
+            name: seedSubtopic.name,
           );
+          subtopicsByName[seedSubtopic.name.trim().toLowerCase()] = subtopic;
+
+          for (final seedNote in seedSubtopic.studyNotes) {
+            await _createWithRetry(
+              () => studyNotesRepository.addStudyNote(
+                subtopicId: subtopic.id,
+                name: seedNote.name,
+                markdownText: seedNote.markdownText,
+              ),
+            );
+          }
         }
 
         final seedQuiz = seedTopic.quiz;
@@ -159,9 +191,16 @@ class ImportStudySeed {
         );
 
         for (final seedQuestion in seedQuiz.questions) {
+          final requestedSubtopicName = seedQuestion.subtopicName?.trim();
+          final questionSubtopic =
+              requestedSubtopicName == null || requestedSubtopicName.isEmpty
+              ? subtopicsByName.values.single
+              : subtopicsByName[requestedSubtopicName.toLowerCase()]!;
+
           final question = await _createWithRetry(
             () => questionsRepository.addQuestion(
               quizId: quiz.id,
+              subtopicId: questionSubtopic.id,
               markdownText: seedQuestion.markdownText,
               explanationMarkdown: seedQuestion.explanationMarkdown,
             ),

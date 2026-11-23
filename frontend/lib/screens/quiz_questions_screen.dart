@@ -4,6 +4,7 @@ import 'package:frontend/models/question.dart';
 import 'package:frontend/models/quiz.dart';
 import 'package:frontend/controllers/questions_controller.dart';
 import 'package:frontend/providers/questions_stream_provider.dart';
+import 'package:frontend/providers/subtopics_stream_provider.dart';
 import 'package:frontend/screens/new_question.dart';
 import 'package:frontend/screens/question_detail_screen.dart';
 import 'package:frontend/widgets/empty_state_message.dart';
@@ -27,10 +28,15 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
   Future<void> _addQuestion(
     String markdownText,
     String? explanationMarkdown,
+    String subtopicId,
   ) async {
     await ref
         .read(questionsControllerProvider(widget.quiz.id))
-        .addQuestion(markdownText, explanationMarkdown: explanationMarkdown);
+        .addQuestion(
+          markdownText: markdownText,
+          subtopicId: subtopicId,
+          explanationMarkdown: explanationMarkdown,
+        );
 
     if (!mounted) {
       return;
@@ -42,14 +48,29 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
     ).showSnackBar(appSuccessSnackBar('Question successfully created'));
   }
 
-  void _openAddQuestionOverlay() {
+  Future<void> _openAddQuestionOverlay() async {
+    final subtopics = await ref.read(
+      subtopicsStreamProvider(widget.quiz.topicId).future,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    if (subtopics.isEmpty) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(appErrorSnackBar('Create a subtopic first.'));
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
       builder: (ctx) {
-        return NewQuestion(onAddQuestion: _addQuestion);
+        return NewQuestion(subtopics: subtopics, onAddQuestion: _addQuestion);
       },
     );
   }
@@ -97,7 +118,15 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
     return shouldDelete == true;
   }
 
-  void _openEditQuestionOverlay(Question question) {
+  Future<void> _openEditQuestionOverlay(Question question) async {
+    final subtopics = await ref.read(
+      subtopicsStreamProvider(widget.quiz.topicId).future,
+    );
+
+    if (!mounted) {
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -106,9 +135,11 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
       builder: (ctx) {
         return EditQuestion(
           question: question,
-          onUpdateQuestion: (markdownText, explanationMarkdown) {
-            _updateQuestion(
+          subtopics: subtopics,
+          onUpdateQuestion: (markdownText, explanationMarkdown, subtopicId) {
+            return _updateQuestion(
               id: question.id,
+              subtopicId: subtopicId,
               markdownText: markdownText,
               explanationMarkdown: explanationMarkdown,
             );
@@ -120,6 +151,7 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
 
   Future<void> _updateQuestion({
     required String id,
+    required String subtopicId,
     required String markdownText,
     String? explanationMarkdown,
   }) async {
@@ -127,6 +159,7 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
         .read(questionsControllerProvider(widget.quiz.id))
         .updateQuestion(
           id: id,
+          subtopicId: subtopicId,
           markdownText: markdownText,
           explanationMarkdown: explanationMarkdown,
         );
@@ -144,6 +177,16 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
   @override
   Widget build(BuildContext context) {
     final questionsAsync = ref.watch(questionsStreamProvider(widget.quiz.id));
+    final subtopicsAsync = ref.watch(
+      subtopicsStreamProvider(widget.quiz.topicId),
+    );
+    final subtopicsById = subtopicsAsync.when(
+      data: (subtopics) => {
+        for (final subtopic in subtopics) subtopic.id: subtopic.name,
+      },
+      loading: () => const <String, String>{},
+      error: (error, stackTrace) => const <String, String>{},
+    );
 
     Widget mainContent = questionsAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -176,35 +219,51 @@ class _QuizQuestionsScreenState extends ConsumerState<QuizQuestionsScreen> {
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: MarkdownBody(data: question.markdownText),
-                        ),
-                        PopupMenuButton<String>(
-                          onSelected: (value) async {
-                            if (value == 'edit') {
-                              _openEditQuestionOverlay(question);
-                            }
+                        Row(
+                          children: [
+                            Expanded(
+                              child: MarkdownBody(data: question.markdownText),
+                            ),
+                            PopupMenuButton<String>(
+                              onSelected: (value) async {
+                                if (value == 'edit') {
+                                  _openEditQuestionOverlay(question);
+                                }
 
-                            if (value == 'delete') {
-                              final shouldRemove = await _confirmRemoveQuestion(
-                                question,
-                              );
+                                if (value == 'delete') {
+                                  final shouldRemove =
+                                      await _confirmRemoveQuestion(question);
 
-                              if (shouldRemove == true) {
-                                _removeQuestion(question);
-                              }
-                            }
-                          },
-                          itemBuilder: (context) => const [
-                            PopupMenuItem(value: 'edit', child: Text('Edit')),
-                            PopupMenuItem(
-                              value: 'delete',
-                              child: Text('Delete'),
+                                  if (shouldRemove == true) {
+                                    _removeQuestion(question);
+                                  }
+                                }
+                              },
+                              itemBuilder: (context) => const [
+                                PopupMenuItem(
+                                  value: 'edit',
+                                  child: Text('Edit'),
+                                ),
+                                PopupMenuItem(
+                                  value: 'delete',
+                                  child: Text('Delete'),
+                                ),
+                              ],
                             ),
                           ],
                         ),
+                        if (subtopicsById[question.subtopicId]
+                            case final label?)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              label,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ),
                       ],
                     ),
                   ),

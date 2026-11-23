@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/models/question.dart';
+import 'package:frontend/models/subtopic.dart';
 import 'package:frontend/widgets/app_button_styles.dart';
 
 class EditQuestion extends StatefulWidget {
   const EditQuestion({
     super.key,
     required this.question,
+    required this.subtopics,
     required this.onUpdateQuestion,
   });
 
   final Question question;
-  final void Function(String markdownText, String? explanationMarkdown)
+  final List<Subtopic> subtopics;
+  final Future<void> Function(
+    String markdownText,
+    String? explanationMarkdown,
+    String subtopicId,
+  )
   onUpdateQuestion;
 
   @override
@@ -22,6 +29,8 @@ class EditQuestion extends StatefulWidget {
 class _EditQuestionState extends State<EditQuestion> {
   late final TextEditingController _markdownTextController;
   late final TextEditingController _explanationMarkdownController;
+  late String _selectedSubtopicId;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -32,9 +41,10 @@ class _EditQuestionState extends State<EditQuestion> {
     _explanationMarkdownController = TextEditingController(
       text: widget.question.explanationMarkdown ?? '',
     );
+    _selectedSubtopicId = widget.question.subtopicId;
   }
 
-  void _submitQuestionData() {
+  Future<void> _submitQuestionData() async {
     final enteredMarkdownText = _markdownTextController.text.trim();
     final enteredExplanation = _explanationMarkdownController.text.trim();
 
@@ -42,11 +52,27 @@ class _EditQuestionState extends State<EditQuestion> {
       return;
     }
 
-    widget.onUpdateQuestion(
-      enteredMarkdownText,
-      enteredExplanation.isEmpty ? null : enteredExplanation,
-    );
-    Navigator.pop(context);
+    setState(() {
+      _isSaving = true;
+    });
+
+    try {
+      await widget.onUpdateQuestion(
+        enteredMarkdownText,
+        enteredExplanation.isEmpty ? null : enteredExplanation,
+        _selectedSubtopicId,
+      );
+
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
+    }
   }
 
   @override
@@ -72,6 +98,29 @@ class _EditQuestionState extends State<EditQuestion> {
             decoration: const InputDecoration(label: Text('Question')),
           ),
           const SizedBox(height: 16),
+          DropdownButtonFormField<String>(
+            initialValue: _selectedSubtopicId,
+            isExpanded: true,
+            decoration: const InputDecoration(labelText: 'Subtopic'),
+            items: widget.subtopics
+                .map(
+                  (subtopic) => DropdownMenuItem(
+                    value: subtopic.id,
+                    child: Text(subtopic.name, overflow: TextOverflow.ellipsis),
+                  ),
+                )
+                .toList(),
+            onChanged: _isSaving
+                ? null
+                : (value) {
+                    if (value != null) {
+                      setState(() {
+                        _selectedSubtopicId = value;
+                      });
+                    }
+                  },
+          ),
+          const SizedBox(height: 16),
           TextField(
             controller: _explanationMarkdownController,
             maxLength: 2000,
@@ -87,13 +136,20 @@ class _EditQuestionState extends State<EditQuestion> {
             children: [
               FilledButton(
                 style: appPrimaryButtonStyle(context),
-                onPressed: _submitQuestionData,
-                child: const Text('Save'),
+                onPressed: _isSaving ? null : _submitQuestionData,
+                child: _isSaving
+                    ? const SizedBox.square(
+                        dimension: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Save'),
               ),
               TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                onPressed: _isSaving
+                    ? null
+                    : () {
+                        Navigator.pop(context);
+                      },
                 child: const Text('Cancel'),
               ),
             ],

@@ -12,14 +12,14 @@ abstract class PracticeExamQuestionsRepository {
   Future<PracticeExamQuestion> addQuestion({
     required String practiceExamId,
     required String markdownText,
-    String? topicId,
+    String? subtopicId,
     String? explanationMarkdown,
   });
 
   Future<void> updateQuestion({
     required String id,
     required String markdownText,
-    String? topicId,
+    String? subtopicId,
     String? explanationMarkdown,
   });
 

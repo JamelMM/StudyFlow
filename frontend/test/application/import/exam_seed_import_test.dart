@@ -11,6 +11,7 @@ import 'package:frontend/repositories/contracts/questions_repository.dart';
 import 'package:frontend/repositories/contracts/quizzes_repository.dart';
 import 'package:frontend/repositories/contracts/study_notes_repository.dart';
 import 'package:frontend/repositories/contracts/subjects_repository.dart';
+import 'package:frontend/repositories/contracts/subtopics_repository.dart';
 import 'package:frontend/repositories/contracts/topics_repository.dart';
 
 void main() {
@@ -23,6 +24,7 @@ void main() {
       validation: const StudySeedValidation(),
       subjectsRepository: unusedRepositories,
       topicsRepository: unusedRepositories,
+      subtopicsRepository: unusedRepositories,
       studyNotesRepository: unusedRepositories,
       quizzesRepository: unusedRepositories,
       questionsRepository: unusedRepositories,
@@ -141,9 +143,7 @@ class _MemoryExamTipsRepository implements ExamTipsRepository {
 
   @override
   Future<List<ExamTip>> getExamTipsBySectionId(String examSectionId) async {
-    return items
-        .where((item) => item.examSectionId == examSectionId)
-        .toList();
+    return items.where((item) => item.examSectionId == examSectionId).toList();
   }
 
   @override
@@ -170,6 +170,7 @@ class _UnusedStudyRepositories
     implements
         SubjectsRepository,
         TopicsRepository,
+        SubtopicsRepository,
         StudyNotesRepository,
         QuizzesRepository,
         QuestionsRepository,

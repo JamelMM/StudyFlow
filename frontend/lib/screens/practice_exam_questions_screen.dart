@@ -5,7 +5,7 @@ import 'package:frontend/controllers/practice_exam_questions_controller.dart';
 import 'package:frontend/models/practice_exam.dart';
 import 'package:frontend/models/practice_exam_question.dart';
 import 'package:frontend/providers/practice_exam_questions_stream_provider.dart';
-import 'package:frontend/providers/practice_exam_topic_options_provider.dart';
+import 'package:frontend/providers/practice_exam_subtopic_options_provider.dart';
 import 'package:frontend/screens/practice_exam_question_form.dart';
 import 'package:frontend/screens/practice_exam_question_detail_screen.dart';
 import 'package:frontend/widgets/app_snack_bar.dart';
@@ -40,13 +40,15 @@ class _PracticeExamQuestionsScreenState
   }
 
   Future<void> _openQuestionOverlay({PracticeExamQuestion? question}) async {
-    List<PracticeExamTopicOption> topicOptions;
+    List<PracticeExamSubtopicOption> subtopicOptions;
 
     try {
-      topicOptions = await ref.read(practiceExamTopicOptionsProvider.future);
+      subtopicOptions = await ref.read(
+        practiceExamSubtopicOptionsProvider.future,
+      );
     } catch (_) {
       if (mounted) {
-        _showSnackBar(appErrorSnackBar('Could not load topics.'));
+        _showSnackBar(appErrorSnackBar('Could not load subtopics.'));
       }
       return;
     }
@@ -62,13 +64,13 @@ class _PracticeExamQuestionsScreenState
       constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width),
       builder: (context) => PracticeExamQuestionForm(
         question: question,
-        topicOptions: topicOptions,
-        onSubmit: (markdownText, explanationMarkdown, topicId) {
+        subtopicOptions: subtopicOptions,
+        onSubmit: (markdownText, explanationMarkdown, subtopicId) {
           if (question == null) {
             return _addQuestion(
               markdownText: markdownText,
               explanationMarkdown: explanationMarkdown,
-              topicId: topicId,
+              subtopicId: subtopicId,
             );
           }
 
@@ -76,7 +78,7 @@ class _PracticeExamQuestionsScreenState
             question: question,
             markdownText: markdownText,
             explanationMarkdown: explanationMarkdown,
-            topicId: topicId,
+            subtopicId: subtopicId,
           );
         },
       ),
@@ -86,7 +88,7 @@ class _PracticeExamQuestionsScreenState
   Future<bool> _addQuestion({
     required String markdownText,
     String? explanationMarkdown,
-    String? topicId,
+    String? subtopicId,
   }) async {
     try {
       await ref
@@ -94,7 +96,7 @@ class _PracticeExamQuestionsScreenState
           .addQuestion(
             markdownText: markdownText,
             explanationMarkdown: explanationMarkdown,
-            topicId: topicId,
+            subtopicId: subtopicId,
           );
 
       if (!mounted) {
@@ -116,7 +118,7 @@ class _PracticeExamQuestionsScreenState
     required PracticeExamQuestion question,
     required String markdownText,
     String? explanationMarkdown,
-    String? topicId,
+    String? subtopicId,
   }) async {
     try {
       await ref
@@ -125,7 +127,7 @@ class _PracticeExamQuestionsScreenState
             id: question.id,
             markdownText: markdownText,
             explanationMarkdown: explanationMarkdown,
-            topicId: topicId,
+            subtopicId: subtopicId,
           );
 
       if (!mounted) {
@@ -185,12 +187,12 @@ class _PracticeExamQuestionsScreenState
 
   @override
   Widget build(BuildContext context) {
-    final topicOptions = ref
-        .watch(practiceExamTopicOptionsProvider)
+    final subtopicOptions = ref
+        .watch(practiceExamSubtopicOptionsProvider)
         .when(
           data: (options) => options,
-          loading: () => const <PracticeExamTopicOption>[],
-          error: (error, stackTrace) => const <PracticeExamTopicOption>[],
+          loading: () => const <PracticeExamSubtopicOption>[],
+          error: (error, stackTrace) => const <PracticeExamSubtopicOption>[],
         );
     final questionsAsync = ref.watch(
       practiceExamQuestionsStreamProvider(widget.practiceExam.id),
@@ -216,7 +218,10 @@ class _PracticeExamQuestionsScreenState
           itemCount: questions.length,
           itemBuilder: (context, index) {
             final question = questions[index];
-            final topicLabel = _findTopicLabel(topicOptions, question.topicId);
+            final subtopicLabel = _findSubtopicLabel(
+              subtopicOptions,
+              question.subtopicId,
+            );
 
             return Card(
               child: InkWell(
@@ -244,7 +249,7 @@ class _PracticeExamQuestionsScreenState
                             ),
                             const SizedBox(height: 8),
                             MarkdownBody(data: question.markdownText),
-                            if (topicLabel != null) ...[
+                            if (subtopicLabel != null) ...[
                               const SizedBox(height: 8),
                               Row(
                                 children: [
@@ -252,7 +257,7 @@ class _PracticeExamQuestionsScreenState
                                   const SizedBox(width: 6),
                                   Expanded(
                                     child: Text(
-                                      topicLabel,
+                                      subtopicLabel,
                                       style: Theme.of(
                                         context,
                                       ).textTheme.bodySmall,
@@ -342,16 +347,16 @@ class _PracticeExamQuestionsScreenState
     );
   }
 
-  String? _findTopicLabel(
-    List<PracticeExamTopicOption> options,
-    String? topicId,
+  String? _findSubtopicLabel(
+    List<PracticeExamSubtopicOption> options,
+    String? subtopicId,
   ) {
-    if (topicId == null) {
+    if (subtopicId == null) {
       return null;
     }
 
     for (final option in options) {
-      if (option.topicId == topicId) {
+      if (option.subtopicId == subtopicId) {
         return option.label;
       }
     }

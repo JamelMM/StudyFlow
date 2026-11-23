@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/models/study_note.dart';
-import 'package:frontend/models/topic.dart';
-import 'package:frontend/providers/study_notes_stream_provider.dart';
-import 'package:frontend/screens/note_screen.dart';
-import 'package:frontend/widgets/study_notes/study_note_list_item.dart';
-import 'package:frontend/widgets/app_snack_bar.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/controllers/study_notes_controller.dart';
+import 'package:frontend/models/study_note.dart';
+import 'package:frontend/models/subtopic.dart';
+import 'package:frontend/providers/study_notes_stream_provider.dart';
 import 'package:frontend/screens/edit_study_note.dart';
+import 'package:frontend/screens/note_screen.dart';
+import 'package:frontend/widgets/app_snack_bar.dart';
+import 'package:frontend/widgets/empty_state_message.dart';
 import 'package:frontend/widgets/responsive_layout.dart';
+import 'package:frontend/widgets/study_notes/study_note_list_item.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class StudyNotesScreen extends ConsumerStatefulWidget {
   const StudyNotesScreen({
     super.key,
-    required this.topic,
+    required this.subtopic,
     required this.onAddStudyNotePressed,
   });
 
-  final Topic topic;
+  final Subtopic subtopic;
   final VoidCallback onAddStudyNotePressed;
 
   @override
@@ -56,7 +56,7 @@ class _StudyNotesScreenState extends ConsumerState<StudyNotesScreen> {
     required String markdownText,
   }) async {
     await ref
-        .read(studyNotesControllerProvider(widget.topic.id))
+        .read(studyNotesControllerProvider(widget.subtopic.id))
         .updateStudyNote(id: note.id, name: title, markdownText: markdownText);
 
     if (!mounted) {
@@ -64,9 +64,9 @@ class _StudyNotesScreenState extends ConsumerState<StudyNotesScreen> {
     }
 
     ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      appSuccessSnackBar('Note successfully updated'),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appSuccessSnackBar('Note successfully updated'));
   }
 
   Future<void> _confirmRemoveStudyNote(StudyNote note) async {
@@ -103,7 +103,7 @@ class _StudyNotesScreenState extends ConsumerState<StudyNotesScreen> {
 
   Future<void> _removeStudyNote(StudyNote note) async {
     await ref
-        .read(studyNotesControllerProvider(widget.topic.id))
+        .read(studyNotesControllerProvider(widget.subtopic.id))
         .removeStudyNote(note.id);
 
     if (!mounted) {
@@ -111,15 +111,15 @@ class _StudyNotesScreenState extends ConsumerState<StudyNotesScreen> {
     }
 
     ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      appDeleteSnackBar('Note deleted'),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appDeleteSnackBar('Note deleted'));
   }
 
   @override
   Widget build(BuildContext context) {
     final studyNotesAsync = ref.watch(
-      studyNotesStreamProvider(widget.topic.id),
+      studyNotesStreamProvider(widget.subtopic.id),
     );
 
     final mainContent = studyNotesAsync.when(
@@ -131,7 +131,7 @@ class _StudyNotesScreenState extends ConsumerState<StudyNotesScreen> {
           return EmptyStateMessage(
             icon: Icons.note_add_outlined,
             title: 'No study notes yet.',
-            message: 'Create your first note for this topic.',
+            message: 'Create your first note for this subtopic.',
             buttonText: 'Add note',
             onPressed: widget.onAddStudyNotePressed,
           );

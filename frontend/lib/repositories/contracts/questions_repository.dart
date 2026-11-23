@@ -5,6 +5,7 @@ abstract class QuestionsRepository {
 
   Future<Question> addQuestion({
     required String quizId,
+    required String subtopicId,
     required String markdownText,
     String? explanationMarkdown,
   });
@@ -15,6 +16,7 @@ abstract class QuestionsRepository {
 
   Future<void> updateQuestion({
     required String id,
+    required String subtopicId,
     required String markdownText,
     String? explanationMarkdown,
   });

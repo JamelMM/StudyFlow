@@ -98,8 +98,36 @@ class StudySeedParser {
 
       return SeedTopic(
         name: item['name'] as String,
-        studyNotes: _parseStudyNotes(item['studyNotes']),
+        subtopics: _parseSubtopics(item),
         quiz: _parseQuiz(item['quiz']),
+      );
+    }).toList();
+  }
+
+  List<SeedSubtopic> _parseSubtopics(Map<String, dynamic> topicJson) {
+    final value = topicJson['subtopics'];
+
+    if (value == null) {
+      return [
+        SeedSubtopic(
+          name: 'General',
+          studyNotes: _parseStudyNotes(topicJson['studyNotes']),
+        ),
+      ];
+    }
+
+    if (value is! List) {
+      throw const FormatException('subtopics must be a list.');
+    }
+
+    return value.map((item) {
+      if (item is! Map<String, dynamic>) {
+        throw const FormatException('Each subtopic must be an object.');
+      }
+
+      return SeedSubtopic(
+        name: item['name'] as String,
+        studyNotes: _parseStudyNotes(item['studyNotes']),
       );
     }).toList();
   }
@@ -152,6 +180,7 @@ class StudySeedParser {
 
       return SeedQuestion(
         markdownText: item['markdownText'] as String,
+        subtopicName: (item['subtopic'] ?? item['subtopicName']) as String?,
         explanationMarkdown: item['explanationMarkdown'] as String?,
         answerOptions: _parseAnswerOptions(item['answerOptions']),
       );

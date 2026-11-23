@@ -11,9 +11,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/widgets/question_explanation_card.dart';
 
 class QuizPlayScreen extends ConsumerStatefulWidget {
-  const QuizPlayScreen({super.key, required this.quiz});
+  const QuizPlayScreen({
+    super.key,
+    required this.quiz,
+    required this.selectedSubtopicIds,
+  });
 
   final Quiz quiz;
+  final Set<String> selectedSubtopicIds;
 
   @override
   ConsumerState<QuizPlayScreen> createState() {
@@ -64,6 +69,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
             quiz: widget.quiz,
             correctAnswersCount: _correctAnswersCount,
             totalQuestions: quizPlayData.questions.length,
+            selectedSubtopicIds: widget.selectedSubtopicIds,
           ),
         ),
       );
@@ -86,18 +92,31 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
       error: (error, stackTrace) =>
           const Center(child: Text('Could not load quiz data.')),
       data: (quizPlayData) {
-        if (quizPlayData.questions.isEmpty) {
+        final filteredQuizPlayData = QuizPlayData(
+          questions: quizPlayData.questions
+              .where(
+                (question) =>
+                    widget.selectedSubtopicIds.contains(question.subtopicId),
+              )
+              .toList(),
+          answerOptionsByQuestionId: quizPlayData.answerOptionsByQuestionId,
+        );
+
+        if (filteredQuizPlayData.questions.isEmpty) {
           return const Center(child: Text('No questions found for this quiz.'));
         }
 
-        final currentQuestion = quizPlayData.questions[_currentQuestionIndex];
+        final currentQuestion =
+            filteredQuizPlayData.questions[_currentQuestionIndex];
         final explanationMarkdown = currentQuestion.explanationMarkdown?.trim();
         final selectedAnswerOptionId =
             _selectedAnswerOptionIdsByQuestionId[currentQuestion.id];
         final hasAnswered = selectedAnswerOptionId != null;
 
         final currentAnswerOptions =
-            quizPlayData.answerOptionsByQuestionId[currentQuestion.id] ?? [];
+            filteredQuizPlayData.answerOptionsByQuestionId[currentQuestion
+                .id] ??
+            [];
 
         return LayoutBuilder(
           builder: (context, constraints) {
@@ -193,10 +212,11 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                     appBarTheme.foregroundColor ?? colorScheme.onPrimary,
               ),
               onPressed: hasAnswered
-                  ? () => _goToNextQuestion(quizPlayData)
+                  ? () => _goToNextQuestion(filteredQuizPlayData)
                   : null,
               child: Text(
-                _currentQuestionIndex == quizPlayData.questions.length - 1
+                _currentQuestionIndex ==
+                        filteredQuizPlayData.questions.length - 1
                     ? 'Finish quiz'
                     : 'Next question',
               ),
@@ -248,7 +268,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Text(
-                            'Question ${_currentQuestionIndex + 1} of ${quizPlayData.questions.length}',
+                            'Question ${_currentQuestionIndex + 1} of ${filteredQuizPlayData.questions.length}',
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 16),
@@ -282,7 +302,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Question ${_currentQuestionIndex + 1} of ${quizPlayData.questions.length}',
+                      'Question ${_currentQuestionIndex + 1} of ${filteredQuizPlayData.questions.length}',
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),

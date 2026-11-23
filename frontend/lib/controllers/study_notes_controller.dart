@@ -3,30 +3,30 @@ import 'package:frontend/providers/study_notes_repository_provider.dart';
 import 'package:frontend/repositories/contracts/study_notes_repository.dart';
 
 final studyNotesControllerProvider =
-    Provider.family<StudyNotesController, String>((ref, topicId) {
+    Provider.family<StudyNotesController, String>((ref, subtopicId) {
       final studyNotesRepository = ref.watch(studyNotesRepositoryProvider);
 
       return StudyNotesController(
         studyNotesRepository: studyNotesRepository,
-        topicId: topicId,
+        subtopicId: subtopicId,
       );
     });
 
 class StudyNotesController {
   const StudyNotesController({
     required this.studyNotesRepository,
-    required this.topicId,
+    required this.subtopicId,
   });
 
   final StudyNotesRepository studyNotesRepository;
-  final String topicId;
+  final String subtopicId;
 
   Future<void> addStudyNote({
     required String name,
     required String markdownText,
   }) async {
     await studyNotesRepository.addStudyNote(
-      topicId: topicId,
+      subtopicId: subtopicId,
       name: name,
       markdownText: markdownText,
     );
@@ -43,6 +43,7 @@ class StudyNotesController {
   }) async {
     await studyNotesRepository.updateStudyNote(
       id: id,
+      subtopicId: subtopicId,
       name: name,
       markdownText: markdownText,
     );

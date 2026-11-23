@@ -32,11 +32,18 @@ class SeedSubject {
 }
 
 class SeedTopic {
-  const SeedTopic({required this.name, required this.studyNotes, this.quiz});
+  const SeedTopic({required this.name, required this.subtopics, this.quiz});
+
+  final String name;
+  final List<SeedSubtopic> subtopics;
+  final SeedQuiz? quiz;
+}
+
+class SeedSubtopic {
+  const SeedSubtopic({required this.name, required this.studyNotes});
 
   final String name;
   final List<SeedStudyNote> studyNotes;
-  final SeedQuiz? quiz;
 }
 
 class SeedStudyNote {
@@ -57,10 +64,12 @@ class SeedQuestion {
   const SeedQuestion({
     required this.markdownText,
     required this.answerOptions,
+    this.subtopicName,
     this.explanationMarkdown,
   });
 
   final String markdownText;
+  final String? subtopicName;
   final String? explanationMarkdown;
   final List<SeedAnswerOption> answerOptions;
 }

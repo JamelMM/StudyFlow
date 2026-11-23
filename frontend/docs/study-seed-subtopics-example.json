@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "subjects": [
+    {
+      "name": "Anwendungsentwicklung",
+      "topics": [
+        {
+          "name": "Programmiergrundlagen",
+          "subtopics": [
+            {
+              "name": "Objektorientierte Programmierung",
+              "studyNotes": [
+                {
+                  "name": "Kapselung",
+                  "markdownText": "# Kapselung\n\nKapselung schützt den internen Zustand eines Objekts und erlaubt den Zugriff über eine klar definierte öffentliche Schnittstelle."
+                }
+              ]
+            },
+            {
+              "name": "Testing",
+              "studyNotes": [
+                {
+                  "name": "Unit Test",
+                  "markdownText": "# Unit Test\n\nEin Unit Test prüft eine kleine, isolierte Einheit des Programms automatisch und reproduzierbar."
+                }
+              ]
+            }
+          ],
+          "quiz": {
+            "name": "Programmiergrundlagen Quiz",
+            "questions": [
+              {
+                "subtopic": "Objektorientierte Programmierung",
+                "markdownText": "Welches Ziel hat die **Kapselung**?",
+                "explanationMarkdown": "Kapselung verbirgt interne Details und stellt einen kontrollierten Zugriff über eine öffentliche Schnittstelle bereit.",
+                "answerOptions": [
+                  {
+                    "markdownText": "Den internen Zustand kontrolliert schützen",
+                    "isCorrect": true
+                  },
+                  {
+                    "markdownText": "Alle Attribute global verfügbar machen",
+                    "isCorrect": false
+                  },
+                  {
+                    "markdownText": "Vererbung vollständig ersetzen",
+                    "isCorrect": false
+                  },
+                  {
+                    "markdownText": "Quellcode automatisch kompilieren",
+                    "isCorrect": false
+                  }
+                ]
+              },
+              {
+                "subtopic": "Testing",
+                "markdownText": "Was prüft ein **Unit Test** normalerweise?",
+                "explanationMarkdown": "Ein Unit Test konzentriert sich auf eine kleine Einheit und isoliert sie möglichst von externen Abhängigkeiten.",
+                "answerOptions": [
+                  {
+                    "markdownText": "Eine kleine, isolierte Programmeinheit",
+                    "isCorrect": true
+                  },
+                  {
+                    "markdownText": "Ausschließlich die Benutzeroberfläche",
+                    "isCorrect": false
+                  },
+                  {
+                    "markdownText": "Immer das vollständige Produktivsystem",
+                    "isCorrect": false
+                  },
+                  {
+                    "markdownText": "Nur die Netzwerkgeschwindigkeit",
+                    "isCorrect": false
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "examSections": [
+    {
+      "name": "AP1",
+      "tips": [
+        {
+          "name": "Aufgaben zuerst überblicken",
+          "markdownText": "# Aufgaben zuerst überblicken\n\nLies zuerst alle Aufgaben und plane danach die verfügbare Zeit."
+        }
+      ]
+    }
+  ]
+}

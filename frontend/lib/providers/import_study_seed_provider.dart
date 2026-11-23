@@ -8,6 +8,7 @@ import 'package:frontend/providers/quizzes_repository_provider.dart';
 import 'package:frontend/providers/study_notes_repository_provider.dart';
 import 'package:frontend/providers/subjects_repository_provider.dart';
 import 'package:frontend/providers/topics_repository_provider.dart';
+import 'package:frontend/providers/subtopics_repository_provider.dart';
 import 'package:frontend/providers/exam_sections_repository_provider.dart';
 import 'package:frontend/providers/exam_tips_repository_provider.dart';
 
@@ -25,6 +26,7 @@ final importStudySeedProvider = Provider<ImportStudySeed>((ref) {
     validation: ref.watch(studySeedValidationProvider),
     subjectsRepository: ref.watch(subjectsRepositoryProvider),
     topicsRepository: ref.watch(topicsRepositoryProvider),
+    subtopicsRepository: ref.watch(subtopicsRepositoryProvider),
     studyNotesRepository: ref.watch(studyNotesRepositoryProvider),
     quizzesRepository: ref.watch(quizzesRepositoryProvider),
     questionsRepository: ref.watch(questionsRepositoryProvider),
