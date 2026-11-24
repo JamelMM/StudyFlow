@@ -1,0 +1,111 @@
+import 'package:frontend/core/database/studyflow_database.dart';
+import 'package:frontend/features/quiz/domain/models/question.dart';
+import 'package:frontend/features/quiz/domain/repositories/questions_repository.dart';
+
+class ToStoreQuestionsRepository implements QuestionsRepository {
+  static const _tableName = 'questions';
+
+  Question _mapRow(Map<String, dynamic> row) {
+    final updatedAt = row['updatedAt'];
+
+    return Question(
+      id: row['id'].toString(),
+      quizId: row['quizId'].toString(),
+      subtopicId: row['subtopicId'].toString(),
+      markdownText: row['markdownText'].toString(),
+      explanationMarkdown: row['explanationMarkdown']?.toString(),
+      createdAt: DateTime.parse(row['createdAt'].toString()),
+      updatedAt: updatedAt == null
+          ? null
+          : DateTime.parse(updatedAt.toString()),
+    );
+  }
+
+  @override
+  Future<Question> addQuestion({
+    required String quizId,
+    required String subtopicId,
+    required String markdownText,
+    String? explanationMarkdown,
+  }) async {
+    final createdAt = DateTime.now();
+
+    final result = await StudyFlowDatabase.db.insert(_tableName, {
+      'quizId': quizId,
+      'subtopicId': subtopicId,
+      'markdownText': markdownText,
+      'createdAt': createdAt.toIso8601String(),
+      'explanationMarkdown': explanationMarkdown,
+      'updatedAt': null,
+    });
+
+    if (result.hasErrors) {
+      throw Exception('Could not create Question.');
+    }
+
+    final generatedId = result.firstPrimaryKey.toString();
+
+    return Question(
+      id: generatedId,
+      quizId: quizId,
+      subtopicId: subtopicId,
+      markdownText: markdownText,
+      createdAt: createdAt,
+      explanationMarkdown: explanationMarkdown,
+    );
+  }
+
+  @override
+  Future<List<Question>> getQuestionsByQuizId(String quizId) async {
+    final result = await StudyFlowDatabase.db.query(_tableName);
+
+    return result.data
+        .where((row) => row['quizId'].toString() == quizId)
+        .map(_mapRow)
+        .toList();
+  }
+
+  @override
+  Future<void> removeQuestion(String id) async {
+    final result = await StudyFlowDatabase.db
+        .delete(_tableName)
+        .where('id', '=', id);
+
+    if (result.hasErrors) {
+      throw Exception('Could not delete question.');
+    }
+  }
+
+  @override
+  Future<void> updateQuestion({
+    required String id,
+    required String subtopicId,
+    required String markdownText,
+    String? explanationMarkdown,
+  }) async {
+    final updatedAt = DateTime.now();
+
+    final result = await StudyFlowDatabase.db
+        .update(_tableName, {
+          'subtopicId': subtopicId,
+          'markdownText': markdownText,
+          'explanationMarkdown': explanationMarkdown,
+          'updatedAt': updatedAt.toIso8601String(),
+        })
+        .where('id', '=', id);
+
+    if (result.hasErrors) {
+      throw Exception('Could not update question.');
+    }
+  }
+
+  @override
+  Stream<List<Question>> watchQuestionsByQuizId(String quizId) {
+    return StudyFlowDatabase.db.query(_tableName).watch().map((rows) {
+      return rows
+          .where((row) => row['quizId'].toString() == quizId)
+          .map(_mapRow)
+          .toList();
+    });
+  }
+}

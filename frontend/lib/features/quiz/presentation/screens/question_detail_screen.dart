@@ -1,0 +1,309 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:frontend/features/quiz/domain/models/answer_option.dart';
+import 'package:frontend/features/quiz/domain/models/question.dart';
+import 'package:frontend/features/quiz/presentation/screens/edit_answer_option.dart';
+import 'package:frontend/features/quiz/presentation/screens/new_answer_option.dart';
+import 'package:frontend/core/widgets/app_snack_bar.dart';
+import 'package:frontend/core/widgets/empty_state_message.dart';
+import 'package:frontend/features/quiz/application/controllers/answer_options_controller.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/features/quiz/application/providers/answer_options_stream_provider.dart';
+import 'package:frontend/core/widgets/question_explanation_card.dart';
+
+class QuestionDetailScreen extends ConsumerStatefulWidget {
+  const QuestionDetailScreen({super.key, required this.question});
+
+  final Question question;
+
+  @override
+  ConsumerState<QuestionDetailScreen> createState() {
+    return _QuestionDetailScreenState();
+  }
+}
+
+class _QuestionDetailScreenState extends ConsumerState<QuestionDetailScreen> {
+  void _openAddAnswerOptionOverlay() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+      builder: (ctx) {
+        return NewAnswerOption(
+          onAddAnswerOption: (markdownText, isCorrect) {
+            _addAnswerOption(markdownText: markdownText, isCorrect: isCorrect);
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _addAnswerOption({
+    required String markdownText,
+    required bool isCorrect,
+  }) async {
+    final errorMessage = await ref
+        .read(answerOptionsControllerProvider(widget.question.id))
+        .addAnswerOption(markdownText: markdownText, isCorrect: isCorrect);
+
+    if (!mounted) {
+      return;
+    }
+
+    if (errorMessage != null) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(appErrorSnackBar(errorMessage));
+      return;
+    }
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appSuccessSnackBar('Answer successfully created'));
+  }
+
+  Future<void> _removeAnswerOption(String id) async {
+    final answerOptionsController = ref.read(
+      answerOptionsControllerProvider(widget.question.id),
+    );
+
+    await answerOptionsController.removeAnswerOption(id);
+
+    if (!mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appDeleteSnackBar('Answer deleted'));
+  }
+
+  Future<bool> _confirmRemoveAnswerOption(AnswerOption answerOption) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Delete answer?'),
+          content: const Text('This answer option will be deleted.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, false);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx, true);
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    return shouldDelete == true;
+  }
+
+  void _openEditAnswerOptionOverlay(AnswerOption answerOption) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
+      builder: (ctx) {
+        return EditAnswerOption(
+          answerOption: answerOption,
+          onUpdateAnswerOption: (markdownText, isCorrect) {
+            _updateAnswerOption(
+              answerOption: answerOption,
+              markdownText: markdownText,
+              isCorrect: isCorrect,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _updateAnswerOption({
+    required AnswerOption answerOption,
+    required String markdownText,
+    required bool isCorrect,
+  }) async {
+    final errorMessage = await ref
+        .read(answerOptionsControllerProvider(widget.question.id))
+        .updateAnswerOption(
+          id: answerOption.id,
+          markdownText: markdownText,
+          isCorrect: isCorrect,
+        );
+
+    if (!mounted) {
+      return;
+    }
+
+    if (errorMessage != null) {
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(appErrorSnackBar(errorMessage));
+      return;
+    }
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(appSuccessSnackBar('Answer successfully updated'));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final answerOptionsAsync = ref.watch(
+      answerOptionsStreamProvider(widget.question.id),
+    );
+    final appBarTheme = Theme.of(context).appBarTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+    final explanationMarkdown = widget.question.explanationMarkdown?.trim();
+
+    final mainContent = answerOptionsAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stackTrace) =>
+          const Center(child: Text('Could not load answers.')),
+      data: (answerOptions) {
+        if (answerOptions.isEmpty) {
+          return EmptyStateMessage(
+            icon: Icons.checklist_outlined,
+            title: 'No answers yet.',
+            message: 'Create answer options for this question.',
+            buttonText: 'Add answer',
+            onPressed: _openAddAnswerOptionOverlay,
+          );
+        }
+
+        return ListView.builder(
+          itemCount: answerOptions.length,
+          itemBuilder: (context, index) {
+            final answerOption = answerOptions[index];
+
+            return Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Icon(
+                      answerOption.isCorrect
+                          ? Icons.check_circle
+                          : Icons.radio_button_unchecked,
+                      color: answerOption.isCorrect
+                          ? const Color(0xFF2F855A)
+                          : colorScheme.onPrimaryContainer,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: MarkdownBody(data: answerOption.markdownText),
+                    ),
+                    PopupMenuButton<String>(
+                      onSelected: (value) async {
+                        if (value == 'edit') {
+                          _openEditAnswerOptionOverlay(answerOption);
+                        }
+
+                        if (value == 'delete') {
+                          final shouldRemove = await _confirmRemoveAnswerOption(
+                            answerOption,
+                          );
+
+                          if (shouldRemove == true) {
+                            _removeAnswerOption(answerOption.id);
+                          }
+                        }
+                      },
+                      itemBuilder: (context) => const [
+                        PopupMenuItem(value: 'edit', child: Text('Edit')),
+                        PopupMenuItem(value: 'delete', child: Text('Delete')),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Question',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: colorScheme.onPrimaryContainer,
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: _openAddAnswerOptionOverlay,
+            icon: const Icon(Icons.add),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Card(
+              color: appBarTheme.backgroundColor ?? colorScheme.primary,
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: MarkdownBody(
+                  data: widget.question.markdownText,
+                  styleSheet: MarkdownStyleSheet(
+                    p: GoogleFonts.sourceSans3(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      height: 1.35,
+                      color:
+                          appBarTheme.foregroundColor ?? colorScheme.onPrimary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            if (explanationMarkdown != null &&
+                explanationMarkdown.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              QuestionExplanationCard(
+                explanationMarkdown: explanationMarkdown,
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+              ),
+            ],
+            const SizedBox(height: 30),
+            Center(
+              child: Text(
+                'Answers',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onPrimaryContainer,
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+            Expanded(child: mainContent),
+          ],
+        ),
+      ),
+    );
+  }
+}

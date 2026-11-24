@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:frontend/models/subtopic.dart';
-import 'package:frontend/screens/quiz_subtopic_selection_sheet.dart';
+import 'package:frontend/features/study_content/domain/models/subtopic.dart';
+import 'package:frontend/features/quiz/presentation/screens/quiz_subtopic_selection_sheet.dart';
 
 void main() {
   testWidgets('subtopic selection requires at least one selection', (

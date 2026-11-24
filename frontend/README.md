@@ -114,19 +114,45 @@ frontend/
 |   |-- screenshots/
 |   `-- study-seed-subtopics-example.json
 |-- lib/
-|   |-- application/             Use cases, validation, play data, imports
-|   |-- controllers/             Create, edit, and delete orchestration
-|   |-- local/tostore/           Database setup, schemas, repositories
-|   |-- models/                  Frontend domain models
-|   |-- providers/               Riverpod dependencies and streams
-|   |-- repositories/contracts/  Persistence abstractions
-|   |-- screens/                 Study Mode and Exam Mode UI
-|   |-- theme/                   Light and dark Material themes
-|   `-- widgets/                 Reusable UI components
-|-- test/
+|   |-- core/
+|   |   |-- database/            ToStore setup and schemas
+|   |   |-- theme/               Light and dark Material themes
+|   |   `-- widgets/             UI shared by multiple features
+|   |-- features/
+|   |   |-- app_shell/           Startup and mode selection
+|   |   |-- exam/                Exam Mode and Practice Exams
+|   |   |-- quiz/                Topic quizzes and quiz play
+|   |   |-- seed_import/         JSON parsing, validation, and import UI
+|   |   `-- study_content/       Subject to Study Note hierarchy
+|   `-- main.dart
+|-- test/                        Tests grouped by feature
 |-- pubspec.yaml
 `-- README.md
 ```
+
+#### Architecture Decision: Feature First
+
+The first implementation used global folders such as `models`, `providers`,
+`controllers`, `repositories`, and `screens`. That layout was easy to start
+with, but a single product change eventually required navigating through many
+folders containing unrelated files.
+
+StudyFlow now groups code by product capability. A developer working on a quiz,
+an exam, content management, or seed import can find the complete flow under one
+feature. Larger features use the following internal layers:
+
+```text
+feature/
+|-- domain/         Models and repository contracts
+|-- data/           ToStore repository implementations
+|-- application/    Controllers, providers, and use cases
+`-- presentation/   Screens and feature-specific widgets
+```
+
+This is a pragmatic feature-first architecture rather than strict Clean
+Architecture. Layer boundaries remain useful, but they serve the product flow
+instead of scattering it. `core` is reserved for infrastructure and UI that is
+actually shared by more than one feature.
 
 The main data flow is:
 
@@ -341,6 +367,25 @@ leer, weil erforderliche Subtopic-Fremdschluessel nicht sicher in bereits
 gefuellte Pre-V1-Tabellen eingefuegt werden konnten. Alte Datenbankdateien werden
 nicht geloescht; ihre Inhalte muessen ueber einen konvertierten Seed erneut
 importiert werden.
+
+### Architekturentscheidung: Feature First
+
+Die erste Version verwendete globale Ordner fuer Modelle, Provider, Controller,
+Repositories und Screens. Das war am Anfang einfach, fuehrte aber spaeter dazu,
+dass eine funktionale Aenderung ueber viele Ordner mit nicht zusammengehoerigen
+Dateien verteilt war.
+
+Der Code ist deshalb jetzt nach Produktfunktionen organisiert: `study_content`,
+`quiz`, `exam`, `seed_import` und `app_shell`. Groessere Features behalten intern
+die Schichten `domain`, `data`, `application` und `presentation`. Dadurch bleibt
+die Abhaengigkeitsrichtung nachvollziehbar, waehrend alle Dateien eines Ablaufs
+nah beieinander liegen. `core` enthaelt nur Datenbank-, Theme- und UI-Code, der
+wirklich von mehreren Features gemeinsam genutzt wird.
+
+Diese Struktur ist bewusst pragmatisch und keine starre Clean Architecture. Sie
+soll die Suche nach Dateien vereinfachen, zusammengehoerige Aenderungen buendeln
+und neue Funktionen wie Verlauf, Karteikarten und Wiederholungsplanung klar
+abgrenzen.
 
 ### Pruefung, Start und Build
 

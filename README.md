@@ -121,16 +121,25 @@ Main frontend folders:
 
 ```text
 frontend/lib/
-|-- application/             Use cases, validation, play data, seed import
-|-- controllers/             User actions and orchestration
-|-- local/tostore/           Database schemas and repository implementations
-|-- models/                  Local domain models
-|-- providers/               Riverpod dependency and stream providers
-|-- repositories/contracts/  Persistence abstractions
-|-- screens/                 Study Mode and Exam Mode screens
-|-- theme/                   Shared light and dark themes
-`-- widgets/                 Reusable UI components
+|-- core/                    Shared database, theme, and UI building blocks
+|-- features/
+|   |-- app_shell/           Startup and mode selection
+|   |-- exam/                Exam Sections, Tips, and Practice Exams
+|   |-- quiz/                Topic quizzes and quiz play
+|   |-- seed_import/         JSON parsing, validation, and import UI
+|   `-- study_content/       Subjects, Topics, Subtopics, and Study Notes
+`-- main.dart
 ```
+
+StudyFlow originally grouped every model, provider, controller, repository, and
+screen in a global technical folder. As the application grew, changing one
+workflow required searching across many unrelated directories. The frontend now
+uses a feature-first structure: files that change together live together.
+
+Larger features keep internal `domain`, `data`, `application`, and
+`presentation` layers. This preserves repository abstractions and dependency
+direction without introducing a separate feature for every entity. Shared code
+belongs in `core` only when it is genuinely used by multiple features.
 
 ### Current Backend Status
 
@@ -275,6 +284,30 @@ Flutter Screen
 -> ToStore Repository
 -> Lokale ToStore-Datenbank
 ```
+
+Das Frontend ist nach Features organisiert:
+
+```text
+frontend/lib/
+|-- core/                    Gemeinsame Datenbank-, Theme- und UI-Bausteine
+|-- features/
+|   |-- app_shell/           Start und Modusauswahl
+|   |-- exam/                Exam Sections, Tips und Practice Exams
+|   |-- quiz/                Topic Quizzes und Quiz-Ablauf
+|   |-- seed_import/         JSON-Parsing, Validierung und Import
+|   `-- study_content/       Subjects, Topics, Subtopics und Study Notes
+`-- main.dart
+```
+
+Urspruenglich lagen Modelle, Provider, Controller, Repositories und Screens in
+globalen technischen Ordnern. Mit wachsendem Umfang mussten Aenderungen an
+einem Ablauf in vielen getrennten Ordnern gesucht werden. Deshalb liegen jetzt
+alle Dateien, die zu einem Feature gehoeren und gemeinsam geaendert werden, am
+selben Ort.
+
+Groessere Features behalten intern die Schichten `domain`, `data`,
+`application` und `presentation`. Gemeinsamer Code kommt nur dann nach `core`,
+wenn er tatsaechlich von mehreren Features verwendet wird.
 
 ### Backend-Stand
 
